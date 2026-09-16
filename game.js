@@ -114,6 +114,9 @@ async function createAccount(){
         username
     );
 
+    document.getElementById("playerUsername").textContent =
+        username;
+
     await saveLeaderboardStats();
 }
 
