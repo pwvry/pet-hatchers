@@ -35,19 +35,32 @@ document
     .getElementById("logoutButton")
     .addEventListener("click", async () => {
 
+        if(!currentUser){
+
+            document
+                .getElementById("accountScreen")
+                .classList.remove("hidden");
+
+            return;
+        }
+
         await supabaseClient.auth.signOut();
 
         currentUser = null;
 
         document
             .getElementById("accountScreen")
-            .style.display = "flex";
+            .classList.remove("hidden");
 
         document
             .getElementById("playerUsername")
             .textContent = "";
 
-    });
+        document
+            .getElementById("logoutButton")
+            .textContent = "LOGIN";
+
+    });   
 
 async function createAccount(){
 
@@ -147,6 +160,29 @@ async function createAccount(){
 
     currentUser = data.user;
 
+    const localSave =
+        localStorage.getItem(SAVE_KEY);
+
+    let localGameData = null;
+
+    if(localSave){
+
+        try{
+
+            localGameData =
+                JSON.parse(localSave);
+
+        }catch(e){
+
+            console.error(
+                "Local save migration error:",
+                e
+            );
+
+        }
+
+    }
+
     const {
         error: usernameError
     } = await supabaseClient
@@ -181,6 +217,10 @@ async function createAccount(){
     document
         .getElementById("accountScreen")
         .style.display = "none";
+
+    await load();
+
+    updateUI();
 
     await saveLeaderboardStats();
     await loadLeaderboards();
@@ -233,6 +273,10 @@ async function loginAccount(){
     }
 
     currentUser = data.user;
+
+    document
+        .getElementById("logoutButton")
+        .textContent = "LOG OUT";
 
     const {
         data: usernameData,
@@ -291,11 +335,34 @@ async function saveLeaderboardStats(){
     const username =
         localStorage.getItem("playerUsername");
 
+    const {
+        error
+    } = await supabaseClient
+        .from("leaderboards")
+        .upsert({
+            user_id: currentUser.id,
+            username: username,
+            eggs_hatched: totalHatches,
+            coins: coins,
+            rebirths: rebirths,
+            playtime: playTime,
+            updated_at: new Date().toISOString()
+        });
+
+    if(error){
+
+        console.error(
+            "Leaderboard save error:",
+            error
+        );
+
+        return;
+    }
+
     console.log(
         "Leaderboard stats saved!"
     );
 }
-
 async function initializeLeaderboard(){
 
     await getCurrentUser();
@@ -4689,14 +4756,26 @@ document.getElementById("craftAllMachineButton").addEventListener("click", () =>
 
 async function restoreLogin(){
 
+    document
+        .getElementById("logoutButton")
+        .textContent = "LOGIN";
+
     const loggedInUser =
         await getCurrentUser();
 
     if(!loggedInUser){
+
+        document
+            .getElementById("accountScreen")
+            .classList.remove("hidden");
+
         return;
     }
 
     currentUser = loggedInUser;
+    document
+        .getElementById("logoutButton")
+        .textContent = "LOG OUT";
 
     const {
         data: usernameData,
