@@ -4819,5 +4819,3 @@ setInterval(() => {
     updateUI();
 
 }, 1000);
-
-save();
