@@ -4863,6 +4863,20 @@ restoreLogin().then(() => {
             ? "LOG OUT"
             : "LOGIN";
 
+    document
+        .getElementById("gameScreen")
+        .classList.toggle(
+            "hidden",
+            !currentUser
+        );
+
+    document
+        .getElementById("accountScreen")
+        .classList.toggle(
+            "hidden",
+            !!currentUser
+        );
+
     initializeLeaderboard();
 
     MAX_EQUIPPED = getMaxEquipped();
@@ -4876,7 +4890,6 @@ restoreLogin().then(() => {
     updateRebirthButtons();
 
 });
-
 supabaseClient
     .channel("leaderboards-live")
     .on(
