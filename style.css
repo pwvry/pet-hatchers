@@ -2323,6 +2323,10 @@ button{
     background: #0f172a;
 }
 
+.account-screen.hidden {
+    display: none;
+}
+
 .account-card {
     width: min(420px, 90%);
     padding: 35px;
@@ -2347,10 +2351,74 @@ button{
 }
 
 .account-card button {
+
     width: 100%;
     padding: 14px;
+    margin-top: 10px;
     border: none;
     border-radius: 10px;
     font-weight: bold;
+    font-size: 15px;
     cursor: pointer;
+    color: white;
+    transition: 0.2s ease;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+
+}
+
+.account-card button:hover {
+
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 70, 229, 0.5);
+
+}
+
+.account-card button:active {
+
+    transform: translateY(0);
+
+}
+
+#loginButton {
+
+    background: #334155;
+    box-shadow: none;
+
+}
+
+#loginButton:hover {
+
+    background: #475569;
+    box-shadow: 0 6px 18px rgba(71, 85, 105, 0.35);
+
+}
+
+#logoutButton {
+
+    margin-left: 12px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    background: #334155;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+
+}
+
+#logoutButton:hover {
+
+    background: #ef4444;
+    border-color: #ef4444;
+    transform: translateY(-1px);
+
+}
+
+#logoutButton:active {
+
+    transform: translateY(0);
+
 }

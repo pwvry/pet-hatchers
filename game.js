@@ -23,42 +23,56 @@ async function getCurrentUser(){
     return user;
 }
 
-async function createPlayerAccount(){
-
-    const {
-        data,
-        error
-    } = await supabaseClient.auth.signInAnonymously();
-
-    if(error){
-
-        console.error(
-            "Supabase login error:",
-            error
-        );
-
-        return null;
-    }
-
-    currentUser = data.user;
-
-    return data.user;
-}
-
 document
     .getElementById("createAccountButton")
     .addEventListener("click", createAccount);
+
+document
+    .getElementById("loginButton")
+    .addEventListener("click", loginAccount);
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", async () => {
+
+        await supabaseClient.auth.signOut();
+
+        currentUser = null;
+
+        document
+            .getElementById("accountScreen")
+            .style.display = "flex";
+
+        document
+            .getElementById("playerUsername")
+            .textContent = "";
+
+    });
 
 async function createAccount(){
 
     const usernameInput =
         document.getElementById("usernameInput");
 
+    const emailInput =
+        document.getElementById("emailInput");
+
+    const passwordInput =
+        document.getElementById("passwordInput");
+
     const accountError =
         document.getElementById("accountError");
 
     const username =
         usernameInput.value.trim();
+
+    const email =
+        emailInput.value.trim();
+
+    const password =
+        passwordInput.value;
+
+    accountError.textContent = "";
 
     if(username.length < 3){
         accountError.textContent =
@@ -72,50 +86,196 @@ async function createAccount(){
         return;
     }
 
-    const user =
-        await createPlayerAccount();
-
-    if(!user){
+    if(!email){
         accountError.textContent =
-            "Unable to create account.";
+            "Please enter your email.";
         return;
     }
 
-    const { error } =
-        await supabaseClient
-            .from("leaderboards")
-            .upsert({
-                user_id: user.id,
-                username: username,
-                eggs_hatched: 0,
-                clicks: 0,
-                rebirths: 0,
-                playtime: 0,
-                updated_at: new Date().toISOString()
-            });
+    if(password.length < 6){
+        accountError.textContent =
+            "Password must be at least 6 characters.";
+        return;
+    }
+
+    const {
+        data: existingUsername,
+        error: usernameCheckError
+    } = await supabaseClient
+        .from("usernames")
+        .select("username")
+        .eq("username", username)
+        .maybeSingle();
+
+    if(usernameCheckError){
+        console.error(
+            "Username check error:",
+            usernameCheckError
+        );
+
+        accountError.textContent =
+            "Unable to check username.";
+
+        return;
+    }
+
+    if(existingUsername){
+        accountError.textContent =
+            "Username already taken.";
+        return;
+    }
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password
+    });
 
     if(error){
-        console.error("Account creation error:", error);
+        console.error(
+            "Account creation error:",
+            error
+        );
 
         accountError.textContent =
-            "Unable to save account.";
+            error.message;
 
         return;
     }
 
-    document
-        .getElementById("accountScreen")
-        .style.display = "none";
+    currentUser = data.user;
 
-    currentUser = user;
+    const {
+        error: usernameError
+    } = await supabaseClient
+        .from("usernames")
+        .insert({
+            username: username,
+            user_id: currentUser.id
+        });
+
+    if(usernameError){
+
+        console.error(
+            "Username creation error:",
+            usernameError
+        );
+
+        accountError.textContent =
+            "Unable to save username.";
+
+        return;
+    }
 
     localStorage.setItem(
         "playerUsername",
         username
     );
 
-    document.getElementById("playerUsername").textContent =
-        username;
+    document
+        .getElementById("playerUsername")
+        .textContent = username;
+
+    document
+        .getElementById("accountScreen")
+        .style.display = "none";
+
+    await saveLeaderboardStats();
+    await loadLeaderboards();
+}
+
+async function loginAccount(){
+
+    const email =
+        document.getElementById("emailInput").value.trim();
+
+    const password =
+        document.getElementById("passwordInput").value;
+
+    const accountError =
+        document.getElementById("accountError");
+
+    accountError.textContent = "";
+
+    if(!email){
+        accountError.textContent =
+            "Please enter your email.";
+        return;
+    }
+
+    if(!password){
+        accountError.textContent =
+            "Please enter your password.";
+        return;
+    }
+
+    const {
+        data,
+        error
+    } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if(error){
+
+        console.error(
+            "Login error:",
+            error
+        );
+
+        accountError.textContent =
+            "Incorrect email or password.";
+
+        return;
+    }
+
+    currentUser = data.user;
+
+    const {
+        data: usernameData,
+        error: usernameError
+    } = await supabaseClient
+        .from("usernames")
+        .select("username")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+    if(usernameError){
+
+        console.error(
+            "Username lookup error:",
+            usernameError
+        );
+
+        accountError.textContent =
+            "Unable to load account.";
+
+        return;
+    }
+
+    if(usernameData){
+
+        localStorage.setItem(
+            "playerUsername",
+            usernameData.username
+        );
+
+        document
+            .getElementById("playerUsername")
+            .textContent =
+            usernameData.username;
+    }
+
+    document
+        .getElementById("accountScreen")
+        .style.display = "none";
+
+    await load();
+
+    updateUI();
 
     await saveLeaderboardStats();
 }
@@ -130,30 +290,6 @@ async function saveLeaderboardStats(){
 
     const username =
         localStorage.getItem("playerUsername");
-
-    const {
-        error
-    } = await supabaseClient
-        .from("leaderboards")
-        .upsert({
-            user_id: currentUser.id,
-            username: username,
-            eggs_hatched: totalHatches,
-            coins: coins,
-            rebirths: rebirths,
-            playtime: playTime,
-            updated_at: new Date().toISOString()
-        });
-
-    if(error){
-
-        console.error(
-            "Leaderboard save error:",
-            error
-        );
-
-        return;
-    }
 
     console.log(
         "Leaderboard stats saved!"
@@ -4439,19 +4575,53 @@ document.getElementById("craftAllMachineButton").addEventListener("click", () =>
 
 load();
 
-const savedUsername =
-    localStorage.getItem("playerUsername");
+async function restoreLogin(){
 
-if(savedUsername){
-    document.getElementById("playerUsername").textContent =
-        savedUsername;
+    const loggedInUser =
+        await getCurrentUser();
+
+    if(!loggedInUser){
+        return;
+    }
+
+    const {
+        data: usernameData,
+        error: usernameError
+    } = await supabaseClient
+        .from("usernames")
+        .select("username")
+        .eq("user_id", loggedInUser.id)
+        .maybeSingle();
+
+    if(usernameError){
+
+        console.error(
+            "Username restore error:",
+            usernameError
+        );
+
+        return;
+    }
+
+    if(usernameData){
+
+        localStorage.setItem(
+            "playerUsername",
+            usernameData.username
+        );
+
+        document
+            .getElementById("playerUsername")
+            .textContent =
+            usernameData.username;
+
+        document
+            .getElementById("accountScreen")
+            .classList.add("hidden");
+    }
 }
 
-if(savedUsername){
-    document
-        .getElementById("accountScreen")
-        .style.display = "none";
-}
+restoreLogin();
 
 initializeLeaderboard();
 

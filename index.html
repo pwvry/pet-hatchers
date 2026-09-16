@@ -13,7 +13,8 @@
   <div class="brand"><div class="brand-icon">🐾</div><div><h1>Pet Hatchers</h1><p>Build your ultimate pet collection!</p></div></div>
 
     <div class="player-account">
-        👤 <span id="playerUsername">Player</span>
+        👤 <span id="playerUsername"></span>
+        <button id="logoutButton">LOG OUT</button>
     </div>
 
   <div class="currency">
@@ -22,23 +23,41 @@
   </div>
 </header>
 
-<div id="accountScreen" class="account-screen">
+<div id="accountScreen" class="account-screen hidden">
 
     <div class="account-card">
 
         <h2>🐾 Welcome to Pet Hatchers!</h2>
 
-        <p>Create your player account to begin.</p>
+        <p id="accountModeText">
+            Create your account to begin.
+        </p>
 
         <input
             type="text"
             id="usernameInput"
-            placeholder="Enter username"
+            placeholder="Username"
             maxlength="16"
+        >
+
+        <input
+            type="email"
+            id="emailInput"
+            placeholder="Email"
+        >
+
+        <input
+            type="password"
+            id="passwordInput"
+            placeholder="Password"
         >
 
         <button id="createAccountButton">
             CREATE ACCOUNT
+        </button>
+
+        <button id="loginButton">
+            LOGIN
         </button>
 
         <p id="accountError"></p>
