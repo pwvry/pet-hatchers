@@ -4318,7 +4318,7 @@ function renderInventory(){
                 <strong>${pet}</strong>
 
                 <small>
-                    ×${getPetMultiplier(pet).toFixed(2)}
+                    ×${formatCoins(getPetMultiplier(pet))}
                     click power
                 </small>
 
@@ -4409,28 +4409,88 @@ function renderInventory(){
         }
 
 
-        return `
-            <div class="pet-card">
+                return ` 
+            <div class="pet-card"> 
+ 
+                <div class="emoji"> 
+                    ${emojiForPet(name)} 
+                </div> 
+ 
+                <strong>${name}</strong> 
+ 
+                <small> 
+                    Owned: ${formatCoins(owned)}
+                    <br>
+                    Equipped: ${formatCoins(equipped)}
+                    · Available: ${formatCoins(available)}
+                    <br>
+                    ⚡ ×${formatCoins(getPetMultiplier(name))} click power
+                </small> 
+ 
+                <div class="pet-card-buttons">
+                    ${button}
 
-                <div class="emoji">
-                    ${emojiForPet(name)}
+                    <button
+                        class="delete-pet-button"
+                        onclick="deletePet('${name.replace(/'/g, "\\'")}')"
+                    >
+                        🗑️ DELETE
+                    </button>
                 </div>
-
-                <strong>${name}</strong>
-
-                <small>
-                    Owned: ${owned}
-                    · Equipped: ${equipped}
-                    · Available: ${available}
-                    · ×${getPetMultiplier(name).toFixed(2)}
-                </small>
-
-                ${button}
-
-            </div>
+ 
+            </div> 
         `;
 
     }).join("");
+}
+
+function deletePet(name){
+
+    const owned =
+        inventory[name] || 0;
+
+    if(owned <= 0){
+        return;
+    }
+
+    const equipped =
+        equippedPets.filter(
+            pet => pet === name
+        ).length;
+
+    const available =
+        owned - equipped;
+
+    if(available <= 0){
+
+        showNotification(
+            "🔒 Pet Equipped",
+            "All copies of this pet are equipped."
+        );
+
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            `Delete ALL ${formatCoins(available)} unequipped ${name}?\n\n` +
+            `${formatCoins(equipped)} equipped will be kept.\n\n` +
+            `This cannot be undone.`
+        );
+
+    if(!confirmed){
+        return;
+    }
+
+    inventory[name] = equipped;
+
+    if(inventory[name] <= 0){
+        delete inventory[name];
+    }
+
+    renderInventory();
+    updateUI();
+    save();
 }
 
 function updateUpgradeUI(){
