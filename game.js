@@ -2154,6 +2154,18 @@ async function load(){
 
                 accountResetVersion = 0;
 
+                await supabaseClient
+                    .from("player_data")
+                    .update({
+                        game_data: {},
+                        reset_version: 0,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq(
+                        "user_id",
+                        currentUser.id
+                    );
+
             }else{
 
                 raw =
