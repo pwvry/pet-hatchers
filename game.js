@@ -53,6 +53,10 @@ document
             .classList.remove("hidden");
 
         document
+            .getElementById("gameScreen")
+            .classList.add("hidden");
+
+        document
             .getElementById("playerUsername")
             .textContent = "";
 
@@ -218,6 +222,10 @@ async function createAccount(){
         .getElementById("accountScreen")
         .style.display = "none";
 
+    document
+        .getElementById("gameScreen")
+        .classList.remove("hidden");
+
     await load();
 
     updateUI();
@@ -316,6 +324,10 @@ async function loginAccount(){
     document
         .getElementById("accountScreen")
         .style.display = "none";
+
+    document
+        .getElementById("gameScreen")
+        .classList.remove("hidden");
 
     await load();
 
@@ -4769,10 +4781,27 @@ async function restoreLogin(){
             .getElementById("accountScreen")
             .classList.remove("hidden");
 
+        document
+            .getElementById("gameScreen")
+            .classList.remove("hidden");
+
+        document
+            .getElementById("gameScreen")
+            .classList.add("hidden");
+
         return;
     }
 
     currentUser = loggedInUser;
+
+    document
+    .getElementById("accountScreen")
+    .classList.add("hidden");
+
+    document
+        .getElementById("gameScreen")
+        .classList.remove("hidden");
+
     document
         .getElementById("logoutButton")
         .textContent = "LOG OUT";
