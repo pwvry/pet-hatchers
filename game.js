@@ -2152,6 +2152,8 @@ async function load(){
                     SAVE_KEY
                 );
 
+                accountResetVersion = 0;
+
             }else{
 
                 raw =
