@@ -15,6 +15,10 @@
     <div class="player-account">
         👤 <span id="playerUsername"></span>
         <button id="logoutButton">LOGIN</button>
+
+        <button id="adminButton" class="admin-button hidden">
+            👑 ADMIN
+        </button>
     </div>
 
   <div class="currency">
@@ -67,6 +71,76 @@
 </div>
 
 <div id="gameScreen" class="game-layout hidden">
+    <div id="adminPanel" class="admin-panel hidden">
+
+    <div class="admin-card">
+
+        <div class="admin-title">
+            👑 ADMIN PANEL
+        </div>
+
+        <div class="admin-subtitle">
+            Pet Hatchers Control Center
+        </div>
+
+        <input
+            type="text"
+            id="adminPlayerSearch"
+            placeholder="Enter username"
+            maxlength="16"
+        >
+
+        <button id="adminSearchButton">
+            SEARCH PLAYER
+        </button>
+
+        <p id="adminPlayerResult"></p>
+
+        <div id="adminControls" class="admin-controls hidden">
+
+            <h3 id="adminTargetName"></h3>
+
+            <label>💰 Coins</label>
+            <input
+                type="number"
+                id="adminCoins"
+                placeholder="Coins"
+            >
+
+            <label>💎 Gems</label>
+            <input
+                type="number"
+                id="adminGems"
+                placeholder="Gems"
+            >
+
+            <label>🔄 Rebirths</label>
+            <input
+                type="number"
+                id="adminRebirths"
+                placeholder="Rebirths"
+            >
+
+            <label>⚡ Click Power</label>
+            <input
+                type="number"
+                id="adminClickPower"
+                placeholder="Click Power"
+            >
+
+            <button id="adminSaveButton">
+                💾 SAVE CHANGES
+            </button>
+
+            <button id="adminResetButton">
+                🗑️ RESET PLAYER
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 <aside class="sidebar">
   <button class="nav active" data-page="eggs">🥚 <span>Eggs</span></button>
   <button class="nav" data-page="inventory">🎒 <span>Inventory</span></button>

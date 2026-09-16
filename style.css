@@ -2474,3 +2474,110 @@ button{
     background: linear-gradient(135deg, #22c55e, #16a34a);
     box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
 }
+
+.admin-panel {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 30px 20px;
+}
+
+.admin-card {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 30px;
+    background: #111827;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+}
+
+.admin-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 900;
+    color: #c084fc;
+    margin-bottom: 5px;
+}
+
+.admin-subtitle {
+    text-align: center;
+    color: #94a3b8;
+    margin-bottom: 25px;
+}
+
+.admin-card input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin: 7px 0 15px;
+    border: none;
+    border-radius: 9px;
+    background: #1e293b;
+    color: white;
+    font-size: 15px;
+}
+
+.admin-card label {
+    display: block;
+    color: #cbd5e1;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.admin-card button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(124,58,237,0.35);
+}
+
+.admin-card button:active {
+    transform: translateY(0);
+}
+
+#adminResetButton {
+    background: #dc2626;
+}
+
+#adminResetButton:hover {
+    background: #ef4444;
+}
+
+#adminPlayerResult {
+    text-align: center;
+    min-height: 20px;
+    color: #facc15;
+}
+
+.admin-controls h3 {
+    text-align: center;
+    color: #c084fc;
+    margin: 20px 0;
+}
+
+.admin-button {
+    margin-left: 8px;
+    padding: 7px 12px;
+    border: 1px solid #a855f7;
+    border-radius: 8px;
+    background: #581c87;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.admin-button:hover {
+    background: #7e22ce;
+}

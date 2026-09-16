@@ -51,6 +51,15 @@ document
         await supabaseClient.auth.signOut();
 
         currentUser = null;
+        document
+            .getElementById("adminButton")
+            .classList
+            .add("hidden");
+
+        document
+            .getElementById("adminPanel")
+            .classList
+            .add("hidden");
 
         document
             .getElementById("accountScreen")
@@ -285,6 +294,7 @@ async function loginAccount(){
     }
 
     currentUser = data.user;
+    await checkAdmin();
 
     document
         .getElementById("logoutButton")
@@ -534,6 +544,9 @@ let selectedRebirthAmount = 1;
 let gems = 0;
 let rebirthUpgradeLevel = 0;
 const MAX_REBIRTH_UPGRADE = 15;
+
+let adminTargetUserId = null;
+let adminTargetUsername = null;
 
 let clickSpeedLevel = 0;
 let multiplierLevel = 0;
@@ -4606,6 +4619,233 @@ document.getElementById("toggleAutoRebirthButton").addEventListener(
     toggleAutoRebirth
 );
 
+document
+    .getElementById("adminSearchButton")
+    .addEventListener("click", async () => {
+
+        const username =
+            document
+                .getElementById("adminPlayerSearch")
+                .value
+                .trim();
+
+        const result =
+            document
+                .getElementById("adminPlayerResult");
+
+        const controls =
+            document
+                .getElementById("adminControls");
+
+        result.textContent = "";
+        controls.classList.add("hidden");
+
+        if(!username){
+            result.textContent =
+                "Enter a username.";
+            return;
+        }
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("usernames")
+            .select("username, user_id")
+            .eq("username", username)
+            .maybeSingle();
+
+        if(error){
+
+            console.error(
+                "Admin search error:",
+                error
+            );
+
+            result.textContent =
+                "Search failed.";
+
+            return;
+        }
+
+        if(!data){
+
+            result.textContent =
+                "Player not found.";
+
+            return;
+        }
+
+        adminTargetUserId =
+            data.user_id;
+
+        adminTargetUsername =
+            data.username;
+
+        document
+            .getElementById("adminTargetName")
+            .textContent =
+            "Editing: " + data.username;
+
+        result.textContent =
+            "Player found.";
+
+        controls.classList.remove("hidden");
+
+    });
+
+document
+    .getElementById("adminSaveButton")
+    .addEventListener("click", async () => {
+
+        if(!adminTargetUserId){
+            return;
+        }
+
+        const changes = {};
+
+        const coinsValue =
+            document
+                .getElementById("adminCoins")
+                .value;
+
+        const gemsValue =
+            document
+                .getElementById("adminGems")
+                .value;
+
+        const rebirthsValue =
+            document
+                .getElementById("adminRebirths")
+                .value;
+
+        const clickPowerValue =
+            document
+                .getElementById("adminClickPower")
+                .value;
+
+        if(coinsValue !== ""){
+            changes.coins =
+                Number(coinsValue);
+        }
+
+        if(gemsValue !== ""){
+            changes.gems =
+                Number(gemsValue);
+        }
+
+        if(rebirthsValue !== ""){
+            changes.rebirths =
+                Number(rebirthsValue);
+        }
+
+        if(clickPowerValue !== ""){
+            changes.clickPower =
+                Number(clickPowerValue);
+        }
+
+        if(Object.keys(changes).length === 0){
+            alert("Enter at least one value.");
+            return;
+        }
+
+        const {
+            error
+        } = await supabaseClient
+            .rpc(
+                "admin_update_player",
+                {
+                    target_user_id:
+                        adminTargetUserId,
+
+                    changes:
+                        changes
+                }
+            );
+
+        if(error){
+
+            console.error(
+                "Admin update error:",
+                error
+            );
+
+            alert(
+                "Admin update failed."
+            );
+
+            return;
+        }
+
+        alert(
+            adminTargetUsername +
+            " updated successfully."
+        );
+
+    });
+
+document
+    .getElementById("adminResetButton")
+    .addEventListener("click", async () => {
+
+        if(!adminTargetUserId){
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                "Reset " +
+                adminTargetUsername +
+                "'s entire game?"
+            );
+
+        if(!confirmed){
+            return;
+        }
+
+        const {
+            error
+        } = await supabaseClient
+            .rpc(
+                "admin_reset_player",
+                {
+                    target_user_id:
+                        adminTargetUserId
+                }
+            );
+
+        if(error){
+
+            console.error(
+                "Admin reset error:",
+                error
+            );
+
+            alert(
+                "Reset failed."
+            );
+
+            return;
+        }
+
+        alert(
+            adminTargetUsername +
+            " has been reset."
+        );
+
+    });
+
+document
+    .getElementById("adminButton")
+    .addEventListener("click", () => {
+
+        document
+            .getElementById("adminPanel")
+            .classList
+            .toggle("hidden");
+
+    });
+
 document.getElementById("shopClickMultiplierButton").addEventListener("click", () => {
 
     if(shopClickMultiplier >= MAX_SHOP_CLICK_MULTIPLIER){
@@ -5094,6 +5334,7 @@ async function restoreLogin(){
     }
 
     currentUser = loggedInUser;
+    await checkAdmin();
 
     document
     .getElementById("accountScreen")
@@ -5153,6 +5394,53 @@ async function restoreLogin(){
         renderAchievements();
         renderClickSkins();
         updateRebirthButtons();
+    }
+}
+
+async function checkAdmin(){
+
+    if(!currentUser){
+        return;
+    }
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("admin_users")
+        .select("user_id")
+        .eq(
+            "user_id",
+            currentUser.id
+        )
+        .maybeSingle();
+
+    if(error){
+
+        console.error(
+            "Admin check error:",
+            error
+        );
+
+        return;
+    }
+
+    const adminButton =
+        document
+            .getElementById("adminButton");
+
+    if(data){
+
+        adminButton
+            .classList
+            .remove("hidden");
+
+    }else{
+
+        adminButton
+            .classList
+            .add("hidden");
+
     }
 }
 
