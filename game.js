@@ -1066,7 +1066,7 @@ function upgradeAutoRebirth(){
         return;
     }
 
-    const cost = 1;
+    const cost = 100;
 
     if(gems < cost){
 
@@ -1921,6 +1921,11 @@ function updateUI(){
             autoRebirthEnabled
                 ? "🟢 AUTO REBIRTH: ON"
                 : "🔴 AUTO REBIRTH: OFF";
+
+        toggleAutoRebirthButton.classList.toggle(
+            "active",
+            autoRebirthEnabled
+        );
 
     }else{
 

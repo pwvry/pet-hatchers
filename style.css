@@ -2422,3 +2422,55 @@ button{
     transform: translateY(0);
 
 }
+
+/* ============================= */
+/* 🔄 AUTO REBIRTH CONTROLS      */
+/* ============================= */
+
+#autoRebirthControls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+#selectAutoRebirthButton,
+#toggleAutoRebirthButton {
+    min-width: 190px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#selectAutoRebirthButton {
+    background: linear-gradient(135deg, #6c63ff, #8e7dff);
+    color: white;
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+#toggleAutoRebirthButton {
+    background: linear-gradient(135deg, #555, #333);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+#selectAutoRebirthButton:hover,
+#toggleAutoRebirthButton:hover {
+    transform: translateY(-2px);
+}
+
+#selectAutoRebirthButton:active,
+#toggleAutoRebirthButton:active {
+    transform: translateY(0);
+}
+
+/* 🟢 Auto-Rebirth ON */
+#toggleAutoRebirthButton.active {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+}
