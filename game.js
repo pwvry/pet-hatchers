@@ -1861,8 +1861,9 @@ if(luckyBoostActive){
     updateUpgradeUI();
 }
 
-function save(){
-    localStorage.setItem(SAVE_KEY,JSON.stringify({
+async function save(){
+
+    const gameData = {
         coins,
         gems,
         clickPower,
@@ -1899,29 +1900,94 @@ function save(){
         equippedClickSkin,
         shopPurchases,
         mysteryBoxesOpened
-        }));
+    };
+
+    localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(gameData)
+    );
+
+    if(currentUser){
+
+        const {
+            error
+        } = await supabaseClient
+            .from("player_data")
+            .upsert({
+                user_id: currentUser.id,
+                game_data: gameData,
+                updated_at: new Date().toISOString()
+            });
+
+        if(error){
+            console.error(
+                "Online save error:",
+                error
+            );
+        }
+    }
 
     saveLeaderboardStats();
 }
 
-function load(){
-    const raw=localStorage.getItem(SAVE_KEY);
+async function load(){
+
+    let raw =
+        localStorage.getItem(SAVE_KEY);
+
+    if(currentUser){
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("player_data")
+            .select("game_data")
+            .eq("user_id", currentUser.id)
+            .maybeSingle();
+
+        if(error){
+
+            console.error(
+                "Online load error:",
+                error
+            );
+
+        }else if(data?.game_data){
+
+            raw =
+                JSON.stringify(data.game_data);
+
+            localStorage.setItem(
+                SAVE_KEY,
+                raw
+            );
+        }
+    }
+
     if(!raw) return;
+
     try{
-        const d=JSON.parse(raw);
+
+        const d =
+            JSON.parse(raw);
+
         coins=d.coins ?? coins;
         gems=d.gems ?? gems;
         playTime=d.playTime ?? playTime;
         clickPower=d.clickPower ?? clickPower;
         rebirths=d.rebirths ?? rebirths;
         rebirthCost=d.rebirthCost ?? rebirthCost;
+
         rebirthUpgradeLevel =
-        Math.min(
-            d.rebirthUpgradeLevel ?? rebirthUpgradeLevel,
-            MAX_REBIRTH_UPGRADE
-        );
+            Math.min(
+                d.rebirthUpgradeLevel ?? rebirthUpgradeLevel,
+                MAX_REBIRTH_UPGRADE
+            );
+
         clickSpeedLevel =
-        d.clickSpeedLevel ?? clickSpeedLevel;
+            d.clickSpeedLevel ?? clickSpeedLevel;
+
         multiplierLevel =
             d.multiplierLevel ?? multiplierLevel;
 
@@ -1964,11 +2030,22 @@ function load(){
         shopClickMultiplierCost =
             d.shopClickMultiplierCost ?? shopClickMultiplierCost;
 
-        selectedEgg=d.selectedEgg ?? selectedEgg;
-        unlockedEggs=new Set(d.unlockedEggs ?? ["Starter Egg"]);
+        selectedEgg =
+            d.selectedEgg ?? selectedEgg;
+
+        unlockedEggs =
+            new Set(
+                d.unlockedEggs ?? ["Starter Egg"]
+            );
+
         unlockedEggs.add("Starter Egg");
-        inventory=d.inventory ?? {};
-        discovered=new Set(d.discovered ?? []);
+
+        inventory =
+            d.inventory ?? {};
+
+        discovered =
+            new Set(d.discovered ?? []);
+
         totalHatches =
             d.totalHatches ?? 0;
 
@@ -1979,51 +2056,86 @@ function load(){
             d.bestHatchStreak ?? 0;
 
         unlockedAchievements =
-            new Set(d.unlockedAchievements ?? []);
+            new Set(
+                d.unlockedAchievements ?? []
+            );
 
         ownedClickSkins =
-            new Set(d.ownedClickSkins ?? ["Classic"]);
+            new Set(
+                d.ownedClickSkins ?? ["Classic"]
+            );
 
         ownedClickSkins.add("Classic");
 
         equippedClickSkin =
             d.equippedClickSkin ?? "Classic";
 
-        if(!ownedClickSkins.has(equippedClickSkin)){
-            equippedClickSkin = "Classic";
+        if(
+            !ownedClickSkins.has(
+                equippedClickSkin
+            )
+        ){
+
+            equippedClickSkin =
+                "Classic";
         }
 
-        shopPurchases = d.shopPurchases ?? 0;
-        mysteryBoxesOpened = d.mysteryBoxesOpened ?? 0;
+        shopPurchases =
+            d.shopPurchases ?? 0;
+
+        mysteryBoxesOpened =
+            d.mysteryBoxesOpened ?? 0;
 
         equippedPets =
-    Array.isArray(d.equippedPets)
-        ? d.equippedPets
-        : [];
+            Array.isArray(d.equippedPets)
+                ? d.equippedPets
+                : [];
 
-equippedPets =
-    equippedPets
-        .filter(pet => inventory[pet] !== undefined)
-        .slice(0, getMaxEquipped());
-        if(!eggs[selectedEgg] || !unlockedEggs.has(selectedEgg)) selectedEgg="Starter Egg";
+        equippedPets =
+            equippedPets
+                .filter(
+                    pet =>
+                        inventory[pet] !== undefined
+                )
+                .slice(
+                    0,
+                    getMaxEquipped()
+                );
 
-                if(clickBoostActive &&
-           Date.now() >= clickBoostEndTime){
+        if(
+            !eggs[selectedEgg] ||
+            !unlockedEggs.has(selectedEgg)
+        ){
+
+            selectedEgg =
+                "Starter Egg";
+        }
+
+        if(
+            clickBoostActive &&
+            Date.now() >= clickBoostEndTime
+        ){
 
             clickBoostActive = false;
             clickBoostEndTime = 0;
-
         }
 
-        if(luckyBoostActive &&
-           Date.now() >= luckyBoostEndTime){
+        if(
+            luckyBoostActive &&
+            Date.now() >= luckyBoostEndTime
+        ){
 
             luckyBoostActive = false;
             luckyBoostEndTime = 0;
-
         }
 
-    }catch(e){}
+    }catch(e){
+
+        console.error(
+            "Save load error:",
+            e
+        );
+    }
 }
 
 function renderEggs(){
@@ -4573,7 +4685,7 @@ document.getElementById("craftAllMachineButton").addEventListener("click", () =>
     craftAllMachines();
 });
 
-load();
+// Online account loading happens in restoreLogin()
 
 async function restoreLogin(){
 
@@ -4583,6 +4695,8 @@ async function restoreLogin(){
     if(!loggedInUser){
         return;
     }
+
+    currentUser = loggedInUser;
 
     const {
         data: usernameData,
@@ -4618,12 +4732,36 @@ async function restoreLogin(){
         document
             .getElementById("accountScreen")
             .classList.add("hidden");
+
+        await load();
+
+        MAX_EQUIPPED = getMaxEquipped();
+
+        renderEggs();
+        renderInventory();
+        renderIndex();
+        updateUI();
+        renderAchievements();
+        renderClickSkins();
+        updateRebirthButtons();
     }
 }
 
-restoreLogin();
+restoreLogin().then(() => {
 
-initializeLeaderboard();
+    initializeLeaderboard();
+
+    MAX_EQUIPPED = getMaxEquipped();
+
+    renderEggs();
+    renderInventory();
+    renderIndex();
+    updateUI();
+    renderAchievements();
+    renderClickSkins();
+    updateRebirthButtons();
+
+});
 
 supabaseClient
     .channel("leaderboards-live")
@@ -4640,15 +4778,6 @@ supabaseClient
     )
     .subscribe();
 
-MAX_EQUIPPED=getMaxEquipped();
-
-renderEggs();
-renderInventory();
-renderIndex();
-updateUI();
-renderAchievements();
-renderClickSkins();
-updateRebirthButtons();
 setInterval(() => {
 
     autoRebirthCheck();
@@ -4690,3 +4819,5 @@ setInterval(() => {
     updateUI();
 
 }, 1000);
+
+save();
