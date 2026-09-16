@@ -79,6 +79,28 @@ document
 
     });   
 
+    document
+        .getElementById("adminCloseButton")
+        .addEventListener("click", () => {
+
+            document
+                .getElementById("adminPanel")
+                .classList
+                .add("hidden");
+
+    });
+
+    document
+        .getElementById("autoRebirthCloseButton")
+        .onclick = () => {
+
+            document
+                .getElementById("autoRebirthPanel")
+                .classList
+                .add("hidden");
+
+        };
+
 async function createAccount(){
 
     const usernameInput =
@@ -3585,68 +3607,14 @@ function selectAutoRebirth(){
         return;
     }
 
-    const choices = [];
+    const panel =
+        document.getElementById("autoRebirthPanel");
 
-    for(
-        let level = 1;
-        level <= rebirthUpgradeLevel;
-        level++
-    ){
+    panel
+        .classList
+        .remove("hidden");
 
-        const amount =
-            rebirthUpgradeAmounts[level];
-
-        if(amount !== undefined){
-            choices.push(amount);
-        }
-    }
-
-    if(choices.length === 0){
-
-        showNotification(
-            "🔒 No Targets",
-            "Unlock a rebirth amount first."
-        );
-
-        return;
-    }
-
-    const choiceText = choices
-        .map(
-            value =>
-                `${value}: Rebirth ×${formatRebirthAmount(value)}`
-        )
-        .join("\n");
-
-    const selected = prompt(
-        `Select Auto-Rebirth target:\n\n${choiceText}\n\nEnter a number:`
-    );
-
-    if(selected === null){
-        return;
-    }
-
-    const target = Number(selected);
-
-    if(!choices.includes(target)){
-
-        showNotification(
-            "❌ Invalid Target",
-            "Please choose one of your unlocked rebirth amounts."
-        );
-
-        return;
-    }
-
-    autoRebirthTarget = target;
-
-    updateUI();
-    save();
-
-    showNotification(
-        "🎯 Target Selected!",
-        `Auto-Rebirth target set to ×${formatRebirthAmount(target)}.`
-    );
+    updateRebirthButtons();
 }
 
 
@@ -3727,7 +3695,11 @@ function updateRebirthButtons(){
     const container =
         document.getElementById("rebirthButtons");
 
+    const autoContainer =
+        document.getElementById("autoRebirthOptions");
+
     container.innerHTML = "";
+    autoContainer.innerHTML = "";
 
     for(let level = 1; level <= rebirthUpgradeLevel; level++){
 
@@ -3737,6 +3709,8 @@ function updateRebirthButtons(){
         if(amount === undefined){
             continue;
         }
+
+        /* NORMAL REBIRTH BUTTON */
 
         const button =
             document.createElement("button");
@@ -3754,6 +3728,45 @@ function updateRebirthButtons(){
         });
 
         container.appendChild(button);
+
+
+        /* AUTO-REBIRTH OPTION */
+
+        const option =
+            document.createElement("div");
+
+        option.className =
+            "auto-rebirth-option";
+
+        option.innerHTML = `
+            <div class="auto-rebirth-option-name">
+                🔄 Rebirth ×${formatRebirthAmount(amount)}
+            </div>
+
+            <button
+                class="auto-rebirth-select-button"
+            >
+                SELECT
+            </button>
+        `;
+
+        option
+            .querySelector("button")
+            .addEventListener("click", () => {
+
+                autoRebirthTarget = amount;
+
+                document
+                    .getElementById("autoRebirthPanel")
+                    .classList
+                    .add("hidden");
+
+                updateUpgradeUI();
+                save();
+
+            });
+
+        autoContainer.appendChild(option);
     }
 }
 
@@ -4719,11 +4732,6 @@ document
                 .getElementById("adminRebirths")
                 .value;
 
-        const clickPowerValue =
-            document
-                .getElementById("adminClickPower")
-                .value;
-
         if(coinsValue !== ""){
             changes.coins =
                 Number(coinsValue);
@@ -4737,11 +4745,6 @@ document
         if(rebirthsValue !== ""){
             changes.rebirths =
                 Number(rebirthsValue);
-        }
-
-        if(clickPowerValue !== ""){
-            changes.clickPower =
-                Number(clickPowerValue);
         }
 
         if(Object.keys(changes).length === 0){
@@ -4775,6 +4778,23 @@ document
             );
 
             return;
+        }
+
+        if(adminTargetUserId === currentUser.id){
+
+            if(changes.rebirths !== undefined){
+                rebirths = changes.rebirths;
+            }
+
+            if(changes.coins !== undefined){
+                coins = changes.coins;
+            }
+
+            if(changes.gems !== undefined){
+                gems = changes.gems;
+            }
+
+            updateUI();
         }
 
         alert(
@@ -4826,6 +4846,13 @@ document
             );
 
             return;
+        }
+
+        if(adminTargetUserId === currentUser.id){
+
+            localStorage.removeItem(SAVE_KEY);
+
+            location.reload();
         }
 
         alert(

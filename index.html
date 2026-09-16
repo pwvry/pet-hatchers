@@ -6,26 +6,47 @@
 <title>Pet Hatchers</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <div id="notificationCenter"></div>
+
+<div id="notificationCenter"></div>
+
 <div class="app">
+
 <header class="topbar">
-  <div class="brand"><div class="brand-icon">🐾</div><div><h1>Pet Hatchers</h1><p>Build your ultimate pet collection!</p></div></div>
+
+    <div class="brand">
+        <div class="brand-icon">🐾</div>
+        <div>
+            <h1>Pet Hatchers</h1>
+            <p>Build your ultimate pet collection!</p>
+        </div>
+    </div>
 
     <div class="player-account">
         👤 <span id="playerUsername"></span>
-        <button id="logoutButton">LOGIN</button>
 
         <button id="adminButton" class="admin-button hidden">
             👑 ADMIN
         </button>
+
+        <button id="logoutButton">
+            LOGIN
+        </button>
     </div>
 
-  <div class="currency">
-    <div class="currency-card">💰 <span id="coins">0</span></div>
-    <div class="currency-card">💎 <span id="gems">0</span></div>
-  </div>
+    <div class="currency">
+        <div class="currency-card">
+            💰 <span id="coins">0</span>
+        </div>
+
+        <div class="currency-card">
+            💎 <span id="gems">0</span>
+        </div>
+    </div>
+
 </header>
+
 
 <div id="accountScreen" class="account-screen">
 
@@ -70,18 +91,1116 @@
 
 </div>
 
+
+<!-- ========================= -->
+<!-- NORMAL GAME SCREEN -->
+<!-- ========================= -->
+
 <div id="gameScreen" class="game-layout hidden">
-    <div id="adminPanel" class="admin-panel hidden">
+
+    <aside class="sidebar">
+
+        <button class="nav active" data-page="eggs">
+            🥚 <span>Eggs</span>
+        </button>
+
+        <button class="nav" data-page="inventory">
+            🎒 <span>Inventory</span>
+        </button>
+
+        <button class="nav" data-page="index">
+            📖 <span>Pet Index</span>
+        </button>
+
+        <button class="nav" data-page="upgrades">
+            ⬆️ <span>Upgrades</span>
+        </button>
+
+        <button class="nav" data-page="rebirth">
+            🔄 <span>Rebirth</span>
+        </button>
+
+        <button class="nav" data-page="shop">
+            🛒 <span>Shop</span>
+        </button>
+
+        <button class="nav" data-page="achievements">
+            🏆 <span>Achievements</span>
+        </button>
+
+        <button class="nav" data-page="skins">
+            🎨 <span>Click Skins</span>
+        </button>
+
+        <button class="nav" data-page="machines">
+            ⚙️ <span>Machines</span>
+        </button>
+
+        <button class="nav" data-page="leaderboards">
+            🏆 <span>Leaderboards</span>
+        </button>
+
+    </aside>
+
+
+    <main class="content">
+
+
+        <!-- ========================= -->
+        <!-- EGGS -->
+        <!-- ========================= -->
+
+        <section class="page" id="eggs">
+
+            <div class="page-title">
+                <h2>🥚 Eggs</h2>
+                <p>Select an egg, then hatch pets from it.</p>
+            </div>
+
+            <div id="eggGrid" class="egg-grid"></div>
+
+            <div class="hatch-card">
+
+                <div class="selected-egg-label">
+                    SELECTED EGG
+                </div>
+
+                <div
+                    id="selectedEggName"
+                    class="selected-egg-name"
+                >
+                    🥚 Starter Egg
+                </div>
+
+                <div
+                    id="selectedEggCost"
+                    class="selected-egg-cost"
+                >
+                    Cost: 100 💰
+                </div>
+
+                <div
+                    id="selectedEggResult"
+                    class="result"
+                >
+                    Your next pet is waiting...
+                </div>
+
+                <button
+                    id="hatchButton"
+                    class="hatch-button"
+                >
+                    🥚 HATCH
+                </button>
+
+                <button
+                    id="clickButton"
+                    class="click-button"
+                >
+                    🖱️ CLICK FOR COINS
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- INVENTORY -->
+        <!-- ========================= -->
+
+        <section class="page hidden" id="inventory">
+
+            <div class="page-title">
+                <h2>🎒 Inventory</h2>
+                <p>Your collected pets.</p>
+            </div>
+
+            <div class="equipped-panel">
+
+                <div class="equipped-heading">
+
+                    <div>
+                        <h3>🐾 Equipped Pets</h3>
+                        <p id="equippedCount">
+                            0 / 3 equipped
+                        </p>
+                    </div>
+
+                    <button
+                        id="equipBestButton"
+                        class="secondary-button"
+                    >
+                        ⭐ EQUIP BEST
+                    </button>
+
+                </div>
+
+                <div
+                    id="equippedGrid"
+                    class="equipped-grid"
+                ></div>
+
+            </div>
+
+            <div class="inventory-heading">
+                <h3>📦 Your Pets</h3>
+            </div>
+
+            <div
+                id="inventoryGrid"
+                class="collection-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- PET INDEX -->
+        <!-- ========================= -->
+
+        <section class="page hidden" id="index">
+
+            <div class="page-title">
+                <h2>📖 Pet Index</h2>
+                <p>
+                    Discover all 246 pets and their mutations.
+                </p>
+            </div>
+
+            <div class="progress">
+                <span id="indexProgress"></span>
+            </div>
+
+            <p
+                id="indexCount"
+                class="muted"
+            >
+                0 / 246 discovered
+            </p>
+
+            <div id="indexSections"></div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- UPGRADES -->
+        <!-- ========================= -->
+
+        <section class="page hidden" id="upgrades">
+
+            <div class="page-title">
+
+                <h2>⬆️ UPGRADES ⬆️</h2>
+
+                <p>
+                    Improve your abilities and unlock new features.
+                </p>
+
+            </div>
+
+            <div class="upgrade-currency">
+
+                <div>
+                    💰 Your Coins:
+                    <strong id="upgradeCoins">0</strong>
+                </div>
+
+                <div>
+                    💎 Your Gems:
+                    <strong id="upgradeGems">0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="upgrade-grid">
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        1️⃣ 🖱️ Click Speed
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="clickSpeedLevel">
+                            0 / 5
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current Delay:
+                        <strong id="clickSpeedCurrent">
+                            0.50 seconds
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="clickSpeedCost">
+                            50 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="clickSpeedUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        2️⃣ ⚡ Click Multiplier
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="multiplierLevel">
+                            0 / 20
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current:
+                        <strong id="multiplierCurrent">
+                            1x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Next Upgrade:
+                        <strong id="multiplierNext">
+                            2x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="multiplierCost">
+                            40 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="multiplierUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        3️⃣ 🔄 More Rebirths
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="rebirthUpgradeLevel">
+                            0 / 15
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Unlocks:
+                        <strong id="rebirthUpgradeNext">
+                            Rebirth ×2
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="rebirthUpgradeCost">
+                            40 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="rebirthUpgradeButton"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        4️⃣ 🥚 Egg Hatch Amount
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="hatchAmountLevel">
+                            0 / 3
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current:
+                        <strong id="hatchAmountCurrent">
+                            1x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Next Upgrade:
+                        <strong id="hatchAmountNext">
+                            2x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="hatchAmountCost">
+                            100 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="hatchAmountUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        5️⃣ 🍀 Luck
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="luckLevel">
+                            0 / 40
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current:
+                        <strong id="luckCurrent">
+                            1.0x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Next Upgrade:
+                        <strong id="luckNext">
+                            1.1x
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="luckCost">
+                            50 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="luckUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        6️⃣ 🐾 Pet Equip
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current:
+                        <strong id="equipCurrent">
+                            3 / 5 pets
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Next Upgrade:
+                        <strong id="equipNext">
+                            4 pets
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="equipCost">
+                            500 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="equipUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        7️⃣ 🔄 Auto-Rebirth
+                    </div>
+
+                    <div class="upgrade-info">
+                        Status:
+                        <strong id="autoRebirthStatus">
+                            NOT PURCHASED
+                        </strong>
+                    </div>
+
+                    <div
+                        class="upgrade-info"
+                        id="autoRebirthTargetInfo"
+                    >
+                        Target:
+                        <strong id="autoRebirthTarget">
+                            Rebirth ×1
+                        </strong>
+                    </div>
+
+                    <div
+                        class="upgrade-info"
+                        id="autoRebirthCostInfo"
+                    >
+                        💎 Cost:
+                        <strong id="autoRebirthCost">
+                            100 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="autoRebirthUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ PURCHASE
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- REBIRTH -->
+        <!-- ========================= -->
+
+        <section class="page hidden" id="rebirth">
+
+            <div class="page-title">
+
+                <h2>🔄 Rebirth</h2>
+
+                <p>
+                    Reset your coins to gain gems and permanent click power.
+                </p>
+
+            </div>
+
+
+            <div class="rebirth-stats">
+
+                <div class="rebirth-stat">
+                    <span>💰 Coins</span>
+                    <strong id="rebirthCoins">0</strong>
+                </div>
+
+                <div class="rebirth-stat">
+                    <span>💎 Gems</span>
+                    <strong id="rebirthGems">0</strong>
+                </div>
+
+                <div class="rebirth-stat">
+                    <span>🔄 Rebirths</span>
+                    <strong id="rebirthCount">0</strong>
+                </div>
+
+                <div class="rebirth-stat">
+                    <span>🖱️ Click Power</span>
+                    <strong id="rebirthClickPower">1x</strong>
+                </div>
+
+            </div>
+
+
+            <div class="rebirth-panel">
+
+                <div class="rebirth-icon">
+                    🔄
+                </div>
+
+                <h3>Rebirth ×1</h3>
+
+                <p>
+                    Reset your coins to 0 and gain
+                    <strong>+10 💎 gems</strong>.
+                </p>
+
+                <div class="rebirth-requirement">
+                    💰 Required:
+                    <strong id="rebirthCost">10,000</strong>
+                    coins
+                </div>
+
+                <button
+                    id="rebirthButton"
+                    class="hatch-button"
+                >
+                    🔄 REBIRTH ×1
+                </button>
+
+                <div id="rebirthButtons"></div>
+
+                <div
+                    id="autoRebirthControls"
+                    class="auto-rebirth-controls"
+                    style="display:none;"
+                >
+
+                    <h3>🤖 Auto-Rebirth</h3>
+
+                    <p>
+                        Automatically rebirth when you reach your selected target.
+                    </p>
+
+                    <button
+                        id="selectAutoRebirthButton"
+                        class="upgrade-buy-button"
+                    >
+                        🎯 SELECT REBIRTH TARGET
+                    </button>
+
+                    <button
+                        id="toggleAutoRebirthButton"
+                        class="upgrade-buy-button"
+                    >
+                        🔴 AUTO REBIRTH: OFF
+                    </button>
+
+                </div>
+
+                <p
+                    id="rebirthResult"
+                    class="result-text"
+                ></p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- SHOP -->
+        <!-- ========================= -->
+
+        <section class="page hidden" id="shop">
+
+            <div class="page-title">
+
+                <h2>🛒 Shop</h2>
+
+                <p>
+                    Spend your coins on special boosts and rewards.
+                </p>
+
+            </div>
+
+
+            <div class="upgrade-grid">
+
+
+                <div class="upgrade-card">
+
+                    <span>⚡</span>
+
+                    <strong>
+                        Click Multiplier
+                    </strong>
+
+                    <small>
+                        Current:
+                        <b id="shopClickMultiplier">
+                            1x
+                        </b>
+                    </small>
+
+                    <small>
+                        Upgrade to:
+                        <b id="shopClickMultiplierNext">
+                            2x
+                        </b>
+                    </small>
+
+                    <b id="shopClickMultiplierCost">
+                        💰 1.00M Coins
+                    </b>
+
+                    <button id="shopClickMultiplierButton">
+                        UPGRADE
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>⚡</span>
+
+                    <strong>
+                        Click Boost
+                    </strong>
+
+                    <small>
+                        Temporarily doubles your click earnings.
+                    </small>
+
+                    <b id="clickBoostCost">
+                        💰 100K Coins
+                    </b>
+
+                    <small id="clickBoostStatus"></small>
+
+                    <button id="clickBoostButton">
+                        BUY CLICK BOOST
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>🎁</span>
+
+                    <strong>
+                        Mystery Box
+                    </strong>
+
+                    <small>
+                        Open for special rewards and rare pets.
+                    </small>
+
+                    <b id="mysteryBoxCost">
+                        💰 250K Coins
+                    </b>
+
+                    <button id="mysteryBoxButton">
+                        OPEN MYSTERY BOX
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>🍀</span>
+
+                    <strong>
+                        Lucky Boost
+                    </strong>
+
+                    <small>
+                        Temporarily increases your pet luck.
+                    </small>
+
+                    <b id="luckyBoostCost">
+                        💰 150K Coins
+                    </b>
+
+                    <small id="luckyBoostStatus"></small>
+
+                    <button id="luckyBoostButton">
+                        BUY LUCKY BOOST
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- ACHIEVEMENTS -->
+        <!-- ========================= -->
+
+        <section
+            class="page hidden"
+            id="achievements"
+        >
+
+            <div class="page-title">
+
+                <h2>🏆 Achievements</h2>
+
+                <p>
+                    Complete challenges and become the ultimate hatcher.
+                </p>
+
+            </div>
+
+            <div class="achievement-counter">
+
+                🏆 Unlocked:
+                <b id="achievementUnlockedCount">0</b>
+                /
+                <b id="achievementTotalCount">0</b>
+
+            </div>
+
+            <div
+                id="achievementList"
+                class="achievement-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- LEADERBOARDS -->
+        <!-- ========================= -->
+
+        <section
+            class="page hidden"
+            id="leaderboards"
+        >
+
+            <div class="page-title">
+
+                <h2>🏆 Global Leaderboards</h2>
+
+                <p>
+                    Compete with players around the world.
+                </p>
+
+            </div>
+
+
+            <div class="leaderboard-grid">
+
+
+                <div class="leaderboard-card">
+
+                    <h3>
+                        🥚 Most Eggs Hatched
+                    </h3>
+
+                    <div
+                        id="eggsLeaderboard"
+                    ></div>
+
+                </div>
+
+
+                <div class="leaderboard-card">
+
+                    <h3>
+                        💰 Most Coins
+                    </h3>
+
+                    <div
+                        id="coinsLeaderboard"
+                    ></div>
+
+                </div>
+
+
+                <div class="leaderboard-card">
+
+                    <h3>
+                        🔄 Most Rebirths
+                    </h3>
+
+                    <div
+                        id="rebirthsLeaderboard"
+                    ></div>
+
+                </div>
+
+
+                <div class="leaderboard-card">
+
+                    <h3>
+                        ⏱️ Most Playtime
+                    </h3>
+
+                    <div
+                        id="playtimeLeaderboard"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <p id="leaderboardUpdated">
+                Updating...
+            </p>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- CLICK SKINS -->
+        <!-- ========================= -->
+
+        <section
+            class="page hidden"
+            id="skins"
+        >
+
+            <div class="page-title">
+
+                <h2>🎨 Click Skins</h2>
+
+                <p>
+                    Customize your clicks and increase your earnings.
+                </p>
+
+            </div>
+
+
+            <div class="skin-equipped">
+
+                🖱️ Equipped:
+                <b id="equippedClickSkin">
+                    Classic
+                </b>
+
+            </div>
+
+
+            <div
+                id="clickSkinGrid"
+                class="skin-grid"
+            ></div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- PET MACHINES -->
+        <!-- ========================= -->
+
+        <section
+            class="page hidden"
+            id="machines"
+        >
+
+            <div class="page-title">
+
+                <h2>⚙️ Pet Machines</h2>
+
+                <p>
+                    Combine duplicate pets into stronger variants.
+                </p>
+
+            </div>
+
+
+            <div class="upgrade-grid">
+
+
+                <div class="upgrade-card">
+
+                    <span>✨</span>
+
+                    <strong>
+                        Golden Machine
+                    </strong>
+
+                    <small>
+                        Combine duplicate pets to create a Golden version.
+                    </small>
+
+                    <b>
+                        Requires: 6 Pets
+                    </b>
+
+                    <button id="goldenMachineButton">
+                        CRAFT GOLDEN
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>🌈</span>
+
+                    <strong>
+                        Rainbow Machine
+                    </strong>
+
+                    <small>
+                        Combine Golden pets to create a Rainbow version.
+                    </small>
+
+                    <b>
+                        Requires: 6 Golden Pets
+                    </b>
+
+                    <button id="rainbowMachineButton">
+                        CRAFT RAINBOW
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>🌑</span>
+
+                    <strong>
+                        Dark Matter Machine
+                    </strong>
+
+                    <small>
+                        Combine Rainbow pets to create a Dark Matter version.
+                    </small>
+
+                    <b>
+                        Requires: 6 Rainbow Pets
+                    </b>
+
+                    <button id="darkMatterMachineButton">
+                        CRAFT DARK MATTER
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>💠</span>
+
+                    <strong>
+                        Superior Machine
+                    </strong>
+
+                    <small>
+                        Combine Dark Matter pets to create a Superior version.
+                    </small>
+
+                    <b>
+                        Requires: 6 Dark Matter Pets
+                    </b>
+
+                    <button id="superiorMachineButton">
+                        CRAFT SUPERIOR
+                    </button>
+
+                </div>
+
+
+                <div class="upgrade-card">
+
+                    <span>⚙️</span>
+
+                    <strong>
+                        Craft All
+                    </strong>
+
+                    <small>
+                        Automatically craft every available machine.
+                    </small>
+
+                    <b>
+                        Uses all available duplicates
+                    </b>
+
+                    <button id="craftAllMachineButton">
+                        CRAFT ALL
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<div id="autoRebirthPanel" class="auto-rebirth-panel hidden">
+
+    <div class="auto-rebirth-card">
+
+        <h2>🎯 Select Auto-Rebirth Target</h2>
+
+        <p>
+            Choose how many rebirths you want Auto-Rebirth to perform.
+        </p>
+
+        <div id="autoRebirthOptions"></div>
+
+        <button
+            id="autoRebirthCloseButton"
+            class="auto-rebirth-close-button"
+        >
+            ← BACK TO REBIRTH
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- SEPARATE ADMIN GUI -->
+<!-- ========================= -->
+
+<div
+    id="adminPanel"
+    class="admin-panel hidden"
+>
 
     <div class="admin-card">
+
+        <button
+            id="adminCloseButton"
+            class="admin-close-button"
+        >
+            ← BACK TO GAME
+        </button>
+
 
         <div class="admin-title">
             👑 ADMIN PANEL
         </div>
 
+
         <div class="admin-subtitle">
             Pet Hatchers Control Center
         </div>
+
 
         <input
             type="text"
@@ -90,47 +1209,59 @@
             maxlength="16"
         >
 
+
         <button id="adminSearchButton">
             SEARCH PLAYER
         </button>
 
+
         <p id="adminPlayerResult"></p>
 
-        <div id="adminControls" class="admin-controls hidden">
+
+        <div
+            id="adminControls"
+            class="admin-controls hidden"
+        >
 
             <h3 id="adminTargetName"></h3>
 
-            <label>💰 Coins</label>
+
+            <label>
+                💰 Coins
+            </label>
+
             <input
                 type="number"
                 id="adminCoins"
                 placeholder="Coins"
             >
 
-            <label>💎 Gems</label>
+
+            <label>
+                💎 Gems
+            </label>
+
             <input
                 type="number"
                 id="adminGems"
                 placeholder="Gems"
             >
 
-            <label>🔄 Rebirths</label>
+
+            <label>
+                🔄 Rebirths
+            </label>
+
             <input
                 type="number"
                 id="adminRebirths"
                 placeholder="Rebirths"
             >
 
-            <label>⚡ Click Power</label>
-            <input
-                type="number"
-                id="adminClickPower"
-                placeholder="Click Power"
-            >
-
             <button id="adminSaveButton">
                 💾 SAVE CHANGES
             </button>
+
 
             <button id="adminResetButton">
                 🗑️ RESET PLAYER
@@ -141,662 +1272,11 @@
     </div>
 
 </div>
-<aside class="sidebar">
-  <button class="nav active" data-page="eggs">🥚 <span>Eggs</span></button>
-  <button class="nav" data-page="inventory">🎒 <span>Inventory</span></button>
-  <button class="nav" data-page="index">📖 <span>Pet Index</span></button>
-  <button class="nav" data-page="upgrades">⬆️ <span>Upgrades</span></button>
-  <button class="nav" data-page="rebirth">🔄 <span>Rebirth</span></button>
-  <button class="nav" data-page="shop">🛒 <span>Shop</span></button>
-  <button class="nav" data-page="achievements">🏆 <span>Achievements</span></button>
-  <button class="nav" data-page="skins">🎨 <span>Click Skins</span></button>
-  <button class="nav" data-page="machines">⚙️ <span>Machines</span></button>
-  <button class="nav" data-page="leaderboards">
-    🏆 <span>Leaderboards</span>
-</button>
-</aside>
 
-<main class="content">
-<section class="page" id="eggs">
-  <div class="page-title"><h2>🥚 Eggs</h2><p>Select an egg, then hatch pets from it.</p></div>
-  <div id="eggGrid" class="egg-grid"></div>
-
-  <div class="hatch-card">
-    <div class="selected-egg-label">SELECTED EGG</div>
-    <div id="selectedEggName" class="selected-egg-name">🥚 Starter Egg</div>
-    <div id="selectedEggCost" class="selected-egg-cost">Cost: 100 💰</div>
-    <div id="selectedEggResult" class="result">Your next pet is waiting...</div>
-    <button id="hatchButton" class="hatch-button">🥚 HATCH</button>
-    <button id="clickButton" class="click-button">🖱️ CLICK FOR COINS</button>
-  </div>
-</section>
-
-<section class="page hidden" id="inventory">
-
-  <div class="page-title">
-    <h2>🎒 Inventory</h2>
-    <p>Your collected pets.</p>
-  </div>
-
-  <div class="equipped-panel">
-
-    <div class="equipped-heading">
-
-      <div>
-        <h3>🐾 Equipped Pets</h3>
-        <p id="equippedCount">0 / 3 equipped</p>
-      </div>
-
-      <button id="equipBestButton" class="secondary-button">
-        ⭐ EQUIP BEST
-      </button>
-
-    </div>
-
-    <div id="equippedGrid" class="equipped-grid"></div>
-
-  </div>
-
-  <div class="inventory-heading">
-    <h3>📦 Your Pets</h3>
-  </div>
-
-  <div id="inventoryGrid" class="collection-grid"></div>
-
-</section>
-
-<section class="page hidden" id="index">
-  <div class="page-title"><h2>📖 Pet Index</h2><p>Discover all 246 pets and their mutations.</p></div>
-  <div class="progress"><span id="indexProgress"></span></div>
-  <p id="indexCount" class="muted">0 / 246 discovered</p>
-  <div id="indexSections"></div>
-</section>
-
-<section class="page hidden" id="upgrades">
-
-    <div class="page-title">
-        <h2>⬆️ UPGRADES ⬆️</h2>
-        <p>Improve your abilities and unlock new features.</p>
-    </div>
-
-    <div class="upgrade-currency">
-        <div>
-            💰 Your Coins:
-            <strong id="upgradeCoins">0</strong>
-        </div>
-        <div>
-            💎 Your Gems:
-            <strong id="upgradeGems">0</strong>
-        </div>
-    </div>
-
-    <div class="upgrade-grid">
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                1️⃣ 🖱️ Click Speed
-            </div>
-
-            <div class="upgrade-info">
-                Level:
-                <strong id="clickSpeedLevel">0 / 5</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Current Delay:
-                <strong id="clickSpeedCurrent">0.50 seconds</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="clickSpeedCost">50 gems</strong>
-            </div>
-
-            <button id="clickSpeedUpgrade" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                2️⃣ ⚡ Click Multiplier
-            </div>
-
-            <div class="upgrade-info">
-                Level:
-                <strong id="multiplierLevel">0 / 20</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Current:
-                <strong id="multiplierCurrent">1x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Next Upgrade:
-                <strong id="multiplierNext">2x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="multiplierCost">40 gems</strong>
-            </div>
-
-            <button id="multiplierUpgrade" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                3️⃣ 🔄 More Rebirths
-            </div>
-
-            <div class="upgrade-info">
-                Level:
-                <strong id="rebirthUpgradeLevel">0 / 15</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Unlocks:
-                <strong id="rebirthUpgradeNext">Rebirth ×2</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="rebirthUpgradeCost">40 gems</strong>
-            </div>
-
-            <button id="rebirthUpgradeButton" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                4️⃣ 🥚 Egg Hatch Amount
-            </div>
-
-            <div class="upgrade-info">
-                Level:
-                <strong id="hatchAmountLevel">0 / 3</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Current:
-                <strong id="hatchAmountCurrent">1x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Next Upgrade:
-                <strong id="hatchAmountNext">2x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="hatchAmountCost">100 gems</strong>
-            </div>
-
-            <button id="hatchAmountUpgrade" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                5️⃣ 🍀 Luck
-            </div>
-
-            <div class="upgrade-info">
-                Level:
-                <strong id="luckLevel">0 / 40</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Current:
-                <strong id="luckCurrent">1.0x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Next Upgrade:
-                <strong id="luckNext">1.1x</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="luckCost">50 gems</strong>
-            </div>
-
-            <button id="luckUpgrade" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                6️⃣ 🐾 Pet Equip
-            </div>
-
-            <div class="upgrade-info">
-                Current:
-                <strong id="equipCurrent">3 / 5 pets</strong>
-            </div>
-
-            <div class="upgrade-info">
-                Next Upgrade:
-                <strong id="equipNext">4 pets</strong>
-            </div>
-
-            <div class="upgrade-info">
-                💎 Cost:
-                <strong id="equipCost">500 gems</strong>
-            </div>
-
-            <button id="equipUpgrade" class="upgrade-buy-button">
-                ⬆️ UPGRADE
-            </button>
-
-        </div>
-
-
-        <div class="upgrade-item">
-
-            <div class="upgrade-title">
-                7️⃣ 🔄 Auto-Rebirth
-            </div>
-
-            <div class="upgrade-info">
-                Status:
-                <strong id="autoRebirthStatus">NOT PURCHASED</strong>
-            </div>
-
-            <div class="upgrade-info" id="autoRebirthTargetInfo">
-                Target:
-                <strong id="autoRebirthTarget">Rebirth ×1</strong>
-            </div>
-
-            <div class="upgrade-info" id="autoRebirthCostInfo">
-                💎 Cost:
-                <strong id="autoRebirthCost">100 gems</strong>
-            </div>
-
-            <button
-                id="autoRebirthUpgrade"
-                class="upgrade-buy-button"
-            >
-                ⬆️ PURCHASE
-            </button>
-
-            <div
-                id="autoRebirthControls"
-                style="display:none; margin-top:12px;"
-            >
-
-                <button
-                    id="selectAutoRebirthButton"
-                    class="upgrade-buy-button"
-                >
-                    🎯 SELECT AUTO REBIRTH
-                </button>
-
-                <button
-                    id="toggleAutoRebirthButton"
-                    class="upgrade-buy-button"
-                >
-                    🔴 AUTO REBIRTH: OFF
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-<section class="page hidden" id="rebirth">
-
-    <div class="page-title">
-        <h2>🔄 Rebirth</h2>
-        <p>Reset your coins to gain gems and permanent click power.</p>
-    </div>
-
-    <div class="rebirth-stats">
-
-        <div class="rebirth-stat">
-            <span>💰 Coins</span>
-            <strong id="rebirthCoins">0</strong>
-        </div>
-
-        <div class="rebirth-stat">
-            <span>💎 Gems</span>
-            <strong id="rebirthGems">0</strong>
-        </div>
-
-        <div class="rebirth-stat">
-            <span>🔄 Rebirths</span>
-            <strong id="rebirthCount">0</strong>
-        </div>
-
-        <div class="rebirth-stat">
-            <span>🖱️ Click Power</span>
-            <strong id="rebirthClickPower">1x</strong>
-        </div>
-
-    </div>
-
-    <div class="rebirth-panel">
-
-        <div class="rebirth-icon">
-            🔄
-        </div>
-
-        <h3>Rebirth ×1</h3>
-
-        <p>
-            Reset your coins to 0 and gain
-            <strong>+10 💎 gems</strong>.
-        </p>
-
-        <div class="rebirth-requirement">
-            💰 Required:
-            <strong id="rebirthCost">10,000</strong>
-            coins
-        </div>
-
-        <button id="rebirthButton" class="hatch-button">
-            🔄 REBIRTH ×1
-        </button>
-        <div id="rebirthButtons"></div>
-
-        <p id="rebirthResult" class="result-text"></p>
-
-    </div>
-
-</section>
-
-<section class="page hidden" id="shop">
-
-    <div class="page-title">
-        <h2>🛒 Shop</h2>
-        <p>Spend your coins on special boosts and rewards.</p>
-    </div>
-
-    <div class="upgrade-grid">
-
-        <div class="upgrade-card">
-
-            <span>⚡</span>
-
-            <strong>Click Multiplier</strong>
-
-            <small>
-                Current:
-                <b id="shopClickMultiplier">1x</b>
-            </small>
-
-            <small>
-                Upgrade to:
-                <b id="shopClickMultiplierNext">2x</b>
-            </small>
-
-            <b id="shopClickMultiplierCost">
-                💰 1.00M Coins
-            </b>
-
-            <button id="shopClickMultiplierButton">
-                UPGRADE
-            </button>
-
-        </div>
-
-        <div class="upgrade-card">
-
-            <span>⚡</span>
-
-            <strong>Click Boost</strong>
-
-            <small>
-                Temporarily doubles your click earnings.
-            </small>
-
-            <b id="clickBoostCost">
-                💰 100K Coins
-            </b>
-
-            <small id="clickBoostStatus"></small>
-
-            <button id="clickBoostButton">
-                BUY CLICK BOOST
-            </button>
-
-        </div>
-
-        <div class="upgrade-card">
-
-            <span>🎁</span>
-
-            <strong>Mystery Box</strong>
-
-            <small>
-                Open for special rewards and rare pets.
-            </small>
-
-            <b id="mysteryBoxCost">
-                💰 250K Coins
-            </b>
-
-            <button id="mysteryBoxButton">
-                OPEN MYSTERY BOX
-            </button>
-
-        </div>
-
-        <div class="upgrade-card">
-
-            <span>🍀</span>
-
-            <strong>Lucky Boost</strong>
-
-            <small>
-                Temporarily increases your pet luck.
-            </small>
-
-            <b id="luckyBoostCost">
-                💰 150K Coins
-            </b>
-
-            <small id="luckyBoostStatus"></small>
-
-            <button id="luckyBoostButton">
-                BUY LUCKY BOOST
-            </button>
-
-        </div>
-
-    </div>
-
-</section>
-
-<section class="page hidden" id="achievements">
-
-    <div class="page-title">
-        <h2>🏆 Achievements</h2>
-        <p>Complete challenges and become the ultimate hatcher.</p>
-    </div>
-
-    <div class="achievement-counter">
-        🏆 Unlocked:
-        <b id="achievementUnlockedCount">0</b>
-        /
-        <b id="achievementTotalCount">0</b>
-    </div>
-
-        <div id="achievementList" class="achievement-grid">
-
-        </div>
-
-    </section>
-
-    <section class="page hidden" id="leaderboards">
-
-    <div class="page-title">
-        <h2>🏆 Global Leaderboards</h2>
-        <p>Compete with players around the world.</p>
-    </div>
-
-    <div class="leaderboard-grid">
-
-        <div class="leaderboard-card">
-            <h3>🥚 Most Eggs Hatched</h3>
-            <div id="eggsLeaderboard"></div>
-        </div>
-
-        <div class="leaderboard-card">
-            <h3>💰 Most Coins</h3>
-            <div id="coinsLeaderboard"></div>
-        </div>
-
-        <div class="leaderboard-card">
-            <h3>🔄 Most Rebirths</h3>
-            <div id="rebirthsLeaderboard"></div>
-        </div>
-
-        <div class="leaderboard-card">
-            <h3>⏱️ Most Playtime</h3>
-            <div id="playtimeLeaderboard"></div>
-        </div>
-
-    </div>
-
-    <p id="leaderboardUpdated">
-        Updating...
-    </p>
-
-</section>
-
-
-<section class="page hidden" id="skins">
-
-    <div class="page-title">
-        <h2>🎨 Click Skins</h2>
-        <p>Customize your clicks and increase your earnings.</p>
-    </div>
-
-    <div class="skin-equipped">
-        🖱️ Equipped:
-        <b id="equippedClickSkin">Classic</b>
-    </div>
-
-    <div id="clickSkinGrid" class="skin-grid"></div>
-
-</section>
-
-<section class="page hidden" id="machines">
-
-    <div class="page-title">
-        <h2>⚙️ Pet Machines</h2>
-        <p>Combine duplicate pets into stronger variants.</p>
-    </div>
-
-    <div class="upgrade-grid">
-
-        <div class="upgrade-card">
-            <span>✨</span>
-            <strong>Golden Machine</strong>
-
-            <small>
-                Combine duplicate pets to create a Golden version.
-            </small>
-
-            <b>Requires: 6 Pets</b>
-
-            <button id="goldenMachineButton">
-                CRAFT GOLDEN
-            </button>
-        </div>
-
-        <div class="upgrade-card">
-            <span>🌈</span>
-            <strong>Rainbow Machine</strong>
-
-            <small>
-                Combine Golden pets to create a Rainbow version.
-            </small>
-
-            <b>Requires: 6 Golden Pets</b>
-
-            <button id="rainbowMachineButton">
-                CRAFT RAINBOW
-            </button>
-        </div>
-
-        <div class="upgrade-card">
-            <span>🌑</span>
-            <strong>Dark Matter Machine</strong>
-
-            <small>
-                Combine Rainbow pets to create a Dark Matter version.
-            </small>
-
-            <b>Requires: 6 Rainbow Pets</b>
-
-            <button id="darkMatterMachineButton">
-                CRAFT DARK MATTER
-            </button>
-        </div>
-
-        <div class="upgrade-card">
-            <span>💠</span>
-            <strong>Superior Machine</strong>
-
-            <small>
-                Combine Dark Matter pets to create a Superior version.
-            </small>
-
-            <b>Requires: 6 Dark Matter Pets</b>
-
-            <button id="superiorMachineButton">
-                CRAFT SUPERIOR
-            </button>
-        </div>
-
-                <div class="upgrade-card">
-            <span>⚙️</span>
-            <strong>Craft All</strong>
-
-            <small>
-                Automatically craft every available machine.
-            </small>
-
-            <b>Uses all available duplicates</b>
-
-            <button id="craftAllMachineButton">
-                CRAFT ALL
-            </button>
-        </div>
-
-    </div>
-
-</section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="game.js?v=5"></script>
+
 </body>
 </html>
-
