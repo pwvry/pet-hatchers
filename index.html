@@ -154,7 +154,7 @@
             💎 Your Gems:
             <strong id="upgradeGems">0</strong>
         </div>
-    </div>>
+    </div>
 
     <div class="upgrade-grid">
 
@@ -351,14 +351,43 @@
                 <strong id="autoRebirthStatus">NOT PURCHASED</strong>
             </div>
 
-            <div class="upgrade-info">
+            <div class="upgrade-info" id="autoRebirthTargetInfo">
+                Target:
+                <strong id="autoRebirthTarget">Rebirth ×1</strong>
+            </div>
+
+            <div class="upgrade-info" id="autoRebirthCostInfo">
                 💎 Cost:
                 <strong id="autoRebirthCost">100 gems</strong>
             </div>
 
-            <button id="autoRebirthUpgrade" class="upgrade-buy-button">
+            <button
+                id="autoRebirthUpgrade"
+                class="upgrade-buy-button"
+            >
                 ⬆️ PURCHASE
             </button>
+
+            <div
+                id="autoRebirthControls"
+                style="display:none; margin-top:12px;"
+            >
+
+                <button
+                    id="selectAutoRebirthButton"
+                    class="upgrade-buy-button"
+                >
+                    🎯 SELECT AUTO REBIRTH
+                </button>
+
+                <button
+                    id="toggleAutoRebirthButton"
+                    class="upgrade-buy-button"
+                >
+                    🔴 AUTO REBIRTH: OFF
+                </button>
+
+            </div>
 
         </div>
 

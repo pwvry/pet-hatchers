@@ -9,6 +9,10 @@ const supabaseClient =
     );
 
 let currentUser = null;
+let accountResetVersion = 0;
+let autoRebirthPurchased = false;
+let autoRebirthEnabled = false;
+let autoRebirthTarget = 1;
 
 async function getCurrentUser(){
 
@@ -344,6 +348,15 @@ async function saveLeaderboardStats(){
         return;
     }
 
+    // Don't allow an account marked for reset
+    // to overwrite the leaderboard with old data.
+    if(accountResetVersion !== 0){
+        console.log(
+            "Leaderboard save blocked: account is being reset."
+        );
+        return;
+    }
+
     const username =
         localStorage.getItem("playerUsername");
 
@@ -527,7 +540,6 @@ let multiplierLevel = 0;
 let hatchAmountLevel = 0;
 let luckLevel = 0;
 let equipUpgradeLevel = 0;
-let autoRebirthPurchased = false;
 let clickBoostActive = false;
 let clickBoostEndTime = 0;
 
@@ -1054,7 +1066,7 @@ function upgradeAutoRebirth(){
         return;
     }
 
-    const cost = 100;
+    const cost = 1;
 
     if(gems < cost){
 
@@ -1068,8 +1080,17 @@ function upgradeAutoRebirth(){
 
     autoRebirthPurchased = true;
 
+    // Default settings
+    autoRebirthEnabled = false;
+    autoRebirthTarget = 1;
+
     resultEl.textContent =
         "🎉 Auto-Rebirth purchased!";
+
+    showNotification(
+        "🔄 Auto-Rebirth Unlocked!",
+        "You can now select your automatic rebirth target."
+    );
 
     updateUI();
     save();
@@ -1081,10 +1102,41 @@ function autoRebirthCheck(){
         return;
     }
 
-    if(coins >= rebirthCost){
+    if(!autoRebirthEnabled){
+        return;
+    }
 
-        rebirth();
+    const amount = autoRebirthTarget;
 
+    if(!amount || amount < 1){
+        return;
+    }
+
+    let totalCost = 0;
+    let tempCost = rebirthCost;
+
+    for(let i = 0; i < amount; i++){
+
+        if(
+            tempCost >= Number.MAX_VALUE ||
+            totalCost >= Number.MAX_VALUE - tempCost
+        ){
+            totalCost = Number.MAX_VALUE;
+            break;
+        }
+
+        totalCost += tempCost;
+
+        tempCost =
+            Math.min(
+                tempCost * 2.5,
+                Number.MAX_VALUE
+            );
+    }
+
+    if(coins >= totalCost){
+
+        rebirthMultiple(amount);
     }
 }
 
@@ -1835,6 +1887,53 @@ function craftAllMachines(){
 
 function updateUI(){
 
+    const autoRebirthStatusEl =
+    document.getElementById("autoRebirthStatus");
+
+    const autoRebirthTargetEl =
+        document.getElementById("autoRebirthTarget");
+
+    const autoRebirthUpgradeEl =
+        document.getElementById("autoRebirthUpgrade");
+
+    const autoRebirthControlsEl =
+        document.getElementById("autoRebirthControls");
+
+    const toggleAutoRebirthButton =
+        document.getElementById("toggleAutoRebirthButton");
+
+
+    if(autoRebirthPurchased){
+
+        autoRebirthStatusEl.textContent =
+            "PURCHASED";
+
+        autoRebirthTargetEl.textContent =
+            `Rebirth ×${autoRebirthTarget}`;
+
+        autoRebirthUpgradeEl.style.display =
+            "none";
+
+        autoRebirthControlsEl.style.display =
+            "block";
+
+        toggleAutoRebirthButton.textContent =
+            autoRebirthEnabled
+                ? "🟢 AUTO REBIRTH: ON"
+                : "🔴 AUTO REBIRTH: OFF";
+
+    }else{
+
+        autoRebirthStatusEl.textContent =
+            "NOT PURCHASED";
+
+        autoRebirthUpgradeEl.style.display =
+            "block";
+
+        autoRebirthControlsEl.style.display =
+            "none";
+    }
+
     document.getElementById("shopClickMultiplier").textContent =
     shopClickMultiplier + "x";
 
@@ -1943,8 +2042,12 @@ if(luckyBoostActive){
 async function save(){
 
     const gameData = {
+        saveVersion: 1,
         coins,
         gems,
+        autoRebirthPurchased: autoRebirthPurchased,
+        autoRebirthEnabled: autoRebirthEnabled,
+        autoRebirthTarget: autoRebirthTarget,
         clickPower,
         rebirths,
         rebirthCost,
@@ -1955,7 +2058,6 @@ async function save(){
         hatchAmountLevel,
         luckLevel,
         equipUpgradeLevel,
-        autoRebirthPurchased,
         clickBoostCost,
         mysteryBoxCost,
         luckyBoostCost,
@@ -1986,7 +2088,7 @@ async function save(){
         JSON.stringify(gameData)
     );
 
-    if(currentUser){
+    if(currentUser && accountResetVersion === 0){
 
         const {
             error
@@ -1995,6 +2097,7 @@ async function save(){
             .upsert({
                 user_id: currentUser.id,
                 game_data: gameData,
+                reset_version: 0,
                 updated_at: new Date().toISOString()
             });
 
@@ -2021,7 +2124,7 @@ async function load(){
             error
         } = await supabaseClient
             .from("player_data")
-            .select("game_data")
+            .select("game_data, reset_version")
             .eq("user_id", currentUser.id)
             .maybeSingle();
 
@@ -2032,15 +2135,29 @@ async function load(){
                 error
             );
 
-        }else if(data?.game_data){
+        }else if(data){
 
-            raw =
-                JSON.stringify(data.game_data);
+            accountResetVersion = data.reset_version ?? 0;
 
-            localStorage.setItem(
-                SAVE_KEY,
-                raw
-            );
+            if(accountResetVersion > 0){
+
+                raw = null;
+
+                localStorage.removeItem(
+                    SAVE_KEY
+                );
+
+            }else{
+
+                raw =
+                    JSON.stringify(data.game_data);
+
+                localStorage.setItem(
+                    SAVE_KEY,
+                    raw
+                );
+
+            }
         }
     }
 
@@ -2081,6 +2198,12 @@ async function load(){
 
         autoRebirthPurchased =
             d.autoRebirthPurchased ?? autoRebirthPurchased;
+
+        autoRebirthEnabled =
+            d.autoRebirthEnabled ?? autoRebirthEnabled;
+
+        autoRebirthTarget =
+            d.autoRebirthTarget ?? autoRebirthTarget;
 
         clickBoostCost =
             d.clickBoostCost ?? clickBoostCost;
@@ -3418,6 +3541,111 @@ function upgradeLuck(){
     save();
 }
 
+function selectAutoRebirth(){
+
+    if(!autoRebirthPurchased){
+
+        showNotification(
+            "🔒 Locked",
+            "Purchase Auto-Rebirth first."
+        );
+
+        return;
+    }
+
+    const choices = [];
+
+    for(
+        let level = 1;
+        level <= rebirthUpgradeLevel;
+        level++
+    ){
+
+        const amount =
+            rebirthUpgradeAmounts[level];
+
+        if(amount !== undefined){
+            choices.push(amount);
+        }
+    }
+
+    if(choices.length === 0){
+
+        showNotification(
+            "🔒 No Targets",
+            "Unlock a rebirth amount first."
+        );
+
+        return;
+    }
+
+    const choiceText = choices
+        .map(
+            value =>
+                `${value}: Rebirth ×${formatRebirthAmount(value)}`
+        )
+        .join("\n");
+
+    const selected = prompt(
+        `Select Auto-Rebirth target:\n\n${choiceText}\n\nEnter a number:`
+    );
+
+    if(selected === null){
+        return;
+    }
+
+    const target = Number(selected);
+
+    if(!choices.includes(target)){
+
+        showNotification(
+            "❌ Invalid Target",
+            "Please choose one of your unlocked rebirth amounts."
+        );
+
+        return;
+    }
+
+    autoRebirthTarget = target;
+
+    updateUI();
+    save();
+
+    showNotification(
+        "🎯 Target Selected!",
+        `Auto-Rebirth target set to ×${formatRebirthAmount(target)}.`
+    );
+}
+
+
+function toggleAutoRebirth(){
+
+    if(!autoRebirthPurchased){
+
+        showNotification(
+            "🔒 Locked",
+            "Purchase Auto-Rebirth first."
+        );
+
+        return;
+    }
+
+    autoRebirthEnabled =
+        !autoRebirthEnabled;
+
+    updateUI();
+    save();
+
+    showNotification(
+        autoRebirthEnabled
+            ? "🟢 Auto-Rebirth ON"
+            : "🔴 Auto-Rebirth OFF",
+        autoRebirthEnabled
+            ? `Automatically rebirthing ×${autoRebirthTarget}.`
+            : "Auto-Rebirth has been disabled."
+    );
+}
+
 function rebirth(){
     rebirthMultiple(1);
 }
@@ -3603,6 +3831,50 @@ function rebirthMultiple(amount){
         formatCoins(newTotalCost);
 
     save();
+}
+
+function checkAutoRebirth(){
+
+    if(!autoRebirthPurchased){
+        return;
+    }
+
+    if(!autoRebirthEnabled){
+        return;
+    }
+
+    const amount = autoRebirthTarget;
+
+    if(!amount || amount < 1){
+        return;
+    }
+
+    let totalCost = 0;
+    let tempCost = rebirthCost;
+
+    for(let i = 0; i < amount; i++){
+
+        if(
+            tempCost >= Number.MAX_VALUE ||
+            totalCost >= Number.MAX_VALUE - tempCost
+        ){
+            totalCost = Number.MAX_VALUE;
+            break;
+        }
+
+        totalCost += tempCost;
+
+        tempCost =
+            Math.min(
+                tempCost * 2.5,
+                Number.MAX_VALUE
+            );
+    }
+
+    if(coins >= totalCost){
+
+        rebirthMultiple(amount);
+    }
 }
 
 function upgradeClickSpeed(){
@@ -4303,6 +4575,16 @@ document.getElementById("equipUpgrade").addEventListener(
 document.getElementById("autoRebirthUpgrade").addEventListener(
     "click",
     upgradeAutoRebirth
+);
+
+document.getElementById("selectAutoRebirthButton").addEventListener(
+    "click",
+    selectAutoRebirth
+);
+
+document.getElementById("toggleAutoRebirthButton").addEventListener(
+    "click",
+    toggleAutoRebirth
 );
 
 document.getElementById("shopClickMultiplierButton").addEventListener("click", () => {
