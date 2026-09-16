@@ -299,7 +299,7 @@ function formatLeaderboardValue(value, type){
 
 const SAVE_KEY = "petHatchersBrowserV2";
 
-let coins = 1000;
+let coins = 0;
 let rebirths = 0;
 let rebirthCost = 10000;
 let selectedRebirthAmount = 1;
