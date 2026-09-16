@@ -10,6 +10,7 @@ const supabaseClient =
 
 let currentUser = null;
 let accountResetVersion = 0;
+let loadingOnlineSave = false;
 let autoRebirthPurchased = false;
 let autoRebirthEnabled = false;
 let autoRebirthTarget = 1;
@@ -2154,68 +2155,78 @@ async function save(){
 
 async function load(){
 
+    loadingOnlineSave = true;
+
     let raw =
         localStorage.getItem(SAVE_KEY);
 
     if(currentUser){
 
-        const {
-            data,
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("player_data")
+        .select("game_data, reset_version")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+    if(error){
+
+        console.error(
+            "Online load error:",
             error
-        } = await supabaseClient
-            .from("player_data")
-            .select("game_data, reset_version")
-            .eq("user_id", currentUser.id)
-            .maybeSingle();
+        );
 
-        if(error){
+    }else if(data){
 
-            console.error(
-                "Online load error:",
-                error
+        accountResetVersion = data.reset_version ?? 0;
+
+        if(accountResetVersion > 0){
+
+            raw = null;
+
+            localStorage.removeItem(
+                SAVE_KEY
             );
 
-        }else if(data){
+            accountResetVersion = 0;
 
-            accountResetVersion = data.reset_version ?? 0;
-
-            if(accountResetVersion > 0){
-
-                raw = null;
-
-                localStorage.removeItem(
-                    SAVE_KEY
+            await supabaseClient
+                .from("player_data")
+                .update({
+                    game_data: {},
+                    reset_version: 0,
+                    updated_at: new Date().toISOString()
+                })
+                .eq(
+                    "user_id",
+                    currentUser.id
                 );
 
-                accountResetVersion = 0;
+        }else{
 
-                await supabaseClient
-                    .from("player_data")
-                    .update({
-                        game_data: {},
-                        reset_version: 0,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq(
-                        "user_id",
-                        currentUser.id
-                    );
+            raw =
+                JSON.stringify(data.game_data);
 
-            }else{
+            localStorage.setItem(
+                SAVE_KEY,
+                raw
+            );
 
-                raw =
-                    JSON.stringify(data.game_data);
+            console.log(
+                "ONLINE SAVE LOADED:",
+                data.game_data
+            );
 
-                localStorage.setItem(
-                    SAVE_KEY,
-                    raw
-                );
-
-            }
         }
     }
+}
 
-    if(!raw) return;
+    if(!raw){
+        loadingOnlineSave = false;
+        return;
+    }
 
     try{
 
@@ -2392,6 +2403,8 @@ async function load(){
             e
         );
     }
+
+    loadingOnlineSave = false;
 }
 
 function renderEggs(){
