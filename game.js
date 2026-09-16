@@ -4828,6 +4828,12 @@ async function restoreLogin(){
 
 restoreLogin().then(() => {
 
+    document
+        .getElementById("logoutButton")
+        .textContent = currentUser
+            ? "LOG OUT"
+            : "LOGIN";
+
     initializeLeaderboard();
 
     MAX_EQUIPPED = getMaxEquipped();
