@@ -5295,97 +5295,86 @@ document
             return;
         }
 
+        const resetType =
+            document
+                .getElementById("adminResetType")
+                .value;
+
+        const resetNames = {
+            full: "entire game",
+            upgrades: "upgrades",
+            shop: "shop purchases",
+            upgrades_shop: "upgrades and shop purchases"
+        };
+
+        const resetName =
+            resetNames[resetType];
+
         const confirmed =
             confirm(
-                "Reset " +
-                adminTargetUsername +
-                "'s entire game?"
+                adminTargetUserId === "ALL"
+                    ? `⚠️ RESET ${resetName.toUpperCase()} FOR EVERY PLAYER?`
+                    : `Reset ${resetName} for ${adminTargetUsername}?`
             );
 
         if(!confirmed){
             return;
         }
 
-        const {
-            error
-        } = await supabaseClient
-            .rpc(
-                "admin_reset_player",
-                {
-                    target_user_id:
-                        adminTargetUserId
-                }
-            );
+        let error;
+
+        if(adminTargetUserId === "ALL"){
+
+            const {
+                error: resetError
+            } = await supabaseClient
+                .rpc(
+                    "admin_reset_all_players",
+                    {
+                        reset_type: resetType
+                    }
+                );
+
+            error = resetError;
+
+        }else{
+
+            const {
+                error: resetError
+            } = await supabaseClient
+                .rpc(
+                    "admin_reset_player",
+                    {
+                        target_user_id:
+                            adminTargetUserId,
+
+                        reset_type:
+                            resetType
+                    }
+                );
+
+            error = resetError;
+        }
 
         if(error){
 
             console.error(
                 "Admin reset error:",
-                JSON.stringify(error, null, 2)
+                error
             );
 
             alert(
-                "Reset failed."
+                "Reset failed: " +
+                error.message
             );
 
             return;
         }
 
-        if(adminTargetUserId === currentUser.id){
-
-            coins = 0;
-            gems = 0;
-            rebirths = 0;
-            rebirthCost = 100;
-            clickPower = 1;
-
-            rebirthUpgradeLevel = 0;
-            clickSpeedLevel = 0;
-            multiplierLevel = 0;
-            hatchAmountLevel = 0;
-            luckLevel = 0;
-            equipUpgradeLevel = 0;
-
-            autoRebirthPurchased = false;
-            autoRebirthEnabled = false;
-            autoRebirthTarget = 1;
-
-            clickBoostActive = false;
-            clickBoostEndTime = 0;
-            luckyBoostActive = false;
-            luckyBoostEndTime = 0;
-
-            shopClickMultiplier = 1;
-            selectedEgg = "Starter Egg";
-            unlockedEggs = new Set(["Starter Egg"]);
-
-            inventory = {};
-            discovered = new Set();
-            equippedPets = [];
-
-            totalHatches = 0;
-            totalClicks = 0;
-            hatchStreak = 0;
-            bestHatchStreak = 0;
-
-            unlockedAchievements = new Set();
-            ownedClickSkins = new Set(["Classic"]);
-            equippedClickSkin = "Classic";
-
-            shopPurchases = 0;
-            mysteryBoxesOpened = 0;
-
-            localStorage.removeItem(SAVE_KEY);
-
-            updateUI();
-            renderInventory();
-            renderIndex();
-            renderEggs();
-        }
-
         alert(
-            adminTargetUsername +
-            " has been reset."
+            adminTargetUserId === "ALL"
+                ? `ALL PLAYERS' ${resetName} have been reset.`
+                : `${adminTargetUsername}'s ${resetName} have been reset.`
         );
 
     });
