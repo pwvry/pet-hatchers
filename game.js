@@ -3566,6 +3566,7 @@ function showHatchAnimation(hatchAmount, hatchedNames){
     eggsContainer.innerHTML = "";
 
     overlay.classList.remove("hidden");
+    overlay.classList.remove("fading-out");
 
     for(let i = 0; i < hatchAmount; i++){
 
@@ -3638,9 +3639,6 @@ function showHatchAnimation(hatchAmount, hatchedNames){
     setTimeout(() => {
 
         overlay.classList.add("fading-out");
-
-        resultEl.textContent =
-            `🎉 You hatched ${hatchAmount} eggs! · ${hatchedNames.join(", ")}`;
 
         renderInventory();
         renderIndex();
