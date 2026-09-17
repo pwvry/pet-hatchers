@@ -3769,12 +3769,6 @@ function showHatchAnimation(hatchAmount, hatchedNames){
             "hatch-animation-egg shaking";
 
         egg.innerHTML = `
-            <div class="hatch-countdown">
-                <span class="countdown-number">2</span>
-                <span class="countdown-number">3</span>
-                <span class="countdown-hatch">HATCH!</span>
-            </div>
-
             <div class="hatch-egg-emoji">
                 🥚
             </div>
