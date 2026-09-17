@@ -4820,6 +4820,10 @@ async function loadAdminPlayers(){
         </option>
     `;
 
+    if(!data){
+        return;
+    }
+
     data.forEach(player => {
 
         const option =
