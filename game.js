@@ -5294,6 +5294,7 @@ document
         const resetNames = {
             full: "entire game",
             upgrades: "upgrades",
+            rebirths: "rebirths",
             shop: "shop purchases",
             upgrades_shop: "upgrades and shop purchases"
         };
