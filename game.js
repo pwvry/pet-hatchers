@@ -4793,11 +4793,10 @@ document
     .getElementById("adminSearchButton")
     .addEventListener("click", async () => {
 
-        const username =
+        const selectedPlayer =
             document
                 .getElementById("adminPlayerSearch")
-                .value
-                .trim();
+                .value;
 
         const result =
             document
@@ -4810,9 +4809,29 @@ document
         result.textContent = "";
         controls.classList.add("hidden");
 
-        if(!username){
+        if(!selectedPlayer){
+
             result.textContent =
-                "Enter a username.";
+                "Select a player.";
+
+            return;
+        }
+
+        if(selectedPlayer === "ALL"){
+
+            adminTargetUserId = "ALL";
+            adminTargetUsername = "ALL PLAYERS";
+
+            document
+                .getElementById("adminTargetName")
+                .textContent =
+                "Editing: ALL PLAYERS";
+
+            result.textContent =
+                "All players selected.";
+
+            controls.classList.remove("hidden");
+
             return;
         }
 
@@ -4822,18 +4841,18 @@ document
         } = await supabaseClient
             .from("usernames")
             .select("username, user_id")
-            .eq("username", username)
+            .eq("username", selectedPlayer)
             .maybeSingle();
 
         if(error){
 
             console.error(
-                "Admin search error:",
+                "Admin player error:",
                 error
             );
 
             result.textContent =
-                "Search failed.";
+                "Player lookup failed.";
 
             return;
         }
@@ -4858,7 +4877,7 @@ document
             "Editing: " + data.username;
 
         result.textContent =
-            "Player found.";
+            "Player selected.";
 
         controls.classList.remove("hidden");
 
@@ -4970,26 +4989,46 @@ document
         }
 
         const confirmed =
-            confirm(
-                "Reset " +
+        confirm(
+            adminTargetUserId === "ALL"
+                ? "⚠️ RESET EVERY PLAYER'S ENTIRE GAME?"
+                : "Reset " +
                 adminTargetUsername +
                 "'s entire game?"
-            );
+        );
 
         if(!confirmed){
             return;
         }
 
-        const {
-            error
-        } = await supabaseClient
-            .rpc(
-                "admin_reset_player",
-                {
-                    target_user_id:
-                        adminTargetUserId
-                }
-            );
+        let error;
+
+        if(adminTargetUserId === "ALL"){
+
+            const {
+                error: resetError
+            } = await supabaseClient
+                .rpc(
+                    "admin_reset_all_players"
+                );
+
+            error = resetError;
+
+        }else{
+
+            const {
+                error: resetError
+            } = await supabaseClient
+                .rpc(
+                    "admin_reset_player",
+                    {
+                        target_user_id:
+                            adminTargetUserId
+                    }
+                );
+
+            error = resetError;
+        }
 
         if(error){
 
@@ -5013,8 +5052,10 @@ document
         }
 
         alert(
-            adminTargetUsername +
-            " has been reset."
+            adminTargetUserId === "ALL"
+                ? "ALL PLAYERS have been reset."
+                : adminTargetUsername +
+                " has been reset."
         );
 
     });

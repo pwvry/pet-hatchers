@@ -2576,6 +2576,19 @@ button{
     font-size: 15px;
 }
 
+.admin-card select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin: 7px 0 15px;
+    border: none;
+    border-radius: 9px;
+    background: #1e293b;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+}
+
 .admin-card label {
     display: block;
     color: #cbd5e1;
