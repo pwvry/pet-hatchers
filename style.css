@@ -2819,6 +2819,17 @@ button{
     margin-top:0;
 }
 
+#inventory .pet-card-buttons .unequip-pet-button{
+    background:linear-gradient(
+        135deg,
+        #8b73ff,
+        #5b4bb7
+    ) !important;
+
+    color:#ffffff !important;
+    border:1px solid rgba(255,255,255,.15) !important;
+}
+
 #inventory .delete-pet-button{
 
     background:
@@ -3266,4 +3277,49 @@ textarea{
 
     background:rgba(139,115,255,.18) !important;
     color:white !important;
+}
+
+/* INVENTORY UNEQUIP BUTTON */
+
+#inventory .secondary-button{
+    width:100%;
+    margin-top:10px;
+    padding:10px 14px;
+
+    background:rgba(139,115,255,.14) !important;
+    color:#c4b5fd !important;
+
+    border:1px solid rgba(139,115,255,.45) !important;
+    border-radius:10px;
+
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.5px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 4px 12px rgba(0,0,0,.15);
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+#inventory .secondary-button:hover{
+    background:rgba(139,115,255,.28) !important;
+    color:#ffffff !important;
+
+    border-color:rgba(167,139,250,.75) !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 6px 18px rgba(139,115,255,.22),
+        inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+#inventory .secondary-button:active{
+    transform:translateY(0);
 }
