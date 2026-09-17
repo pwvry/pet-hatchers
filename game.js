@@ -5263,21 +5263,18 @@ document
             return;
         }
 
-        if(adminTargetUserId === currentUser.id){
+        if(
+            adminTargetUserId === "ALL" ||
+            adminTargetUserId === currentUser.id
+        ){
 
-            if(changes.rebirths !== undefined){
-                rebirths = changes.rebirths;
-            }
-
-            if(changes.coins !== undefined){
-                coins = changes.coins;
-            }
-
-            if(changes.gems !== undefined){
-                gems = changes.gems;
-            }
+            await load();
 
             updateUI();
+            renderInventory();
+            renderIndex();
+            renderEggs();
+            updateRebirthButtons();
         }
 
         alert(
@@ -5308,7 +5305,7 @@ document
         };
 
         const resetName =
-            resetNames[resetType];
+            resetNames[resetType] || "selected items";
 
         const confirmed =
             confirm(
@@ -5331,7 +5328,8 @@ document
                 .rpc(
                     "admin_reset_all_players",
                     {
-                        reset_type: resetType
+                        reset_type:
+                            resetType
                     }
                 );
 
@@ -5369,6 +5367,26 @@ document
             );
 
             return;
+        }
+
+        /*
+         * If we reset the current player,
+         * reload their state from Supabase
+         * so the change happens immediately.
+         */
+        if(
+            adminTargetUserId === "ALL" ||
+            adminTargetUserId === currentUser.id
+        ){
+
+            await load();
+
+            updateUI();
+            renderInventory();
+            renderIndex();
+            renderEggs();
+            updateRebirthButtons();
+
         }
 
         alert(
