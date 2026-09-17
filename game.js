@@ -2051,7 +2051,7 @@ if(luckyBoostActive){
 
 }
 
-    clickPower = Math.pow(2, rebirths);
+    clickPower = rebirths + 1;
     coinsEl.textContent=formatCoins(coins);
     gemsEl.textContent=formatCoins(gems);
     document.getElementById("selectedEggName").textContent=eggs[selectedEgg].emoji+" "+selectedEgg;
