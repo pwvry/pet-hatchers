@@ -4167,8 +4167,7 @@ function rebirthMultiple(amount){
 
     rebirthCost = tempCost;
 
-    clickPower =
-        Math.pow(2, rebirths);
+    clickPower = rebirths + 1;
 
     document.getElementById("rebirthResult").textContent =
         `🎉 REBIRTH ×${formatRebirthAmount(amount)}! +${formatCoins(amount * 10)} 💎 gems`;
