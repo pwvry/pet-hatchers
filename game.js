@@ -5100,9 +5100,15 @@ document
 
         if(adminTargetUserId === currentUser.id){
 
-            localStorage.removeItem(SAVE_KEY);
+            coins = Number(changes.coins ?? coins);
+            gems = Number(changes.gems ?? gems);
+            rebirths = Number(changes.rebirths ?? rebirths);
 
-            location.reload();
+            updateUI();
+            save();
+
+            document.getElementById("adminPlayerResult").textContent =
+                "Changes applied instantly.";
         }
 
         alert(
