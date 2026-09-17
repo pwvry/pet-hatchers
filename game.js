@@ -2037,6 +2037,8 @@ if(luckyBoostActive){
     document.getElementById("rebirthGems").textContent = formatCoins(gems);
     document.getElementById("rebirthCount").textContent = rebirths;
     document.getElementById("rebirthClickPower").textContent = formatCoins(clickPower) + "x";
+    document.getElementById("selectedAutoRebirthAmount").textContent =
+        "×" + formatRebirthAmount(autoRebirthTarget);
 
     updateUpgradeUI();
 }
