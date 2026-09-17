@@ -4789,6 +4789,54 @@ document.getElementById("toggleAutoRebirthButton").addEventListener(
     toggleAutoRebirth
 );
 
+async function loadAdminPlayers(){
+
+    const playerSelect =
+        document.getElementById("adminPlayerSearch");
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .rpc("admin_get_players");
+
+    if(error){
+
+        console.error(
+            "Admin player list error:",
+            error
+        );
+
+        return;
+    }
+
+    playerSelect.innerHTML = `
+        <option value="">
+            SELECT PLAYER
+        </option>
+
+        <option value="ALL">
+            🌎 ALL PLAYERS
+        </option>
+    `;
+
+    data.forEach(player => {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            player.username;
+
+        option.textContent =
+            player.username;
+
+        playerSelect.appendChild(option);
+
+    });
+
+}
+
 document
     .getElementById("adminSearchButton")
     .addEventListener("click", async () => {
@@ -4928,26 +4976,48 @@ document
             return;
         }
 
-        const {
-            error
-        } = await supabaseClient
-            .rpc(
-                "admin_update_player",
-                {
-                    target_user_id:
-                        adminTargetUserId,
+        let error;
 
-                    changes:
-                        changes
-                }
-            );
+        if(adminTargetUserId === "ALL"){
+
+            const {
+                error: updateError
+            } = await supabaseClient
+                .rpc(
+                    "admin_update_all_players",
+                    {
+                        changes:
+                            changes
+                    }
+                );
+
+            error = updateError;
+
+        }else{
+
+            const {
+                error: updateError
+            } = await supabaseClient
+                .rpc(
+                    "admin_update_player",
+                    {
+                        target_user_id:
+                            adminTargetUserId,
+
+                        changes:
+                            changes
+                    }
+                );
+
+            error = updateError;
+        }
 
         if(error){
 
-            console.error(
-                "Admin update error:",
-                error
-            );
+            console.error("ADMIN ERROR MESSAGE:", error?.message);
+            console.error("ADMIN ERROR DETAILS:", error?.details);
+            console.error("ADMIN ERROR HINT:", error?.hint);
+            console.error("ADMIN ERROR CODE:", error?.code);
 
             alert(
                 "Admin update failed."
@@ -4989,52 +5059,32 @@ document
         }
 
         const confirmed =
-        confirm(
-            adminTargetUserId === "ALL"
-                ? "⚠️ RESET EVERY PLAYER'S ENTIRE GAME?"
-                : "Reset " +
+            confirm(
+                "Reset " +
                 adminTargetUsername +
                 "'s entire game?"
-        );
+            );
 
         if(!confirmed){
             return;
         }
 
-        let error;
-
-        if(adminTargetUserId === "ALL"){
-
-            const {
-                error: resetError
-            } = await supabaseClient
-                .rpc(
-                    "admin_reset_all_players"
-                );
-
-            error = resetError;
-
-        }else{
-
-            const {
-                error: resetError
-            } = await supabaseClient
-                .rpc(
-                    "admin_reset_player",
-                    {
-                        target_user_id:
-                            adminTargetUserId
-                    }
-                );
-
-            error = resetError;
-        }
+        const {
+            error
+        } = await supabaseClient
+            .rpc(
+                "admin_reset_player",
+                {
+                    target_user_id:
+                        adminTargetUserId
+                }
+            );
 
         if(error){
 
             console.error(
                 "Admin reset error:",
-                error
+                JSON.stringify(error, null, 2)
             );
 
             alert(
@@ -5052,10 +5102,8 @@ document
         }
 
         alert(
-            adminTargetUserId === "ALL"
-                ? "ALL PLAYERS have been reset."
-                : adminTargetUsername +
-                " has been reset."
+            adminTargetUsername +
+            " has been reset."
         );
 
     });
@@ -5068,6 +5116,8 @@ document
             .getElementById("adminPanel")
             .classList
             .toggle("hidden");
+
+            loadAdminPlayers();
 
     });
 
