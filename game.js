@@ -562,7 +562,7 @@ const SAVE_KEY = "petHatchersBrowserV2";
 
 let coins = 0;
 let rebirths = 0;
-let rebirthCost = 10000;
+let rebirthCost = 100;
 let selectedRebirthAmount = 1;
 let gems = 0;
 let rebirthUpgradeLevel = 0;
@@ -1165,7 +1165,7 @@ function autoRebirthCheck(){
 
         tempCost =
             Math.min(
-                tempCost * 2.5,
+                tempCost * 1.5,
                 Number.MAX_VALUE
             );
     }
@@ -2071,7 +2071,7 @@ if(luckyBoostActive){
         totalCost += tempCost;
 
         tempCost =
-            Math.floor(tempCost * 2.5);
+            Math.floor(tempCost * 1.5);
     }
 
     document.getElementById("rebirthCost").textContent =
@@ -3670,7 +3670,8 @@ function upgradeLuck(){
         return;
     }
 
-    const cost = 50;
+    const clickSpeedCosts = [10, 20, 30, 40, 50];
+    const cost = clickSpeedCosts[clickSpeedLevel];
 
     if(gems < cost){
 
@@ -3904,7 +3905,7 @@ function rebirthMultiple(amount){
 
     tempCost =
         Math.min(
-            tempCost * 2.5,
+            tempCost * 1.5,
             Number.MAX_VALUE
         );
 }
@@ -3963,7 +3964,7 @@ function rebirthMultiple(amount){
 
         newTempCost =
             Math.min(
-                newTempCost * 2.5,
+                newTempCost * 1.5,
                 Number.MAX_VALUE
             );
     }
@@ -4007,7 +4008,7 @@ function checkAutoRebirth(){
 
         tempCost =
             Math.min(
-                tempCost * 2.5,
+                tempCost * 1.5,
                 Number.MAX_VALUE
             );
     }
