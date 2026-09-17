@@ -266,6 +266,8 @@ async function createAccount(){
 
     updateUI();
 
+    startLiveSync();
+
     await saveLeaderboardStats();
     await loadLeaderboards();
 }
@@ -369,6 +371,8 @@ async function loginAccount(){
     await load();
 
     updateUI();
+
+    startLiveSync();
 
     await saveLeaderboardStats();
 }
@@ -2154,6 +2158,235 @@ async function save(){
 }
 
 async function load(){
+
+    let liveSyncInterval = null;
+    let liveSyncLoading = false;
+
+    async function liveSync(){
+
+        if(!currentUser){
+            return;
+        }
+
+        if(liveSyncLoading){
+            return;
+        }
+
+        liveSyncLoading = true;
+
+        try{
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+                .from("player_data")
+                .select("game_data, reset_version, updated_at")
+                .eq("user_id", currentUser.id)
+                .maybeSingle();
+
+            if(error){
+                console.error(
+                    "Live sync error:",
+                    error
+                );
+
+                liveSyncLoading = false;
+                return;
+            }
+
+            if(!data){
+                liveSyncLoading = false;
+                return;
+            }
+
+            /*
+            * A reset is waiting.
+            */
+            if((data.reset_version ?? 0) > 0){
+
+                accountResetVersion = 1;
+
+                coins = 0;
+                gems = 0;
+                rebirths = 0;
+                rebirthCost = 100;
+                clickPower = 1;
+
+                rebirthUpgradeLevel = 0;
+                clickSpeedLevel = 0;
+                multiplierLevel = 0;
+                hatchAmountLevel = 0;
+                luckLevel = 0;
+                equipUpgradeLevel = 0;
+
+                autoRebirthPurchased = false;
+                autoRebirthEnabled = false;
+                autoRebirthTarget = 1;
+
+                clickBoostActive = false;
+                clickBoostEndTime = 0;
+                luckyBoostActive = false;
+                luckyBoostEndTime = 0;
+
+                shopClickMultiplier = 1;
+                selectedEgg = "Starter Egg";
+                unlockedEggs = new Set(["Starter Egg"]);
+
+                inventory = {};
+                discovered = new Set();
+                equippedPets = [];
+
+                totalHatches = 0;
+                totalClicks = 0;
+                hatchStreak = 0;
+                bestHatchStreak = 0;
+
+                unlockedAchievements = new Set();
+                ownedClickSkins = new Set(["Classic"]);
+                equippedClickSkin = "Classic";
+
+                shopPurchases = 0;
+                mysteryBoxesOpened = 0;
+
+                localStorage.removeItem(SAVE_KEY);
+
+                updateUI();
+                renderInventory();
+                renderIndex();
+                renderEggs();
+
+                accountResetVersion = 0;
+
+                liveSyncLoading = false;
+                return;
+            }
+
+            /*
+            * Apply the latest online game data.
+            */
+            const d = data.game_data || {};
+
+            coins = d.coins ?? coins;
+            gems = d.gems ?? gems;
+            rebirths = d.rebirths ?? rebirths;
+            rebirthCost = d.rebirthCost ?? rebirthCost;
+            clickPower = d.clickPower ?? clickPower;
+
+            rebirthUpgradeLevel =
+                Math.min(
+                    d.rebirthUpgradeLevel ?? rebirthUpgradeLevel,
+                    MAX_REBIRTH_UPGRADE
+                );
+
+            clickSpeedLevel =
+                d.clickSpeedLevel ?? clickSpeedLevel;
+
+            multiplierLevel =
+                d.multiplierLevel ?? multiplierLevel;
+
+            hatchAmountLevel =
+                d.hatchAmountLevel ?? hatchAmountLevel;
+
+            luckLevel =
+                d.luckLevel ?? luckLevel;
+
+            equipUpgradeLevel =
+                d.equipUpgradeLevel ?? equipUpgradeLevel;
+
+            autoRebirthPurchased =
+                d.autoRebirthPurchased ?? autoRebirthPurchased;
+
+            autoRebirthEnabled =
+                d.autoRebirthEnabled ?? autoRebirthEnabled;
+
+            autoRebirthTarget =
+                d.autoRebirthTarget ?? autoRebirthTarget;
+
+            shopClickMultiplier =
+                d.shopClickMultiplier ?? shopClickMultiplier;
+
+            selectedEgg =
+                d.selectedEgg ?? selectedEgg;
+
+            unlockedEggs =
+                new Set(
+                    d.unlockedEggs ?? ["Starter Egg"]
+                );
+
+            inventory =
+                d.inventory ?? {};
+
+            discovered =
+                new Set(
+                    d.discovered ?? []
+                );
+
+            equippedPets =
+                d.equippedPets ?? [];
+
+            totalHatches =
+                d.totalHatches ?? totalHatches;
+
+            hatchStreak =
+                d.hatchStreak ?? hatchStreak;
+
+            bestHatchStreak =
+                d.bestHatchStreak ?? bestHatchStreak;
+
+            unlockedAchievements =
+                new Set(
+                    d.unlockedAchievements ?? []
+                );
+
+            ownedClickSkins =
+                new Set(
+                    d.ownedClickSkins ?? ["Classic"]
+                );
+
+            equippedClickSkin =
+                d.equippedClickSkin ?? "Classic";
+
+            shopPurchases =
+                d.shopPurchases ?? shopPurchases;
+
+            mysteryBoxesOpened =
+                d.mysteryBoxesOpened ?? mysteryBoxesOpened;
+
+            localStorage.setItem(
+                SAVE_KEY,
+                JSON.stringify(d)
+            );
+
+            updateUI();
+            renderInventory();
+            renderIndex();
+            renderEggs();
+
+        }catch(error){
+
+            console.error(
+                "Live sync exception:",
+                error
+            );
+
+        }
+
+        liveSyncLoading = false;
+    }
+
+    function startLiveSync(){
+
+        if(liveSyncInterval){
+            clearInterval(liveSyncInterval);
+        }
+
+        liveSyncInterval =
+            setInterval(
+                liveSync,
+                2000
+            );
+    }
 
     loadingOnlineSave = true;
 
@@ -5100,15 +5333,54 @@ document
 
         if(adminTargetUserId === currentUser.id){
 
-            coins = Number(changes.coins ?? coins);
-            gems = Number(changes.gems ?? gems);
-            rebirths = Number(changes.rebirths ?? rebirths);
+            coins = 0;
+            gems = 0;
+            rebirths = 0;
+            rebirthCost = 100;
+            clickPower = 1;
+
+            rebirthUpgradeLevel = 0;
+            clickSpeedLevel = 0;
+            multiplierLevel = 0;
+            hatchAmountLevel = 0;
+            luckLevel = 0;
+            equipUpgradeLevel = 0;
+
+            autoRebirthPurchased = false;
+            autoRebirthEnabled = false;
+            autoRebirthTarget = 1;
+
+            clickBoostActive = false;
+            clickBoostEndTime = 0;
+            luckyBoostActive = false;
+            luckyBoostEndTime = 0;
+
+            shopClickMultiplier = 1;
+            selectedEgg = "Starter Egg";
+            unlockedEggs = new Set(["Starter Egg"]);
+
+            inventory = {};
+            discovered = new Set();
+            equippedPets = [];
+
+            totalHatches = 0;
+            totalClicks = 0;
+            hatchStreak = 0;
+            bestHatchStreak = 0;
+
+            unlockedAchievements = new Set();
+            ownedClickSkins = new Set(["Classic"]);
+            equippedClickSkin = "Classic";
+
+            shopPurchases = 0;
+            mysteryBoxesOpened = 0;
+
+            localStorage.removeItem(SAVE_KEY);
 
             updateUI();
-            save();
-
-            document.getElementById("adminPlayerResult").textContent =
-                "Changes applied instantly.";
+            renderInventory();
+            renderIndex();
+            renderEggs();
         }
 
         alert(
