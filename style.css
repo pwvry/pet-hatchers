@@ -2971,3 +2971,47 @@ button{
     }
 
 }
+
+.rebirth-button-cost{
+    text-align:center;
+    color:#cbd5e1;
+    font-size:14px;
+    font-weight:700;
+    margin: -8px 0 14px;
+}
+
+.rebirth-button-cost strong{
+    color:white;
+}
+
+.auto-rebirth-cost{
+    color:#cbd5e1;
+    font-size:13px;
+    font-weight:700;
+    margin:6px 0 10px;
+}
+
+.auto-rebirth-cost strong{
+    color:white;
+}
+
+.rebirth-choice-button{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    line-height:1.2;
+}
+
+#rebirthButtons{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.rebirth-choice-button small{
+    font-size:14px;
+    font-weight:700;
+    color:#cbd5e1;
+}

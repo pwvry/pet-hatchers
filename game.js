@@ -570,7 +570,7 @@ let rebirthCost = 100;
 let selectedRebirthAmount = 1;
 let gems = 0;
 let rebirthUpgradeLevel = 0;
-const MAX_REBIRTH_UPGRADE = 15;
+const MAX_REBIRTH_UPGRADE = 6;
 
 let adminTargetUserId = null;
 let adminTargetUsername = null;
@@ -1000,30 +1000,7 @@ const rebirthUpgradeAmounts = [
     10,
     20,
     50,
-    100,
-    200,
-    500,
-    1000,
-    2000,
-    5000,
-    10000,
-    20000,
-    50000,
-    100000,
-    200000,
-    500000,
-    1000000,
-    2000000,
-    5000000,
-    10000000,
-    20000000,
-    50000000,
-    100000000,
-    200000000,
-    500000000,
-    1000000000,
-    2000000000,
-    5000000000
+    100
 ];
 let clickPower = 1;
 let selectedEgg = "Starter Egg";
@@ -2060,27 +2037,7 @@ if(luckyBoostActive){
     document.getElementById("rebirthGems").textContent = formatCoins(gems);
     document.getElementById("rebirthCount").textContent = rebirths;
     document.getElementById("rebirthClickPower").textContent = formatCoins(clickPower) + "x";
-    if(selectedRebirthAmount === 1){
 
-    document.getElementById("rebirthCost").textContent =
-        formatCoins(rebirthCost);
-
-}else{
-
-    let totalCost = 0;
-    let tempCost = rebirthCost;
-
-    for(let i = 0; i < selectedRebirthAmount; i++){
-
-        totalCost += tempCost;
-
-        tempCost =
-            Math.floor(tempCost * 1.5);
-    }
-
-    document.getElementById("rebirthCost").textContent =
-        formatCoins(totalCost);
-}
     updateUpgradeUI();
 }
 
@@ -4031,7 +3988,99 @@ function updateRebirthButtons(){
     container.innerHTML = "";
     autoContainer.innerHTML = "";
 
-    for(let level = 1; level <= rebirthUpgradeLevel; level++){
+
+    /*
+     * COST CALCULATOR
+     *
+     * Each rebirth amount uses 1.5x
+     * progression from the previous rebirth.
+     *
+     * ×1 = current rebirth cost
+     * ×2 = current cost × 1.5
+     * ×5 = current cost × 1.5^4
+     * ×10 = current cost × 1.5^9
+     */
+
+    function getRebirthCost(amount){
+
+        if(amount <= 1){
+            return rebirthCost;
+        }
+
+        const cost =
+            rebirthCost *
+            Math.pow(1.5, amount - 1);
+
+        return Math.min(
+            cost,
+            Number.MAX_VALUE
+        );
+    }
+
+
+    /*
+     * CREATE REBIRTH BUTTON
+     */
+
+    function createRebirthButton(amount){
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "hatch-button rebirth-choice-button";
+
+        if(amount === 100){
+            button.style.gridColumn = "1 / -1";
+            button.style.justifySelf = "center";
+        }
+
+        button.innerHTML = `
+            <span>
+                🔄 REBIRTH ×${formatRebirthAmount(amount)}
+            </span>
+
+            <small>
+                💰 Cost: ${formatCoins(
+                    getRebirthCost(amount)
+                )} coins
+            </small>
+        `;
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                selectedRebirthAmount =
+                    amount;
+
+                rebirthMultiple(amount);
+
+            }
+        );
+
+        return button;
+    }
+
+
+    /*
+     * REBIRTH ×1
+     */
+
+    container.appendChild(
+        createRebirthButton(1)
+    );
+
+
+    /*
+     * MORE REBIRTH BUTTONS
+     */
+
+    for(
+        let level = 1;
+        level <= rebirthUpgradeLevel;
+        level++
+    ){
 
         const amount =
             rebirthUpgradeAmounts[level];
@@ -4040,27 +4089,20 @@ function updateRebirthButtons(){
             continue;
         }
 
-        /* NORMAL REBIRTH BUTTON */
+        container.appendChild(
+            createRebirthButton(amount)
+        );
 
-        const button =
-            document.createElement("button");
-
-        button.className = "hatch-button";
-
-        button.textContent =
-            `🔄 REBIRTH ×${formatRebirthAmount(amount)}`;
-
-        button.addEventListener("click", () => {
-
-            selectedRebirthAmount = amount;
-
-            rebirthMultiple(amount);
-        });
-
-        container.appendChild(button);
+    }
 
 
-        /* AUTO-REBIRTH OPTION */
+    /*
+     * AUTO-REBIRTH
+     *
+     * ×1 is ALWAYS available.
+     */
+
+    function createAutoRebirthOption(amount){
 
         const option =
             document.createElement("div");
@@ -4073,6 +4115,16 @@ function updateRebirthButtons(){
                 🔄 Rebirth ×${formatRebirthAmount(amount)}
             </div>
 
+            <div class="auto-rebirth-cost">
+                💰 Cost:
+                <strong>
+                    ${formatCoins(
+                        getRebirthCost(amount)
+                    )}
+                </strong>
+                coins
+            </div>
+
             <button
                 class="auto-rebirth-select-button"
             >
@@ -4082,22 +4134,62 @@ function updateRebirthButtons(){
 
         option
             .querySelector("button")
-            .addEventListener("click", () => {
+            .addEventListener(
+                "click",
+                () => {
 
-                autoRebirthTarget = amount;
+                    autoRebirthTarget =
+                        amount;
 
-                document
-                    .getElementById("autoRebirthPanel")
-                    .classList
-                    .add("hidden");
+                    document
+                        .getElementById(
+                            "autoRebirthPanel"
+                        )
+                        .classList
+                        .add("hidden");
 
-                updateUpgradeUI();
-                save();
+                    updateUpgradeUI();
+                    save();
 
-            });
+                }
+            );
 
-        autoContainer.appendChild(option);
+        return option;
     }
+
+
+    /*
+     * AUTO ×1
+     */
+
+    autoContainer.appendChild(
+        createAutoRebirthOption(1)
+    );
+
+
+    /*
+     * AUTO MORE OPTIONS
+     */
+
+    for(
+        let level = 1;
+        level <= rebirthUpgradeLevel;
+        level++
+    ){
+
+        const amount =
+            rebirthUpgradeAmounts[level];
+
+        if(amount === undefined){
+            continue;
+        }
+
+        autoContainer.appendChild(
+            createAutoRebirthOption(amount)
+        );
+
+    }
+
 }
 
 function formatRebirthAmount(amount){
@@ -4126,25 +4218,22 @@ function rebirthMultiple(amount){
 
     for(let i = 0; i < amount; i++){
 
-    if(
-        tempCost >= Number.MAX_VALUE ||
-        totalCost >= Number.MAX_VALUE - tempCost
-    ){
-        totalCost = Number.MAX_VALUE;
-        break;
+        if(
+            tempCost >= Number.MAX_VALUE ||
+            totalCost >= Number.MAX_VALUE - tempCost
+        ){
+            totalCost = Number.MAX_VALUE;
+            break;
+        }
+
+        totalCost += tempCost;
+
+        tempCost =
+            Math.min(
+                tempCost * 1.5,
+                Number.MAX_VALUE
+            );
     }
-
-    totalCost += tempCost;
-
-    tempCost =
-        Math.min(
-            tempCost * 1.5,
-            Number.MAX_VALUE
-        );
-}
-
-    document.getElementById("rebirthCost").textContent =
-        formatCoins(totalCost);
 
     if(coins < totalCost){
 
@@ -4165,8 +4254,15 @@ function rebirthMultiple(amount){
 
     gems += 10 * amount;
 
+    /*
+     * The next rebirth starts after
+     * every rebirth included in this purchase.
+     */
     rebirthCost = tempCost;
 
+    /*
+     * Every rebirth gives +1x click power.
+     */
     clickPower = rebirths + 1;
 
     document.getElementById("rebirthResult").textContent =
@@ -4179,30 +4275,7 @@ function rebirthMultiple(amount){
 
     updateUI();
 
-    let newTotalCost = 0;
-    let newTempCost = rebirthCost;
-
-    for(let i = 0; i < amount; i++){
-
-        if(
-            newTempCost >= Number.MAX_VALUE ||
-            newTotalCost >= Number.MAX_VALUE - newTempCost
-        ){
-            newTotalCost = Number.MAX_VALUE;
-            break;
-        }
-
-        newTotalCost += newTempCost;
-
-        newTempCost =
-            Math.min(
-                newTempCost * 1.5,
-                Number.MAX_VALUE
-            );
-    }
-
-    document.getElementById("rebirthCost").textContent =
-        formatCoins(newTotalCost);
+    updateRebirthButtons();
 
     save();
 }
