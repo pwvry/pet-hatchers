@@ -2261,10 +2261,16 @@ async function liveSync(){
 
         coins = d.coins ?? coins;
         gems = d.gems ?? gems;
-        rebirths = d.rebirths ?? rebirths;
-        rebirthCost = d.rebirthCost ?? rebirthCost;
-        clickPower = d.clickPower ?? clickPower;
 
+        rebirths = d.rebirths ?? rebirths;
+
+        if(d.rebirths === 0){
+            rebirthCost = 100;
+            clickPower = 1;
+        }else{
+            rebirthCost = d.rebirthCost ?? rebirthCost;
+            clickPower = d.clickPower ?? clickPower;
+        }
         rebirthUpgradeLevel =
             Math.min(
                 d.rebirthUpgradeLevel ?? rebirthUpgradeLevel,
