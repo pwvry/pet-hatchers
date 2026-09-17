@@ -3548,28 +3548,113 @@ function hatch(){
     }
 }
 
-    resultEl.textContent =
-        `🎉 You hatched ${hatchAmount} eggs! · ${hatchedNames.join(", ")}`;
+    showHatchAnimation(
+    hatchAmount,
+    hatchedNames
+);
 
+}
 
-    renderInventory();
+function showHatchAnimation(hatchAmount, hatchedNames){
 
-    renderIndex();
+    const overlay =
+        document.getElementById("hatchAnimationOverlay");
 
-    renderEggs();
+    const eggsContainer =
+        document.getElementById("hatchAnimationEggs");
 
-    updateUI();
+    eggsContainer.innerHTML = "";
 
-    save();
+    overlay.classList.remove("hidden");
 
+    for(let i = 0; i < hatchAmount; i++){
+
+        const egg =
+            document.createElement("div");
+
+        egg.className =
+            "hatch-animation-egg shaking";
+
+        egg.innerHTML = `
+            <div class="hatch-countdown">
+                <span class="countdown-number">2</span>
+                <span class="countdown-number">3</span>
+                <span class="countdown-hatch">HATCH!</span>
+            </div>
+
+            <div class="hatch-egg-emoji">
+                🥚
+            </div>
+        `;
+
+        eggsContainer.appendChild(egg);
+    }
 
     setTimeout(() => {
 
-    hatchLocked = false;
-    hatchButton.disabled = false;
+        const eggs =
+            document.querySelectorAll(
+                ".hatch-animation-egg"
+            );
 
-}, 500);
+        eggs.forEach((egg, index) => {
 
+            const fullResult =
+                hatchedNames[index];
+
+            const parts =
+                fullResult.split(" ");
+
+            const petName =
+                parts.slice(1).join(" ");
+
+            egg.classList.remove("shaking");
+            egg.classList.add("cracking");
+
+            setTimeout(() => {
+
+                egg.classList.remove("cracking");
+
+                egg.innerHTML = `
+                    <div class="hatch-animation-result">
+
+                        <div class="hatch-result-emoji">
+                            ${emojiForPet(petName)}
+                        </div>
+
+                        <div class="hatch-result-name">
+                            ${fullResult}
+                        </div>
+
+                    </div>
+                `;
+
+            }, 600);
+
+        });
+
+    }, 2000);
+
+    setTimeout(() => {
+
+        overlay.classList.add("fading-out");
+
+        resultEl.textContent =
+            `🎉 You hatched ${hatchAmount} eggs! · ${hatchedNames.join(", ")}`;
+
+        renderInventory();
+        renderIndex();
+        renderEggs();
+        updateUI();
+        save();
+
+        hatchLocked = false;
+
+        document
+            .getElementById("hatchButton")
+            .disabled = false;
+
+    }, 3850);
 }
 
 function upgradeLuck(){

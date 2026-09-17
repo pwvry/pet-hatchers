@@ -2705,3 +2705,256 @@ button{
 .auto-rebirth-close-button:hover {
     background: #475569;
 }
+
+/* =========================
+   HATCHING ANIMATION
+========================= */
+
+.hatch-animation-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.92);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    backdrop-filter: blur(6px);
+}
+
+.hatch-animation-overlay.fading-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hatch-animation-eggs {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 30px;
+    width: 100%;
+    max-width: 1400px;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+.hatch-animation-egg {
+    width: 180px;
+    min-width: 0;
+    height: 220px;
+    font-size: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,.45));
+}
+
+.hatch-animation-egg.shaking {
+    will-change: transform;
+    animation: eggShakeCountdown 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes eggShakeCountdown {
+
+    0% {
+        transform: translate3d(-1px, 0, 0) rotate(-1deg) scale(1);
+    }
+
+    10% {
+        transform: translate3d(1px, 0, 0) rotate(1deg) scale(1.01);
+    }
+
+    20% {
+        transform: translate3d(-1px, 0, 0) rotate(-1.5deg) scale(1.015);
+    }
+
+    30% {
+        transform: translate3d(1px, 0, 0) rotate(1.5deg) scale(1.02);
+    }
+
+    40% {
+        transform: translate3d(-2px, 0, 0) rotate(-2deg) scale(1.025);
+    }
+
+    50% {
+        transform: translate3d(2px, 0, 0) rotate(2deg) scale(1.03);
+    }
+
+    60% {
+        transform: translate3d(-2px, 0, 0) rotate(-2.5deg) scale(1.04);
+    }
+
+    70% {
+        transform: translate3d(2px, 0, 0) rotate(2.5deg) scale(1.05);
+    }
+
+    80% {
+        transform: translate3d(-3px, 0, 0) rotate(-3deg) scale(1.07);
+    }
+
+    90% {
+        transform: translate3d(3px, 0, 0) rotate(3deg) scale(1.1);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) rotate(0deg) scale(1.12);
+    }
+
+}
+
+.hatch-animation-egg.cracking {
+    animation: eggCrack 0.6s forwards;
+}
+
+@keyframes eggCrack {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    40% {
+        transform: scale(1.15) rotate(-8deg);
+    }
+
+    70% {
+        transform: scale(1.2) rotate(8deg);
+    }
+
+    100% {
+        transform: scale(0) rotate(15deg);
+        opacity: 0;
+    }
+}
+
+.hatch-animation-result {
+    width: 180px;
+    min-height: 210px;
+    padding: 18px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,41,70,.98),
+            rgba(16,23,42,.99)
+        );
+
+    border: 2px solid rgba(139,115,255,.55);
+    border-radius: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.45),
+        0 0 30px rgba(139,115,255,.18);
+
+    animation: petReveal 0.6s ease-out;
+}
+
+.hatch-result-emoji {
+    font-size: 72px;
+    line-height: 1;
+    margin-bottom: 14px;
+
+    filter:
+        drop-shadow(0 8px 12px rgba(0,0,0,.4));
+}
+
+.hatch-result-name {
+    color: white;
+    font-size: 20px;
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.25;
+}
+
+@keyframes petReveal {
+
+    0% {
+        transform: scale(0) rotate(-12deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.15) rotate(6deg);
+        opacity: 1;
+    }
+
+    75% {
+        transform: scale(.95) rotate(-3deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+}
+
+@media(max-width:700px) {
+
+    .hatch-animation-eggs {
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .hatch-animation-egg {
+        width: 130px;
+        height: 170px;
+    }
+
+        .hatch-animation-result {
+        width: 130px;
+        min-height: 160px;
+        padding: 12px;
+    }
+
+    .hatch-result-emoji {
+        font-size: 52px;
+        margin-bottom: 10px;
+    }
+
+    .hatch-result-name {
+        font-size: 15px;
+    }
+
+}
+
+.hatch-animation-egg {
+    position: relative;
+}
+
+.hatch-countdown {
+    position: absolute;
+    top: -70px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 38px;
+    font-weight: 900;
+    color: white;
+}
+
+.countdown-number,
+.countdown-hatch {
+    display: none;
+}
+
+.hatch-egg-emoji {
+    font-size: 120px;
+}
+
+@keyframes countdown1 {
+
+    0%, 30% {
+        opacity: 1;
+    }
+
+    31%, 100% {
+        opacity: 0;
+    }
+
+}
