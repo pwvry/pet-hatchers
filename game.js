@@ -2036,6 +2036,7 @@ if(luckyBoostActive){
     document.getElementById("rebirthCoins").textContent = formatCoins(coins);
     document.getElementById("rebirthGems").textContent = formatCoins(gems);
     document.getElementById("rebirthCount").textContent = rebirths;
+    document.getElementById("rebirthsTop").textContent = formatRebirthAmount(rebirths);
     document.getElementById("rebirthClickPower").textContent = formatCoins(clickPower) + "x";
     document.getElementById("selectedAutoRebirthAmount").textContent =
         "×" + formatRebirthAmount(autoRebirthTarget);
@@ -2768,14 +2769,18 @@ function hatch(){
         eggs[selectedEgg].cost;
 
 
-    const hatchAmount =
+    const maxHatchAmount =
         hatchAmountLevel + 1;
 
-    if(coins < cost * hatchAmount){
+    const hatchAmount =
+        Math.min(
+            maxHatchAmount,
+            Math.floor(coins / cost)
+        );
 
+    if(hatchAmount < 1){
         resultEl.textContent =
             "❌ Not enough coins!";
-
         return;
     }
 
