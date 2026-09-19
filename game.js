@@ -3976,42 +3976,133 @@ function formatGlobalRarity(rarity){
 
 async function loadGlobalHatches(){
 
-    if(!currentUser){
+    const feed =
+        document.getElementById("globalHatchesFeed");
+
+    if(!feed){
+        console.error("❌ globalHatchesFeed NOT FOUND");
         return;
     }
 
-    const { data, error } =
-        await supabaseClient
-            .from("global_hatches")
-            .select("*")
-            .order("created_at", {
-                ascending:true
-            })
-            .limit(50);
+    if(!currentUser){
+        console.log("🌎 GLOBAL HATCH LOAD: No user yet");
+        return;
+    }
+
+    console.log("🌎 LOADING GLOBAL HATCHES...");
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("global_hatches")
+        .select("id, username, pet_name, rarity, created_at")
+        .order("created_at", {
+            ascending: false
+        })
+        .limit(50);
 
     if(error){
 
         console.error(
-            "Global hatch load error:",
+            "❌ GLOBAL HATCH LOAD ERROR:",
             error
         );
 
         return;
     }
 
-    const feed =
-        document.getElementById(
-            "globalHatchesFeed"
-        );
-
-    if(feed){
-        feed.innerHTML = "";
-    }
-
-    data.forEach(
-        renderGlobalHatch
+    console.log(
+        "🌎 SAVED GLOBAL HATCHES:",
+        data
     );
 
+    /*
+     * Clear the existing feed once.
+     * Then rebuild it from the database.
+     */
+    feed.innerHTML = "";
+
+    if(!data || data.length === 0){
+
+        feed.innerHTML = `
+            <div class="global-empty">
+                🌎 No global hatches yet...
+            </div>
+        `;
+
+        return;
+    }
+
+    /*
+     * Database is newest → oldest.
+     * Render oldest → newest so the feed
+     * keeps the newest hatch at the bottom.
+     */
+    [...data]
+        .reverse()
+        .forEach(hatch => {
+
+            const hatchEl =
+                document.createElement("div");
+
+            const rarity =
+                String(hatch.rarity || "").toLowerCase();
+
+            const petName =
+                String(hatch.pet_name || "Unknown Pet")
+                    .slice(0,100);
+
+            const username =
+                String(hatch.username || "Player")
+                    .slice(0,30);
+
+            let emoji = "🥚";
+
+            if(
+                petName === "Embryon" ||
+                petName.endsWith("Embryon") ||
+                petName === "Mystorius" ||
+                petName.endsWith("Mystorius")
+            ){
+                emoji = "👁️";
+            }else{
+                emoji = emojiForPet(petName);
+            }
+
+            hatchEl.className =
+                `global-hatch rarity-${rarity}`;
+
+            hatchEl.innerHTML = `
+                <div class="global-hatch-username">
+                    🌎 ${escapeGlobalText(username)}
+                </div>
+
+                <div class="global-hatch-pet">
+                    ${emoji}
+                    ${escapeGlobalText(username)}
+                    hatched
+                    ${escapeGlobalText(petName)}!
+                </div>
+
+                <div class="global-hatch-rarity">
+                    ${formatGlobalRarity(rarity)}
+                </div>
+
+                <div class="global-hatch-time">
+                    Just now
+                </div>
+            `;
+
+            feed.appendChild(hatchEl);
+        });
+
+    feed.scrollTop = feed.scrollHeight;
+
+    console.log(
+        "✅ GLOBAL HATCHES RESTORED:",
+        feed.children.length
+    );
 }
 
 function startEmbryonEvent(){
@@ -9202,7 +9293,7 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
 
         // ======================================
-        // 💰 29.99% — 1.2X CURRENT COINS
+        // 💎 29.99% — 25 GEMS
         // ======================================
 
         else if(mysteryRoll < 30){
@@ -9211,21 +9302,17 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
                 "rarity-common"
             );
 
+            const reward = 25;
 
-            const reward =
-                Math.floor(coins * 1.2);
-
-
-            coins += reward;
-
+            gems += reward;
 
             mysteryRevealText.innerHTML = `
                 <div class="mystery-reward-emoji">
-                    💰
+                    💎
                 </div>
 
                 <div class="mystery-reward-name">
-                    +${formatCoins(reward)} Coins!
+                    +${formatCoins(reward)} Gems!
                 </div>
 
                 <div class="mystery-reward-rarity">
@@ -9233,15 +9320,14 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
                 </div>
             `;
 
-
             resultEl.textContent =
-                `🎉 Mystery Box Reward! 💰 +${formatCoins(reward)} coins! · 1.2× current coins`;
+                `🎉 Mystery Box Reward! 💎 +${formatCoins(reward)} gems!`;
 
         }
 
 
         // ======================================
-        // 💰 25% — 1.5X CURRENT COINS
+        // 🎁 25% — 50 GEMS
         // ======================================
 
         else if(mysteryRoll < 55){
@@ -9250,21 +9336,17 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
                 "rarity-rare"
             );
 
+            const reward = 50;
 
-            const reward =
-                Math.floor(coins * 0.5);
-
-
-            coins += reward;
-
+            gems += reward;
 
             mysteryRevealText.innerHTML = `
                 <div class="mystery-reward-emoji">
-                    💰
+                    💎
                 </div>
 
                 <div class="mystery-reward-name">
-                    +${formatCoins(reward)} Coins!
+                    +${formatCoins(reward)} Gems!
                 </div>
 
                 <div class="mystery-reward-rarity">
@@ -9272,9 +9354,8 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
                 </div>
             `;
 
-
             resultEl.textContent =
-                `🎉 Mystery Box Reward! 💰 +${formatCoins(reward)} coins! · 1.5× current coins`;
+                `🎉 Mystery Box Reward! 💎 +${formatCoins(reward)} gems!`;
 
         }
 
@@ -9366,7 +9447,7 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
 
         // ======================================
-        // 💰 7% — 3X CURRENT COINS
+        // 🎁 7% — 100 GEMS
         // ======================================
 
         else if(mysteryRoll < 94){
@@ -9375,31 +9456,26 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
                 "rarity-epic"
             );
 
+            const reward = 100;
 
-            const reward =
-                coins * 3;
-
-
-            coins += reward;
-
+            gems += reward;
 
             mysteryRevealText.innerHTML = `
                 <div class="mystery-reward-emoji">
-                    🎉
+                    💎
                 </div>
 
                 <div class="mystery-reward-name">
-                    JACKPOT!
+                    GEM JACKPOT!
                 </div>
 
                 <div class="mystery-reward-rarity">
-                    EPIC · +${formatCoins(reward)} COINS
+                    EPIC · +${formatCoins(reward)} GEMS
                 </div>
             `;
 
-
             resultEl.textContent =
-                `🎉🎉 JACKPOT! 🎉🎉 💰 +${formatCoins(reward)} coins! · 3× current coins`;
+                `🎉🎉 GEM JACKPOT! 🎉🎉 💎 +${formatCoins(reward)} gems!`;
 
         }
 
