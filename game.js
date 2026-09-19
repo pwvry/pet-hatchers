@@ -632,7 +632,7 @@ let darkMatterCrafts = 0;
 let superiorCrafts = 0;
 
 let clickBoostCost = 250000;
-let mysteryBoxCost = 1000000000;
+let mysteryBoxCost = 1000000;
 let luckyBoostCost = 500000;
 let shopClickMultiplierCost = 1000000;
 
@@ -3016,6 +3016,7 @@ async function load(){
     }
 
     loadingOnlineSave = false;
+    
 }
 
 function renderEggs(){
@@ -6321,24 +6322,113 @@ function toggleAutoRebirth(){
         return;
     }
 
-    autoRebirthEnabled =
-        !autoRebirthEnabled;
+    autoRebirthEnabled = !autoRebirthEnabled;
+
+    // Make absolutely sure the watcher is running
+    if(!autoRebirthInterval){
+        startAutoRebirth();
+    }
 
     updateUI();
     save();
+
+    // If we can already afford it, check immediately
+    if(autoRebirthEnabled){
+        runAutoRebirthCheck();
+    }
 
     showNotification(
         autoRebirthEnabled
             ? "🟢 Auto-Rebirth ON"
             : "🔴 Auto-Rebirth OFF",
+
         autoRebirthEnabled
-            ? `Automatically rebirthing ×${autoRebirthTarget}.`
+            ? `Automatically rebirthing ×${autoRebirthTarget} whenever affordable.`
             : "Auto-Rebirth has been disabled."
     );
 }
 
 function rebirth(){
     rebirthMultiple(1);
+}
+
+
+// =========================
+// AUTO REBIRTH
+// =========================
+
+let autoRebirthInterval = null;
+
+function rebirth(){
+    rebirthMultiple(1);
+}
+
+function runAutoRebirthCheck(){
+
+    if(!autoRebirthPurchased){
+        return;
+    }
+
+    if(!autoRebirthEnabled){
+        return;
+    }
+
+    // How many rebirths to perform each time
+    const target = Math.max(
+        1,
+        Number(autoRebirthTarget) || 1
+    );
+
+    // Calculate the total cost for the selected amount
+    let totalCost = 0;
+    let tempCost = Number(rebirthCost) || 100;
+
+    for(let i = 0; i < target; i++){
+
+        totalCost += tempCost;
+
+        tempCost = Math.min(
+            tempCost * 1.5,
+            Number.MAX_VALUE
+        );
+    }
+
+    // Not enough coins yet — keep waiting
+    if(Number(coins) < totalCost){
+        return;
+    }
+
+    console.log(
+        "🤖 AUTO REBIRTH:",
+        `×${target}`,
+        "Cost:",
+        totalCost,
+        "Coins:",
+        coins
+    );
+
+    // Perform the rebirth
+    rebirthMultiple(target);
+
+    // IMPORTANT:
+    // Do NOT turn Auto-Rebirth off.
+    // It stays ON and waits for the next affordable rebirth.
+}
+
+
+function startAutoRebirth(){
+
+    // Make sure there is only ONE watcher
+    if(autoRebirthInterval){
+        clearInterval(autoRebirthInterval);
+        autoRebirthInterval = null;
+    }
+
+    autoRebirthInterval = setInterval(() => {
+
+        runAutoRebirthCheck();
+
+    }, 250);
 }
 
 function upgradeRebirths(){
@@ -8854,9 +8944,7 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
     checkAchievements();
 
-    mysteryBoxCost =
-        Math.floor(mysteryBoxCost * 1.1);
-
+    mysteryBoxCost = Math.floor(mysteryBoxCost * 1.5);
 
     const mysteryRoll =
         Math.random() * 100;
