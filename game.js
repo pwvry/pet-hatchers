@@ -3153,12 +3153,43 @@ function getPetRarity(name){
         return "Secret";
     }
 
-    // 🔎 Search every egg
+    // 🧬 Remove mutation prefixes before checking base pet
+    let baseName = name;
+
+    const mutationPrefixes = [
+        "Shiny Dark Matter ",
+        "Shiny Superior ",
+        "Shiny Golden ",
+        "Shiny Rainbow ",
+        "Dark Matter ",
+        "Shiny ",
+        "Golden ",
+        "Rainbow ",
+        "Superior "
+    ];
+
+    for(const prefix of mutationPrefixes){
+
+        if(baseName.startsWith(prefix)){
+
+            baseName =
+                baseName.slice(
+                    prefix.length
+                );
+
+            break;
+        }
+    }
+
+    // 🔎 Search every egg using the BASE pet name
     for(const eggName in eggs){
 
         const egg = eggs[eggName];
 
-        if(!egg || !Array.isArray(egg.pets)){
+        if(
+            !egg ||
+            !Array.isArray(egg.pets)
+        ){
             continue;
         }
 
@@ -3166,7 +3197,7 @@ function getPetRarity(name){
 
             if(
                 Array.isArray(pet) &&
-                pet[0] === name
+                pet[0] === baseName
             ){
                 return pet[2];
             }
