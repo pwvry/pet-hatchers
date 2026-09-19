@@ -2281,6 +2281,9 @@ let onlineSaveTimer = null;
 let leaderboardSaveTimer = null;
 let onlineSaveInProgress = false;
 
+// 🛡️ Prevent old browsers from overwriting newer database changes
+let lastKnownDataVersion = null;
+
 function getGameData(){
 
     return {
@@ -2381,62 +2384,49 @@ function save(){
 }
 
 
-async function saveOnline(gameData = null){
+async function saveOnline(){
+
+    onlineSaveTimer = null;
 
     if(!currentUser){
-
-        console.log(
-            "❌ SAVE: No logged-in user."
-        );
-
-        return false;
+        return;
     }
-
 
     if(adminResetInProgress){
-
-        console.log(
-            "🚫 SAVE BLOCKED: Admin reset."
-        );
-
-        return false;
+        return;
     }
 
+    if(accountResetVersion !== 0){
+        return;
+    }
 
-    const dataToSave =
-        gameData || getGameData();
-
+    const gameData =
+        getGameData();
 
     onlineSaveInProgress = true;
-
 
     try{
 
         console.log(
-            "💾 SAVING TO DATABASE:",
+            "💾 Attempting protected save:",
             {
-                user: currentUser.id,
-                coins: dataToSave.coins,
-                gems: dataToSave.gems,
-                rebirths: dataToSave.rebirths,
-                luck: dataToSave.luckLevel
+                version: lastKnownDataVersion,
+                coins: gameData.coins,
+                gems: gameData.gems,
+                rebirths: gameData.rebirths
             }
         );
 
-
-        /*
-         * FIRST:
-         * Try updating the existing player.
-         */
-
         const {
-            data: updatedRows,
-            error: updateError
+            data,
+            error
         } = await supabaseClient
             .from("player_data")
             .update({
-                game_data: dataToSave,
+                game_data: gameData,
                 reset_version: 0,
+                data_version:
+                    Number(lastKnownDataVersion ?? 0) + 1,
                 updated_at:
                     new Date().toISOString()
             })
@@ -2444,85 +2434,63 @@ async function saveOnline(gameData = null){
                 "user_id",
                 currentUser.id
             )
-            .select("user_id");
-
-
-        if(updateError){
-
-            console.error(
-                "❌ PLAYER UPDATE ERROR:",
-                updateError
+            .eq(
+                "data_version",
+                Number(lastKnownDataVersion ?? 0)
+            )
+            .select(
+                "data_version"
             );
 
-            return false;
+        if(error){
+
+            console.error(
+                "❌ Protected save error:",
+                error
+            );
+
+            return;
         }
-
-
-        /*
-         * If a row existed, we're finished.
-         */
 
         if(
-            updatedRows &&
-            updatedRows.length > 0
+            !data ||
+            data.length === 0
         ){
 
-            console.log(
-                "✅ PLAYER UPDATED SUCCESSFULLY"
+            console.warn(
+                "🛡️ SAVE BLOCKED: Database was changed elsewhere."
             );
 
-            return true;
+            await load();
+
+            updateUI();
+            renderInventory();
+            renderIndex();
+            renderEggs();
+            updateRebirthButtons();
+
+            return;
         }
 
-
-        /*
-         * No player row exists yet.
-         * Create it.
-         */
-
-        const {
-            error: insertError
-        } = await supabaseClient
-            .from("player_data")
-            .insert({
-                user_id: currentUser.id,
-
-                game_data: dataToSave,
-
-                reset_version: 0,
-
-                updated_at:
-                    new Date().toISOString()
-            });
-
-
-        if(insertError){
-
-            console.error(
-                "❌ PLAYER INSERT ERROR:",
-                insertError
+        lastKnownDataVersion =
+            Number(
+                data[0].data_version
             );
-
-            return false;
-        }
-
 
         console.log(
-            "✅ PLAYER CREATED SUCCESSFULLY"
+            "✅ Protected save successful.",
+            {
+                newVersion:
+                    lastKnownDataVersion
+            }
         );
-
-        return true;
-
 
     }catch(error){
 
         console.error(
-            "❌ SAVE EXCEPTION:",
+            "❌ Online save exception:",
             error
         );
-
-        return false;
-
 
     }finally{
 
@@ -2812,7 +2780,7 @@ async function load(){
         error
     } = await supabaseClient
         .from("player_data")
-        .select("game_data, reset_version")
+        .select("game_data, reset_version, data_version")
         .eq("user_id", currentUser.id)
         .maybeSingle();
 
@@ -2824,6 +2792,9 @@ async function load(){
         );
 
     }else if(data){
+
+        lastKnownDataVersion =
+        Number(data.data_version ?? 0);
 
         accountResetVersion =
             data.reset_version ?? 0;
@@ -9604,128 +9575,196 @@ async function saveAdminPlayer(){
         );
 
         return;
+    }
+
+    // 🔒 BLOCK NORMAL GAME AUTOSAVES
+    adminResetInProgress = true;
+
+    // Cancel any pending normal save
+    if(onlineSaveTimer){
+
+        clearTimeout(onlineSaveTimer);
+        onlineSaveTimer = null;
 
     }
 
+    // Wait for a save that is already happening
+    while(onlineSaveInProgress){
 
-    const guiData =
-        collectAdminPlayerData();
+        await new Promise(resolve =>
+            setTimeout(resolve, 50)
+        );
 
-
-    let rawData;
+    }
 
 
     try{
 
-        rawData =
-            JSON.parse(
-                document
-                    .getElementById(
-                        "adminRawGameData"
-                    )
-                    .value
+        const guiData =
+            collectAdminPlayerData();
+
+
+        let rawData;
+
+
+        try{
+
+            rawData =
+                JSON.parse(
+                    document
+                        .getElementById(
+                            "adminRawGameData"
+                        )
+                        .value
+                );
+
+        }catch(error){
+
+            alert(
+                "❌ Raw Game Data contains invalid JSON."
             );
 
-    }catch(error){
+            return;
 
-        alert(
-            "❌ Raw Game Data contains invalid JSON."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        !rawData ||
-        typeof rawData !== "object" ||
-        Array.isArray(rawData)
-    ){
-
-        alert(
-            "❌ Invalid player data."
-        );
-
-        return;
-
-    }
-
-
-    // Preserve unknown data,
-    // then apply admin GUI changes.
-
-    const newData = {
-
-        ...rawData,
-        ...guiData
-
-    };
-
-
-    const confirmed =
-        confirm(
-            `💾 SAVE ALL CHANGES FOR ${adminTargetUsername}?`
-        );
-
-
-    if(!confirmed){
-        return;
-    }
-
-
-    const {
-        error
-    } = await supabaseClient.rpc(
-        "admin_set_player_data",
-        {
-            target_user_id:
-                adminTargetUserId,
-
-            new_game_data:
-                newData
         }
-    );
 
 
-    if(error){
+        if(
+            !rawData ||
+            typeof rawData !== "object" ||
+            Array.isArray(rawData)
+        ){
 
-        console.error(
-            "❌ Admin full save error:",
-            error
-        );
+            alert(
+                "❌ Invalid player data."
+            );
 
-        alert(
-            "❌ Failed to save player:\n" +
-            error.message
-        );
+            return;
 
-        return;
-
-    }
+        }
 
 
-    adminEditingData =
-        structuredClone(
+        // Preserve unknown data
+        // and apply admin GUI changes.
+
+        const newData = {
+
+            ...rawData,
+            ...guiData
+
+        };
+
+
+        const confirmed =
+            confirm(
+                `💾 SAVE ALL CHANGES FOR ${adminTargetUsername}?`
+            );
+
+
+        if(!confirmed){
+
+            return;
+
+        }
+
+
+        console.log(
+            "👑 ADMIN SAVING PLAYER:",
+            adminTargetUserId,
             newData
         );
 
 
-    document
-        .getElementById(
-            "adminRawGameData"
-        )
-        .value =
-        JSON.stringify(
-            newData,
-            null,
-            4
+        const {
+            error
+        } = await supabaseClient.rpc(
+            "admin_set_player_data",
+            {
+                target_user_id:
+                    adminTargetUserId,
+
+                new_game_data:
+                    newData
+            }
         );
 
 
-    alert(
-        `✅ ${adminTargetUsername} saved successfully!`
-    );
+        if(error){
+
+            console.error(
+                "❌ Admin full save error:",
+                error
+            );
+
+            alert(
+                "❌ Failed to save player:\n" +
+                error.message
+            );
+
+            return;
+
+        }
+
+
+        // Keep admin editor synced
+        adminEditingData =
+            structuredClone(
+                newData
+            );
+
+
+        document
+            .getElementById(
+                "adminRawGameData"
+            )
+            .value =
+            JSON.stringify(
+                newData,
+                null,
+                4
+            );
+
+
+        /*
+         * ⭐ IMPORTANT
+         *
+         * If the admin is editing the account currently
+         * running this game, reload the game's in-memory
+         * state BEFORE allowing autosaves again.
+         */
+
+        if(
+            currentUser &&
+            adminTargetUserId === currentUser.id
+        ){
+
+            console.log(
+                "🔄 Admin changed current player — loading new database state..."
+            );
+
+            await load();
+
+            updateUI();
+
+            renderInventory();
+            renderIndex();
+            renderEggs();
+            updateRebirthButtons();
+
+        }
+
+
+        alert(
+            `✅ ${adminTargetUsername} saved successfully!`
+        );
+
+
+    }finally{
+
+        // 🔓 Allow normal saves again
+        adminResetInProgress = false;
+
+    }
 
 }
 
