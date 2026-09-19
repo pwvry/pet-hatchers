@@ -9,11 +9,33 @@ const supabaseClient =
     );
 
 let currentUser = null;
+
+let globalPlayerUsername = "Player";
+
+// 🌎 GET REAL PLAYER USERNAME
+function getGlobalUsername(){
+
+    return globalPlayerUsername || "Player";
+
+}
+
+// =========================================================
+// 🌎 GLOBAL HATCH + CHAT
+// =========================================================
+
+let globalChatCooldown = false;
+
+const GLOBAL_CHAT_COOLDOWN = 1500;
+
 let accountResetVersion = 0;
 let loadingOnlineSave = false;
 let autoRebirthPurchased = false;
 let autoRebirthEnabled = false;
 let autoRebirthTarget = 1;
+
+if(!window.petLevels){
+    window.petLevels = {};
+}
 
 async function getCurrentUser(){
 
@@ -24,6 +46,47 @@ async function getCurrentUser(){
     } = await supabaseClient.auth.getUser();
 
     currentUser = user;
+
+    if(currentUser){
+
+        const savedUsername =
+            localStorage.getItem("playerUsername");
+
+        if(savedUsername){
+
+            globalPlayerUsername =
+                savedUsername
+                    .trim()
+                    .slice(0,16);
+
+        }else{
+
+            const {
+                data,
+                error
+            } = await supabaseClient
+                .from("usernames")
+                .select("username")
+                .eq("user_id", currentUser.id)
+                .maybeSingle();
+
+            if(!error && data?.username){
+
+                globalPlayerUsername =
+                    data.username
+                        .trim()
+                        .slice(0,16);
+
+            }
+
+        }
+
+    }
+
+    console.log(
+        "🌎 GLOBAL PLAYER USERNAME:",
+        globalPlayerUsername
+    );
 
     return user;
 }
@@ -199,29 +262,6 @@ async function createAccount(){
     }
 
     currentUser = data.user;
-
-    const localSave =
-        localStorage.getItem(SAVE_KEY);
-
-    let localGameData = null;
-
-    if(localSave){
-
-        try{
-
-            localGameData =
-                JSON.parse(localSave);
-
-        }catch(e){
-
-            console.error(
-                "Local save migration error:",
-                e
-            );
-
-        }
-
-    }
 
     const {
         error: usernameError
@@ -578,7 +618,7 @@ let adminTargetUsername = null;
 let clickSpeedLevel = 0;
 let multiplierLevel = 0;
 let hatchAmountLevel = 0;
-let luckLevel = 0;
+let luckLevel = 1;
 let equipUpgradeLevel = 0;
 let clickBoostActive = false;
 let clickBoostEndTime = 0;
@@ -597,6 +637,16 @@ let shopClickMultiplierCost = 1000000;
 
 let luckyBoostActive = false;
 let luckyBoostEndTime = 0;
+
+let fasterHatchLevel = 0;
+
+// 👁️ Embryon Secret Event
+
+let embryonEventActive = false;
+let embryonDiceNumber = 0;
+let embryonEventLocked = false;
+
+const MAX_FASTER_HATCH_LEVEL = 5;
 
 let unlockedAchievements = new Set();
 // CLICK SKINS
@@ -640,6 +690,90 @@ const clickSkins = {
     },
 
 };
+
+let petPendingDeletion = null;
+
+
+function openDeletePetConfirm(petName){
+
+    const owned =
+        inventory[petName] || 0;
+
+    const equipped =
+        equippedPets.filter(
+            pet => pet === petName
+        ).length;
+
+    const available =
+        owned - equipped;
+
+    petPendingDeletion = {
+        name: petName,
+        owned: owned,
+        equipped: equipped,
+        available: available
+    };
+
+    const overlay =
+        document.getElementById("deletePetOverlay");
+
+    const preview =
+        document.getElementById("deletePetPreview");
+
+    const secretWarning =
+        document.getElementById("deletePetSecretWarning");
+
+
+    const rarity =
+        getPetRarity(petName);
+
+
+    const emoji =
+        emojiForPet(petName);
+
+
+    preview.innerHTML = `
+        <div class="delete-pet-emoji">
+            ${emoji}
+        </div>
+
+        <div class="delete-pet-name">
+            ${colourPetName(petName)}
+        </div>
+    `;
+
+
+    if(rarity === "Secret"){
+
+        secretWarning.classList.remove(
+            "hidden"
+        );
+
+    }else{
+
+        secretWarning.classList.add(
+            "hidden"
+        );
+    }
+
+
+    overlay.classList.remove(
+        "hidden"
+    );
+}
+
+
+function closeDeletePetConfirm(){
+
+    const overlay =
+        document.getElementById("deletePetOverlay");
+
+    overlay.classList.add(
+        "hidden"
+    );
+
+    petPendingDeletion = null;
+}
 
 let ownedClickSkins = new Set(["Classic"]);
 let equippedClickSkin = "Classic";
@@ -829,7 +963,7 @@ const achievements = [
     "Obtain Denji",
     "Obtain Gojo",
     "Obtain Vegeta",
-    "Obtain Sun Jin Woo",
+    "Obtain Sung Jin Woo",
     "Obtain MUI Goku",
     "Obtain Shenron"
 ];
@@ -961,9 +1095,6 @@ function unlockAchievement(name){
 
     unlockedAchievements.add(name);
 
-    resultEl.textContent =
-        `🏆 ACHIEVEMENT UNLOCKED! ${name}`;
-
     showNotification(
         "🏆 Achievement Unlocked!",
         name
@@ -1014,6 +1145,9 @@ let hatchStreak = 0;
 let bestHatchStreak = 0;
 let mysteryBoxesOpened = 0;
 
+let critChance = 0.05; // 5%
+let critMultiplier = 5;
+
 let equippedPets = [];
 
 let clickLocked = false;
@@ -1043,7 +1177,13 @@ function upgradeEquip(){
         return;
     }
 
-    const cost = 500;
+    const equipUpgradeCosts = [
+        1000,
+        5000
+    ];
+
+    const cost =
+        equipUpgradeCosts[equipUpgradeLevel];
 
     if(gems < cost){
 
@@ -1173,19 +1313,19 @@ const basePetMultipliers = {
     "Quantum Phoenix": 15.0,
     "Galaxy Titan": 25.0,
     "Void Emperor": 60.0,
-    "Prototype - A418": 1000000,
+    "Prototype - A418": 125,
 
     "Naruto": 37.5,
     "Luffy": 45,
     "Denji": 97.5,
     "Gojo": 150,
     "Vegeta": 225,
-    "Sun Jin Woo": 375,
-    "MUI Goku": 900,
-    "Shenron": 1500000,
+    "Sung Jin Woo": 375,
+    "MUI Goku": 525,
+    "Shenron": 1250,
 
-    "Embryon": 1000,
-    "Mystorius": 500
+    "Embryon": 10000000,
+    "Mystorius": 7777777,
 };
 
 const mutationMultipliers = {
@@ -1198,15 +1338,6 @@ const mutationMultipliers = {
     "Shiny Dark Matter": 25.0,
     "Superior": 100.0,
     "Shiny Superior": 200.0,
-
-    "Mystorius": 500.0,
-    "Shiny Mystorius": 1000.0,
-    "Golden Mystorius": 1500.0,
-    "Rainbow Mystorius": 2500.0,
-    "Dark Matter Mystorius": 7500.0,
-    "Shiny Golden Mystorius": 3000.0,
-    "Shiny Rainbow Mystorius": 5000.0,
-    "Shiny Dark Matter Mystorius": 12500.0
 };
 
 const mutationNames = [
@@ -1256,12 +1387,69 @@ const eggs = {
             ["Denji","🪚","Epic",15],
             ["Gojo","👁️","Legendary",7],
             ["Vegeta","⚡","Mythic",2],
-            ["Sun Jin Woo","🖤","Ancient",0.8],
+            ["Sung Jin Woo","🖤","Ancient",0.8],
             ["MUI Goku","🌟","Celestial",0.1],
             ["Shenron","🐉","Chromatic",0.01]
         ]
     }
 };
+
+const MAX_PET_LEVEL = 100;
+
+function getPetExpRequired(level){
+    if(level >= MAX_PET_LEVEL){
+        return 0;
+    }
+
+    return 100 * level;
+}
+
+function getPetLevelData(name){
+    if(!window.petLevels){
+        window.petLevels = {};
+    }
+
+    if(!window.petLevels[name]){
+        window.petLevels[name] = {
+            level: 1,
+            exp: 0
+        };
+    }
+
+    return window.petLevels[name];
+}
+
+function addPetExp(petName, amount){
+
+    const data = getPetLevelData(petName);
+
+    if(data.level >= MAX_PET_LEVEL){
+        return false;
+    }
+
+    data.exp += amount;
+
+    let leveledUp = false;
+
+    while(
+        data.level < MAX_PET_LEVEL &&
+        data.exp >= getPetExpRequired(data.level)
+    ){
+
+        data.exp -= getPetExpRequired(data.level);
+
+        data.level++;
+
+        leveledUp = true;
+    }
+
+    if(data.level >= MAX_PET_LEVEL){
+        data.level = MAX_PET_LEVEL;
+        data.exp = 0;
+    }
+
+    return leveledUp;
+}
 
 const coinsEl = document.getElementById("coins");
 const gemsEl = document.getElementById("gems");
@@ -1904,11 +2092,31 @@ function craftAllMachines(){
 
 function updateUI(){
 
-    const autoRebirthStatusEl =
-    document.getElementById("autoRebirthStatus");
+    luckLevel = Math.max(1, Number(luckLevel) || 1);
 
-    const autoRebirthTargetEl =
-        document.getElementById("autoRebirthTarget");
+    const luckValue = document.getElementById("luckValue");
+
+    if(luckValue){
+
+        let currentLuck =
+            Number(luckLevel);
+
+        if(
+            luckyBoostActive &&
+            Date.now() < luckyBoostEndTime
+        ){
+
+            currentLuck *= 2;
+
+        }
+
+        luckValue.textContent =
+            `${currentLuck.toFixed(1)}x`;
+    }
+
+    const autoRebirthStatusEl =
+        document.getElementById("autoRebirthStatus");
+
 
     const autoRebirthUpgradeEl =
         document.getElementById("autoRebirthUpgrade");
@@ -1925,11 +2133,14 @@ function updateUI(){
         autoRebirthStatusEl.textContent =
             "PURCHASED";
 
-        autoRebirthTargetEl.textContent =
-            `Rebirth ×${autoRebirthTarget}`;
+        autoRebirthUpgradeEl.textContent =
+            "OWNED";
+
+        document.getElementById("selectedAutoRebirthAmount").textContent =
+            "×" + formatRebirthAmount(autoRebirthTarget);
 
         autoRebirthUpgradeEl.style.display =
-            "none";
+            "block";
 
         autoRebirthControlsEl.style.display =
             "block";
@@ -1948,6 +2159,9 @@ function updateUI(){
 
         autoRebirthStatusEl.textContent =
             "NOT PURCHASED";
+
+        autoRebirthUpgradeEl.textContent =
+            "⬆️ PURCHASE";
 
         autoRebirthUpgradeEl.style.display =
             "block";
@@ -1997,7 +2211,7 @@ if(clickBoostActive){
         );
 
     clickBoostStatus.textContent =
-        `⚡ ACTIVE · ${secondsLeft}s remaining`;
+        `⚡ 2× CLICK · ${secondsLeft}s remaining`;
 
 }else{
 
@@ -2020,7 +2234,7 @@ if(luckyBoostActive){
         );
 
     luckyBoostStatus.textContent =
-        `🍀 ACTIVE · ${secondsLeft}s remaining`;
+        `🍀 2× LUCK · ${secondsLeft}s remaining`;
 
 }else{
 
@@ -2044,10 +2258,34 @@ if(luckyBoostActive){
     updateUpgradeUI();
 }
 
-async function save(){
+function scheduleOnlineSave(){
 
-    const gameData = {
+    onlineSavePending = true;
+
+    if(onlineSaveTimer){
+        clearTimeout(onlineSaveTimer);
+    }
+
+    onlineSaveTimer = setTimeout(() => {
+
+        onlineSavePending = false;
+        onlineSaveTimer = null;
+
+        save();
+
+    }, 5000);
+}
+
+let onlineSaveTimer = null;
+let leaderboardSaveTimer = null;
+let onlineSaveInProgress = false;
+
+function getGameData(){
+
+    return {
         saveVersion: 1,
+        petLevels: window.petLevels || {},
+        fasterHatchLevel,
         coins,
         gems,
         autoRebirthPurchased: autoRebirthPurchased,
@@ -2087,13 +2325,95 @@ async function save(){
         shopPurchases,
         mysteryBoxesOpened
     };
+}
 
+
+function save(){
+
+    if(loadingOnlineSave){
+        console.warn("SAVE BLOCKED: Online save is still loading.");
+        return;
+    }
+
+    const gameData =
+        getGameData();
+
+    /*
+     * ALWAYS save locally immediately.
+     */
     localStorage.setItem(
         SAVE_KEY,
         JSON.stringify(gameData)
     );
 
-    if(currentUser && accountResetVersion === 0){
+
+    /*
+     * ONLINE SAVE
+     *
+     * Wait 5 seconds before uploading.
+     *
+     * If the player clicks multiple times during
+     * those 5 seconds, they all get combined into
+     * ONE Supabase upload.
+     */
+    if(currentUser){
+
+        if(onlineSaveTimer){
+            clearTimeout(onlineSaveTimer);
+        }
+
+        onlineSaveTimer =
+        setTimeout(
+            saveOnline,
+            1000
+        );
+    }
+
+
+    /*
+     * LEADERBOARD SAVE
+     *
+     * Don't upload leaderboard data on every click.
+     * Wait 60 seconds instead.
+     */
+    if(currentUser){
+
+        if(!leaderboardSaveTimer){
+
+            leaderboardSaveTimer =
+                setTimeout(
+                    async () => {
+
+                        leaderboardSaveTimer = null;
+
+                        await saveLeaderboardStats();
+
+                    },
+                    60000
+                );
+        }
+    }
+}
+
+
+async function saveOnline(){
+
+    onlineSaveTimer = null;
+
+    if(!currentUser){
+        return;
+    }
+
+    if(accountResetVersion !== 0){
+        return;
+    }
+
+    const gameData =
+        getGameData();
+
+    onlineSaveInProgress = true;
+
+    try{
 
         const {
             error
@@ -2107,14 +2427,26 @@ async function save(){
             });
 
         if(error){
+
             console.error(
                 "Online save error:",
                 error
             );
-        }
-    }
 
-    saveLeaderboardStats();
+        }
+
+    }catch(error){
+
+        console.error(
+            "Online save exception:",
+            error
+        );
+
+    }finally{
+
+        onlineSaveInProgress = false;
+
+    }
 }
 
 let liveSyncInterval = null;
@@ -2172,7 +2504,7 @@ async function liveSync(){
             clickSpeedLevel = 0;
             multiplierLevel = 0;
             hatchAmountLevel = 0;
-            luckLevel = 0;
+            luckLevel = 1;
             equipUpgradeLevel = 0;
 
             autoRebirthPurchased = false;
@@ -2249,6 +2581,20 @@ async function liveSync(){
         luckLevel =
             d.luckLevel ?? luckLevel;
 
+        fasterHatchLevel =
+            Number(
+                d.fasterHatchLevel ?? fasterHatchLevel
+            );
+
+        fasterHatchLevel =
+            Math.max(
+                0,
+                Math.min(
+                    fasterHatchLevel,
+                    MAX_FASTER_HATCH_LEVEL
+                )
+            );
+
         equipUpgradeLevel =
             d.equipUpgradeLevel ?? equipUpgradeLevel;
 
@@ -2274,6 +2620,9 @@ async function liveSync(){
 
         inventory =
             d.inventory ?? {};
+
+        window.petLevels =
+            d.petLevels ?? {};
 
         discovered =
             new Set(
@@ -2342,7 +2691,7 @@ function startLiveSync(){
     liveSyncInterval =
         setInterval(
             liveSync,
-            2000
+            60000
         );
 }
 
@@ -2373,29 +2722,17 @@ async function load(){
 
     }else if(data){
 
-        accountResetVersion = data.reset_version ?? 0;
+        accountResetVersion =
+            data.reset_version ?? 0;
 
         if(accountResetVersion > 0){
 
-            raw = null;
-
-            localStorage.removeItem(
-                SAVE_KEY
+            console.warn(
+                "Account has a pending reset. Save was NOT deleted."
             );
 
-            accountResetVersion = 0;
-
-            await supabaseClient
-                .from("player_data")
-                .update({
-                    game_data: {},
-                    reset_version: 0,
-                    updated_at: new Date().toISOString()
-                })
-                .eq(
-                    "user_id",
-                    currentUser.id
-                );
+            loadingOnlineSave = false;
+            return;
 
         }else{
 
@@ -2426,6 +2763,14 @@ async function load(){
         const d =
             JSON.parse(raw);
 
+        console.log("LOADED SAVE DATA:", {
+            coins: d.coins,
+            gems: d.gems,
+            rebirths: d.rebirths,
+            inventory: d.inventory,
+            petLevels: d.petLevels
+        });
+
         coins=d.coins ?? coins;
         gems=d.gems ?? gems;
         playTime=d.playTime ?? playTime;
@@ -2450,6 +2795,20 @@ async function load(){
 
         luckLevel =
             d.luckLevel ?? luckLevel;
+
+        fasterHatchLevel =
+            Number(
+                d.fasterHatchLevel ?? 0
+            );
+
+        fasterHatchLevel =
+            Math.max(
+                0,
+                Math.min(
+                    fasterHatchLevel,
+                    MAX_FASTER_HATCH_LEVEL
+                )
+            );
 
         equipUpgradeLevel =
             d.equipUpgradeLevel ?? equipUpgradeLevel;
@@ -2643,74 +3002,177 @@ function chooseEgg(name){
     save();
 }
 
-function pickPet(egg){
+function getPetRarity(name){
 
-    const pets =
-        eggs[egg].pets;
+    // 👁️ EMBRYON + MYSTORIUS = SECRET
+    if(
+        name === "Embryon" ||
+        name.endsWith("Embryon") ||
+        name === "Mystorius" ||
+        name.endsWith("Mystorius")
+    ){
+        return "Secret";
+    }
 
-    let luckMultiplier =
-        1 + (luckLevel * 0.1);
+    // 🔎 Search every egg
+    for(const eggName in eggs){
 
-    if(luckyBoostActive){
+        const egg = eggs[eggName];
 
-        if(Date.now() < luckyBoostEndTime){
+        if(!egg || !Array.isArray(egg.pets)){
+            continue;
+        }
 
-            luckMultiplier += 5;
+        for(const pet of egg.pets){
 
-        }else{
-
-            luckyBoostActive = false;
-            luckyBoostEndTime = 0;
-
+            if(
+                Array.isArray(pet) &&
+                pet[0] === name
+            ){
+                return pet[2];
+            }
         }
     }
 
-    let totalWeight = 0;
-
-    for(let i = 0; i < pets.length; i++){
-
-        const rarityWeight =
-            1 + (i / (pets.length - 1)) * (luckMultiplier - 1);
-
-        totalWeight +=
-            pets[i][3] * rarityWeight;
-    }
-
-    let roll =
-        Math.random() * totalWeight;
-
-    for(let i = 0; i < pets.length; i++){
-
-        const rarityWeight =
-            1 + (i / (pets.length - 1)) * (luckMultiplier - 1);
-
-        roll -=
-            pets[i][3] * rarityWeight;
-
-        if(roll < 0){
-
-            return pets[i];
-
-        }
-    }
-
-    return pets[0];
+    return "Unknown";
 }
 
 function applyMutation(baseName){
-    const shiny=Math.floor(Math.random()*100)+1;
-    const golden=Math.floor(Math.random()*100)+1;
-    const rainbow=Math.floor(Math.random()*100)+1;
-    const dark=Math.floor(Math.random()*100)+1;
 
-    if(dark===1 && shiny<=5) return "Shiny Dark Matter "+baseName;
-    if(dark===1) return "Dark Matter "+baseName;
-    if(shiny<=5 && golden<=25) return "Shiny Golden "+baseName;
-    if(shiny<=5 && rainbow<=10) return "Shiny Rainbow "+baseName;
-    if(shiny<=5) return "Shiny "+baseName;
-    if(golden<=25) return "Golden "+baseName;
-    if(rainbow<=10) return "Rainbow "+baseName;
-    return baseName;
+    const roll =
+        Math.random() * 100;
+
+    // 95% = normal pet
+    if(roll < 95){
+        return baseName;
+    }
+
+    // 2.5% = Golden
+    if(roll < 97.5){
+        return "Golden " + baseName;
+    }
+
+    // 1.5% = Shiny
+    if(roll < 99){
+        return "Shiny " + baseName;
+    }
+
+    // 0.7% = Rainbow
+    if(roll < 99.7){
+        return "Rainbow " + baseName;
+    }
+
+    // 0.2% = Dark Matter
+    if(roll < 99.9){
+        return "Dark Matter " + baseName;
+    }
+
+    // 0.05% = Shiny Golden
+    if(roll < 99.95){
+        return "Shiny Golden " + baseName;
+    }
+
+    // 0.04% = Shiny Rainbow
+    if(roll < 99.99){
+        return "Shiny Rainbow " + baseName;
+    }
+
+    // 0.01% = Shiny Dark Matter
+    return "Shiny Dark Matter " + baseName;
+}
+
+function colourPetName(pet){
+
+    if(pet.startsWith("Shiny Golden ")){
+        const name = pet.slice(13);
+
+        return `
+            <span class="mutation-shiny">✨Shiny✨</span>
+            <span class="mutation-golden">Golden</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Shiny Rainbow ")){
+        const name = pet.slice(14);
+
+        return `
+            <span class="mutation-shiny">✨Shiny✨</span>
+            <span class="mutation-rainbow">
+                <span>R</span><span>a</span><span>i</span><span>n</span><span>b</span><span>o</span><span>w</span>
+            </span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Shiny Dark Matter ")){
+        const name = pet.slice(18);
+
+        return `
+            <span class="mutation-shiny">✨Shiny✨</span>
+            <span class="mutation-dark-matter">Dark Matter</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Shiny Superior ")){
+        const name = pet.slice(15);
+
+        return `
+            <span class="mutation-shiny">✨Shiny✨</span>
+            <span class="mutation-superior">⭐Superior⭐</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Shiny ")){
+        const name = pet.slice(6);
+
+        return `
+            <span class="mutation-shiny">✨Shiny✨</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Golden ")){
+        const name = pet.slice(7);
+
+        return `
+            <span class="mutation-golden">Golden</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Rainbow ")){
+        const name = pet.slice(8);
+
+        return `
+            <span class="mutation-rainbow">
+                <span>R</span><span>a</span><span>i</span><span>n</span><span>b</span><span>o</span><span>w</span>
+            </span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Dark Matter ")){
+        const name = pet.slice(12);
+
+        return `
+            <span class="mutation-dark-matter">Dark Matter</span>
+            ${name}
+        `;
+    }
+
+    if(pet.startsWith("Superior ")){
+        const name = pet.slice(9);
+
+        return `
+            <span class="mutation-superior">⭐Superior⭐</span>
+            ${name}
+        `;
+    }
+
+    return pet;
 }
 
 function getPetMultiplier(name){
@@ -2742,11 +3204,34 @@ function getPetMultiplier(name){
         }
     }
 
-    const baseMultiplier = basePetMultipliers[cleanName] ?? 1;
+    const baseMultiplier =
+        basePetMultipliers[cleanName] ?? 1;
 
-    const mutationMultiplier = mutationMultipliers[mutation] ?? 1;
+    const mutationMultiplier =
+        mutationMultipliers[mutation] ?? 1;
 
-    return baseMultiplier * mutationMultiplier;
+    // 🐾 PET LEVEL BONUS
+    const petLevelData =
+        getPetLevelData(name);
+
+    const level =
+        Math.max(
+            1,
+            Math.min(
+                MAX_PET_LEVEL,
+                petLevelData.level || 1
+            )
+        );
+
+    // Each level adds 1% to the pet's multiplier
+    const levelMultiplier =
+        1 + ((level - 1) * 0.01);
+
+    return (
+        baseMultiplier *
+        mutationMultiplier *
+        levelMultiplier
+    );
 }
 
 function findPetData(name){
@@ -2756,6 +3241,341 @@ function findPetData(name){
         }
     }
     return null;
+}
+
+function formatRarity(rarity){
+
+    switch(rarity){
+
+        case "Ancient":
+            return "𝙰𝚗𝚌𝚒𝚎𝚗𝚝";
+
+        case "Celestial":
+            return "𝒞𝑒𝓁𝑒𝓈𝓉𝒾𝒶𝓁";
+
+        case "Chromatic":
+            return "𝐂𝐇𝐑𝐎𝐌𝐀𝐓𝐈𝐂";
+
+        case "Secret":
+            return "𝚜𝚎𝚌𝚛𝚎𝚝";
+
+        default:
+            return rarity;
+    }
+
+}
+
+function shouldTriggerEmbryonEvent(){
+
+    return Math.random() < (1 / 10000);
+
+}
+
+function rollEmbryonMutation(){
+
+    const roll =
+        Math.random() * 100;
+
+    if(roll < 0.2){
+        return "Shiny Dark Matter ";
+    }
+
+    if(roll < 1){
+        return "Shiny Rainbow ";
+    }
+
+    if(roll < 2){
+        return "Shiny Golden ";
+    }
+
+    if(roll < 4){
+        return "Dark Matter ";
+    }
+
+    if(roll < 8){
+        return "Rainbow ";
+    }
+
+    if(roll < 15){
+        return "Golden ";
+    }
+
+    if(roll < 30){
+        return "Shiny ";
+    }
+
+    return "";
+
+}
+
+function rollEmbryonDice(){
+
+    const dice =
+        document.getElementById(
+            "embryonDice"
+        );
+
+    const diceText =
+        document.getElementById(
+            "embryonDiceText"
+        );
+
+    dice.classList.add("rolling");
+
+    diceText.textContent =
+        "🎲 Rolling...";
+
+    let elapsed = 0;
+
+    const rollInterval =
+        setInterval(() => {
+
+            // Show fake numbers while rolling
+            dice.textContent =
+                Math.floor(
+                    Math.random() * 20
+                ) + 1;
+
+            elapsed += 100;
+
+            if(elapsed >= 2500){
+
+                clearInterval(
+                    rollInterval
+                );
+
+                dice.classList.remove(
+                    "rolling"
+                );
+
+                // Secretly choose the real number
+                embryonDiceNumber =
+                    Math.floor(
+                        Math.random() * 20
+                    ) + 1;
+
+                // HIDE THE REAL NUMBER
+                dice.textContent = "?";
+
+                diceText.textContent =
+                    "🔮 THE FATE HAS BEEN SEALED...";
+
+                setTimeout(() => {
+
+                    diceText.textContent =
+                        "👁️ Embryon is waiting for your choice...";
+
+                    setTimeout(() => {
+
+                        showEmbryonGuess();
+
+                    }, 1000);
+
+                }, 1500);
+
+            }
+
+        },100);
+
+}
+
+function showEmbryonGuess(){
+
+    const dialogue =
+        document.getElementById(
+            "embryonDialogue"
+        );
+
+    const diceArea =
+        document.getElementById(
+            "embryonDiceArea"
+        );
+
+    const guessArea =
+        document.getElementById(
+            "embryonGuessArea"
+        );
+
+    const grid =
+        document.getElementById(
+            "embryonNumberGrid"
+        );
+
+    diceArea.classList.add("hidden");
+
+    guessArea.classList.remove(
+        "hidden"
+    );
+
+    dialogue.textContent =
+        "Choose wisely...";
+
+    grid.innerHTML = "";
+
+    for(let i = 1; i <= 20; i++){
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "embryon-number-button";
+
+        button.textContent =
+            i;
+
+        button.addEventListener(
+            "click",
+            () => {
+                chooseEmbryonNumber(i);
+            }
+        );
+
+        grid.appendChild(button);
+
+    }
+
+}
+
+function chooseEmbryonNumber(
+    selectedNumber
+){
+
+    if(embryonEventLocked === false){
+        return;
+    }
+
+    embryonEventLocked = false;
+
+    const buttons =
+        document.querySelectorAll(
+            ".embryon-number-button"
+        );
+
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+
+    const dialogue =
+        document.getElementById(
+            "embryonDialogue"
+        );
+
+    const guessArea =
+        document.getElementById(
+            "embryonGuessArea"
+        );
+
+    const resultArea =
+        document.getElementById(
+            "embryonResultArea"
+        );
+
+    const resultTitle =
+        document.getElementById(
+            "embryonResultTitle"
+        );
+
+    const resultPet =
+        document.getElementById(
+            "embryonResultPet"
+        );
+
+    guessArea.classList.add(
+        "hidden"
+    );
+
+    resultArea.classList.remove(
+        "hidden"
+    );
+
+    if(
+        selectedNumber ===
+        embryonDiceNumber
+    ){
+
+        /*
+         * 🎉 PLAYER CAUGHT EMBRYON
+         */
+
+        const mutation =
+            rollEmbryonMutation();
+
+        const finalPet =
+            mutation + "Embryon";
+
+        inventory[finalPet] =
+            (inventory[finalPet] || 0) + 1;
+
+        discovered.add(
+            finalPet
+        );
+
+        // 🌎 GLOBAL SECRET HATCH
+        broadcastGlobalHatch(
+            finalPet,
+            "Secret"
+        );
+
+        dialogue.textContent =
+            "You found me...";
+
+        resultTitle.textContent =
+            "🏆 EMBRYON CAUGHT!";
+
+        resultPet.innerHTML = `
+            <div style="
+                font-size:60px;
+                margin-bottom:15px;
+            ">
+                ${emojiForPet(finalPet)}
+            </div>
+
+            <div>
+                ${colourPetName(finalPet)}
+            </div>
+        `;
+
+        showNotification(
+            "🏆 EMBRYON CAUGHT!",
+            `${colourPetName(finalPet)} has been added to your pets!`
+        );
+
+        checkAchievements();
+
+        updateUI();
+        renderInventory();
+        renderIndex();
+        renderAchievements();
+
+        save();
+
+    }else{
+
+        /*
+         * 💨 EMBRYON ESCAPES
+         */
+
+        dialogue.textContent =
+            "So close...";
+
+        resultTitle.textContent =
+            "💨 EMBRYON ESCAPED!";
+
+        resultPet.innerHTML = `
+            <div style="
+                font-size:22px;
+                margin-top:15px;
+            ">
+                You chose
+                <strong>${selectedNumber}</strong>.
+                <br><br>
+                Embryon's number was
+                <strong>${embryonDiceNumber}</strong>.
+            </div>
+        `;
+
+    }
+
 }
 
 function hatch(){
@@ -2871,16 +3691,955 @@ function hatch(){
             bestHatchStreak = hatchStreak;
         }
 
+        const isNewPet =
+            !discovered.has(petName);
+
         discovered.add(petName);
 
-        hatchedNames.push(
-            `${base[1]} ${petName}`
-        );
+        hatchedNames.push({
+            name: petName,
+            rarity: rarity,
+            isNewPet: isNewPet
+        });
+
+        // 🌎 GLOBAL HATCH — rare pets only
+        if(
+            rarity === "Ancient" ||
+            rarity === "Celestial" ||
+            rarity === "Chromatic"
+        ){
+
+            broadcastGlobalHatch(
+                petName,
+                rarity
+            );
+
+        }
     }
 
     checkAchievements();
 
-    function checkAchievements(){
+    updateUI();
+    renderInventory();
+    renderIndex();
+    renderAchievements();
+    save();
+
+        showHatchAnimation(
+        hatchAmount,
+        hatchedNames
+    );
+
+}
+
+// =========================================================
+// 🌎 BROADCAST GLOBAL HATCH
+// =========================================================
+
+async function broadcastGlobalHatch(
+    petName,
+    rarity
+){
+
+    if(!currentUser){
+        return;
+    }
+
+    const username =
+        await getGlobalUsername();
+
+    console.log(
+        "🌎 GLOBAL USERNAME TEST:",
+        username
+    );
+
+    console.log(
+        "🌎 SAVED PLAYER USERNAME:",
+        localStorage.getItem("playerUsername")
+    );
+
+    console.log(
+        "🌎 CURRENT USER:",
+        currentUser
+    );
+
+    const { error } =
+        await supabaseClient
+            .from("global_hatches")
+            .insert({
+                username: username,
+                pet_name: petName,
+                rarity: rarity
+            });
+
+    if(error){
+
+        console.error(
+            "Global hatch broadcast error:",
+            error
+        );
+
+    }
+
+}
+
+function renderGlobalHatch(hatch){
+
+    const feed =
+        document.getElementById("globalHatchesFeed");
+
+    if(!feed){
+        return;
+    }
+
+    const empty =
+        feed.querySelector(".global-empty");
+
+    if(empty){
+        empty.remove();
+    }
+
+    const rarity =
+        String(hatch.rarity || "").toLowerCase();
+
+    const petName =
+        String(hatch.pet_name || "Unknown Pet")
+            .slice(0,100);
+
+    const username =
+        String(hatch.username || "Player")
+            .slice(0,30);
+
+    let emoji = "🥚";
+
+    if(
+        petName === "Embryon" ||
+        petName.endsWith("Embryon") ||
+        petName === "Mystorius" ||
+        petName.endsWith("Mystorius")
+    ){
+        emoji = "👁️";
+    }else{
+        emoji = emojiForPet(petName);
+    }
+
+
+    /* =========================================
+       🌈 CHROMATIC TEST CARD
+       ========================================= */
+
+    if(rarity === "chromatic"){
+
+        const card =
+            document.createElement("div");
+
+        card.className = "chromatic-test-card";
+
+        card.innerHTML = `
+            <div>🌎 ${escapeGlobalText(username)}</div>
+            <div>${emoji} ${escapeGlobalText(username)} hatched ${escapeGlobalText(petName)}!</div>
+            <div>🌈 CHROMATIC</div>
+            <div>Just now</div>
+        `;
+
+        feed.appendChild(card);
+
+        feed.scrollTop =
+            feed.scrollHeight;
+
+        return;
+    }
+
+
+    /* =========================================
+       🥚 NORMAL HATCH
+       ========================================= */
+
+    const hatchEl =
+        document.createElement("div");
+
+    hatchEl.className =
+        `global-hatch rarity-${rarity}`;
+
+    hatchEl.innerHTML = `
+        <div class="global-hatch-username">
+            🌎 ${escapeGlobalText(username)}
+        </div>
+
+        <div class="global-hatch-pet">
+            ${emoji}
+            ${escapeGlobalText(username)}
+            hatched
+            ${escapeGlobalText(petName)}!
+        </div>
+
+        <div class="global-hatch-rarity">
+            ${formatGlobalRarity(rarity)}
+        </div>
+
+        <div class="global-hatch-time">
+            Just now
+        </div>
+    `;
+
+    feed.appendChild(hatchEl);
+
+    while(feed.children.length > 50){
+        feed.firstElementChild.remove();
+    }
+
+    feed.scrollTop =
+        feed.scrollHeight;
+}
+
+function formatGlobalRarity(rarity){
+
+    if(rarity === "ancient"){
+        return "🔥 ANCIENT";
+    }
+
+    if(rarity === "celestial"){
+        return "✨ CELESTIAL";
+    }
+
+    if(rarity === "chromatic"){
+        return "🌈 CHROMATIC";
+    }
+
+    if(rarity === "secret"){
+        return "👁️ 𝚜𝚎𝚌𝚛𝚎𝚝";
+    }
+
+    return rarity.toUpperCase();
+
+}
+
+async function loadGlobalHatches(){
+
+    if(!currentUser){
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from("global_hatches")
+            .select("*")
+            .order("created_at", {
+                ascending:true
+            })
+            .limit(50);
+
+    if(error){
+
+        console.error(
+            "Global hatch load error:",
+            error
+        );
+
+        return;
+    }
+
+    const feed =
+        document.getElementById(
+            "globalHatchesFeed"
+        );
+
+    if(feed){
+        feed.innerHTML = "";
+    }
+
+    data.forEach(
+        renderGlobalHatch
+    );
+
+}
+
+function startEmbryonEvent(){
+
+    if(embryonEventActive){
+        return;
+    }
+
+    embryonEventActive = true;
+    embryonEventLocked = true;
+
+    const overlay =
+        document.getElementById(
+            "embryonEventOverlay"
+        );
+
+    const dialogue =
+        document.getElementById(
+            "embryonDialogue"
+        );
+
+    const diceArea =
+        document.getElementById(
+            "embryonDiceArea"
+        );
+
+    const guessArea =
+        document.getElementById(
+            "embryonGuessArea"
+        );
+
+    const resultArea =
+        document.getElementById(
+            "embryonResultArea"
+        );
+
+    const dice =
+        document.getElementById(
+            "embryonDice"
+        );
+
+    const diceText =
+        document.getElementById(
+            "embryonDiceText"
+        );
+
+    overlay.classList.remove("hidden");
+
+    diceArea.classList.remove("hidden");
+    guessArea.classList.add("hidden");
+    resultArea.classList.add("hidden");
+
+    dialogue.textContent =
+        "You have been chosen...";
+
+    dice.textContent = "?";
+
+    diceText.textContent =
+        "Embryon is watching you...";
+
+    setTimeout(() => {
+
+        dialogue.textContent =
+            "Very few ever encounter me.";
+
+    }, 1800);
+
+    setTimeout(() => {
+
+        dialogue.textContent =
+            "Let fate decide your destiny.";
+
+    }, 3600);
+
+    setTimeout(() => {
+
+        rollEmbryonDice();
+
+    }, 5400);
+
+}
+
+// =========================================================
+// 🌎 GLOBAL PANEL FUNCTIONS
+// =========================================================
+
+function setupGlobalPanel(){
+
+    const hatchesTab =
+        document.getElementById("globalHatchesTab");
+
+    const chatTab =
+        document.getElementById("globalChatTab");
+
+    const hatchesFeed =
+        document.getElementById("globalHatchesFeed");
+
+    const chatFeed =
+        document.getElementById("globalChatFeed");
+
+    const chatInputArea =
+        document.getElementById("globalChatInputArea");
+
+    if(!hatchesTab || !chatTab){
+        return;
+    }
+
+    hatchesTab.addEventListener("click", () => {
+
+        hatchesTab.classList.add("active");
+        chatTab.classList.remove("active");
+
+        hatchesFeed.classList.remove("hidden");
+        chatFeed.classList.add("hidden");
+
+        chatInputArea.classList.add("hidden");
+
+    });
+
+    chatTab.addEventListener("click", () => {
+
+        chatTab.classList.add("active");
+        hatchesTab.classList.remove("active");
+
+        chatFeed.classList.remove("hidden");
+        hatchesFeed.classList.add("hidden");
+
+        chatInputArea.classList.remove("hidden");
+
+        // 📜 START CHAT AT THE BOTTOM
+        requestAnimationFrame(() => {
+
+            chatFeed.scrollTop =
+                chatFeed.scrollHeight;
+
+            requestAnimationFrame(() => {
+
+                chatFeed.scrollTop =
+                    chatFeed.scrollHeight;
+
+            });
+
+        });
+
+        setTimeout(() => {
+
+            document
+                .getElementById("globalChatInput")
+                ?.focus();
+
+        }, 50);
+
+    });
+
+    const sendButton =
+        document.getElementById("globalChatSend");
+
+    const chatInput =
+        document.getElementById("globalChatInput");
+
+    if(sendButton && chatInput){
+
+        sendButton.addEventListener(
+            "click",
+            sendGlobalChat
+        );
+
+        chatInput.addEventListener(
+            "keydown",
+            event => {
+
+                if(event.key === "Enter"){
+
+                    event.preventDefault();
+
+                    sendGlobalChat();
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+// =========================================================
+// 🖱️ DRAGGABLE GLOBAL PANEL
+// =========================================================
+
+function setupGlobalPanelDrag(){
+
+    const panel =
+        document.getElementById("globalPanel");
+
+    if(!panel){
+        console.warn("Global panel not found.");
+        return;
+    }
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    panel.addEventListener("pointerdown", function(event){
+
+        // Don't drag when interacting with chat/buttons
+        if(
+            event.target.closest("button") ||
+            event.target.closest("input") ||
+            event.target.closest(".global-feed")
+        ){
+            return;
+        }
+
+        const rect =
+            panel.getBoundingClientRect();
+
+        dragging = true;
+
+        offsetX =
+            event.clientX - rect.left;
+
+        offsetY =
+            event.clientY - rect.top;
+
+        // 🔥 FORCE the panel into movable coordinates
+        panel.style.setProperty(
+            "left",
+            rect.left + "px",
+            "important"
+        );
+
+        panel.style.setProperty(
+            "top",
+            rect.top + "px",
+            "important"
+        );
+
+        panel.style.setProperty(
+            "right",
+            "auto",
+            "important"
+        );
+
+        panel.style.setProperty(
+            "bottom",
+            "auto",
+            "important"
+        );
+
+        panel.setPointerCapture(
+            event.pointerId
+        );
+
+        event.preventDefault();
+
+    });
+
+    panel.addEventListener("pointermove", function(event){
+
+        if(!dragging){
+            return;
+        }
+
+        let newLeft =
+            event.clientX - offsetX;
+
+        let newTop =
+            event.clientY - offsetY;
+
+        const maxLeft =
+            window.innerWidth -
+            panel.offsetWidth;
+
+        const maxTop =
+            window.innerHeight -
+            panel.offsetHeight;
+
+        newLeft =
+            Math.max(
+                0,
+                Math.min(
+                    newLeft,
+                    Math.max(0,maxLeft)
+                )
+            );
+
+        newTop =
+            Math.max(
+                0,
+                Math.min(
+                    newTop,
+                    Math.max(0,maxTop)
+                )
+            );
+
+        panel.style.setProperty(
+            "left",
+            newLeft + "px",
+            "important"
+        );
+
+        panel.style.setProperty(
+            "top",
+            newTop + "px",
+            "important"
+        );
+
+    });
+
+    function stopDragging(event){
+
+        if(!dragging){
+            return;
+        }
+
+        dragging = false;
+
+        try{
+            panel.releasePointerCapture(
+                event.pointerId
+            );
+        }catch(error){}
+
+    }
+
+    panel.addEventListener(
+        "pointerup",
+        stopDragging
+    );
+
+    panel.addEventListener(
+        "pointercancel",
+        stopDragging
+    );
+
+}
+
+async function sendGlobalChat(){
+
+    if(globalChatCooldown){
+        showNotification(
+            "⏳ Slow Down",
+            "Please wait a moment before sending another message."
+        );
+        return;
+    }
+
+    const input =
+        document.getElementById("globalChatInput");
+
+    if(!input){
+        return;
+    }
+
+    const message =
+        input.value.trim().slice(0,100);
+
+    if(!message){
+        return;
+    }
+
+    if(!currentUser){
+
+        showNotification(
+            "🔒 Login Required",
+            "You must be logged in to use Global Chat."
+        );
+
+        return;
+    }
+
+    globalChatCooldown = true;
+
+    setTimeout(() => {
+        globalChatCooldown = false;
+    }, GLOBAL_CHAT_COOLDOWN);
+
+    const username =
+        getGlobalUsername();
+
+    const { error } =
+        await supabaseClient
+            .from("global_chat")
+            .insert({
+                username: username,
+                message: message
+            });
+
+    if(error){
+
+        console.error(
+            "Global chat error:",
+            error
+        );
+
+        showNotification(
+            "❌ Chat Error",
+            "Could not send your message."
+        );
+
+        return;
+    }
+
+    input.value = "";
+
+}
+
+function renderGlobalChat(message){
+
+    const feed =
+        document.getElementById("globalChatFeed");
+
+    if(!feed){
+        return;
+    }
+
+    const empty =
+        feed.querySelector(".global-empty");
+
+    if(empty){
+        empty.remove();
+    }
+
+    const messageEl =
+        document.createElement("div");
+
+    messageEl.className =
+        "global-chat-message";
+
+    const username =
+        String(message.username || "Player")
+            .slice(0,30);
+
+    const text =
+        String(message.message || "")
+            .slice(0,100);
+
+    messageEl.innerHTML = `
+        <div class="global-chat-username">
+            ${escapeGlobalText(username)}
+        </div>
+
+        <div class="global-chat-text">
+            ${escapeGlobalText(text)}
+        </div>
+    `;
+
+    feed.appendChild(messageEl);
+
+    while(feed.children.length > 100){
+        feed.firstElementChild.remove();
+    }
+
+    // 📜 ALWAYS SCROLL TO NEWEST MESSAGE
+    requestAnimationFrame(() => {
+
+        feed.scrollTo({
+            top: feed.scrollHeight,
+            behavior: "smooth"
+        });
+
+    });
+
+}
+
+function escapeGlobalText(text){
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text;
+
+    return div.innerHTML;
+
+}
+
+async function loadGlobalChat(){
+
+    if(!currentUser){
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+            .from("global_chat")
+            .select("*")
+            .order("created_at", {
+                ascending:true
+            })
+            .limit(100);
+
+    if(error){
+
+        console.error(
+            "Global chat load error:",
+            error
+        );
+
+        return;
+    }
+
+    const feed =
+        document.getElementById(
+            "globalChatFeed"
+        );
+
+    if(!feed){
+        return;
+    }
+
+    // Clear old messages
+    feed.innerHTML = "";
+
+    // Add all messages
+    data.forEach(message => {
+
+        const messageEl =
+            document.createElement("div");
+
+        messageEl.className =
+            "global-chat-message";
+
+        const username =
+            String(
+                message.username || "Player"
+            ).slice(0,30);
+
+        const text =
+            String(
+                message.message || ""
+            ).slice(0,100);
+
+        messageEl.innerHTML = `
+            <div class="global-chat-username">
+                ${escapeGlobalText(username)}
+            </div>
+
+            <div class="global-chat-text">
+                ${escapeGlobalText(text)}
+            </div>
+        `;
+
+        feed.appendChild(messageEl);
+
+    });
+
+    // 📜 FORCE CHAT TO START AT THE BOTTOM
+    feed.scrollTop =
+        feed.scrollHeight;
+
+    // Force it again after browser layout
+    requestAnimationFrame(() => {
+
+        feed.scrollTop =
+            feed.scrollHeight;
+
+        requestAnimationFrame(() => {
+
+            feed.scrollTop =
+                feed.scrollHeight;
+
+        });
+
+    });
+
+}
+
+// =========================================================
+// 🌎 GLOBAL REALTIME — LIVE HATCHES + CHAT
+// =========================================================
+
+let globalChatChannel = null;
+let globalHatchesChannel = null;
+
+let globalRealtimeChannel = null;
+
+// =========================================================
+// 🌎 GLOBAL REALTIME — CHAT + HATCHES
+// =========================================================
+
+function setupGlobalRealtime(){
+
+    if(!currentUser){
+
+        console.warn(
+            "🌎 Global Realtime: No logged-in user."
+        );
+
+        return;
+    }
+
+
+    // Remove old channel if one exists
+
+    if(globalRealtimeChannel){
+
+        supabaseClient.removeChannel(
+            globalRealtimeChannel
+        );
+
+        globalRealtimeChannel = null;
+    }
+
+
+    console.log(
+        "🌎 Starting Global Realtime..."
+    );
+
+
+    globalRealtimeChannel =
+        supabaseClient
+            .channel(
+                "global-live-" +
+                currentUser.id
+            )
+
+
+            // =================================================
+            // 💬 GLOBAL CHAT
+            // =================================================
+
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "global_chat"
+                },
+                payload => {
+
+                    console.log(
+                        "💬 LIVE CHAT RECEIVED:",
+                        payload.new
+                    );
+
+                    renderGlobalChat(
+                        payload.new
+                    );
+
+                }
+            )
+
+
+            // =================================================
+            // 🥚 GLOBAL HATCHES
+            // =================================================
+
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "global_hatches"
+                },
+                payload => {
+
+                    console.log(
+                        "🥚 LIVE HATCH RECEIVED:",
+                        payload.new
+                    );
+
+                    renderGlobalHatch(
+                        payload.new
+                    );
+
+                }
+            )
+
+
+            // =================================================
+            // 🔌 CONNECT
+            // =================================================
+
+            .subscribe(status => {
+
+                console.log(
+                    "🌎 GLOBAL REALTIME STATUS:",
+                    status
+                );
+
+            });
+
+}
+
+function checkAchievements(){
 
         if(machineCrafts >= 1){
         unlockAchievement("First Machine Craft");
@@ -3049,7 +4808,7 @@ function hatch(){
         "Denji",
         "Gojo",
         "Vegeta",
-        "Sun Jin Woo",
+        "Sung Jin Woo",
         "MUI Goku",
         "Shenron"
     ];
@@ -3081,7 +4840,7 @@ function hatch(){
         "Denji": "Obtain Denji",
         "Gojo": "Obtain Gojo",
         "Vegeta": "Obtain Vegeta",
-        "Sun Jin Woo": "Obtain Sun Jin Woo",
+        "Sung Jin Woo": "Obtain Sung Jin Woo",
         "MUI Goku": "Obtain MUI Goku",
         "Shenron": "Obtain Shenron"
 
@@ -3745,11 +5504,299 @@ function hatch(){
     }
 }
 
-    showHatchAnimation(
-    hatchAmount,
-    hatchedNames
-);
+/* =====================================================
+   📦 MYSTERY BOX OPENING ANIMATION
+===================================================== */
 
+let mysteryBoxOpening = false;
+
+
+function showMysteryBoxOpening(
+    rewardName,
+    rewardRarity
+){
+
+    if(mysteryBoxOpening){
+        return;
+    }
+
+    mysteryBoxOpening = true;
+
+    const overlay =
+        document.getElementById(
+            "mysteryBoxOverlay"
+        );
+
+    const container =
+        document.getElementById(
+            "mysteryBoxContainer"
+        );
+
+    const box =
+        document.getElementById(
+            "mysteryBox"
+        );
+
+    const status =
+        document.getElementById(
+            "mysteryBoxStatus"
+        );
+
+    const reward =
+        document.getElementById(
+            "mysteryBoxReward"
+        );
+
+    const title =
+        document.getElementById(
+            "mysteryBoxTitle"
+        );
+
+
+    overlay.classList.remove(
+        "hidden",
+        "fading-out"
+    );
+
+    container.classList.remove(
+        "shaking",
+        "opening"
+    );
+
+    reward.classList.add(
+        "hidden"
+    );
+
+    reward.classList.remove(
+        "reward-fade"
+    );
+
+    box.textContent = "📦";
+
+    title.textContent =
+        "📦 MYSTERY BOX";
+
+
+    status.textContent =
+        "Something is inside...";
+
+
+
+    /* =========================
+       STEP 1 — SHAKE
+    ========================= */
+
+    setTimeout(() => {
+
+        status.textContent =
+            "👀 What's inside?!";
+
+        container.classList.add(
+            "shaking"
+        );
+
+    }, 800);
+
+
+
+    /* =========================
+       STEP 2 — MORE INTENSE
+    ========================= */
+
+    setTimeout(() => {
+
+        status.textContent =
+            "⚡ IT'S ABOUT TO OPEN!";
+
+    }, 2200);
+
+
+
+    /* =========================
+       STEP 3 — OPEN
+    ========================= */
+
+    setTimeout(() => {
+
+        container.classList.remove(
+            "shaking"
+        );
+
+        container.classList.add(
+            "opening"
+        );
+
+        status.textContent =
+            "✨ REVEALING...";
+
+    }, 3200);
+
+
+
+    /* =========================
+       STEP 4 — REWARD
+    ========================= */
+
+    setTimeout(() => {
+
+        reward.innerHTML = `
+
+            <div class="mystery-reward-emoji">
+                ${emojiForPet(rewardName)}
+            </div>
+
+            <div class="mystery-reward-name">
+                ${colourPetName(rewardName)}
+            </div>
+
+            <div class="mystery-reward-rarity">
+                ${formatRarity(rewardRarity)}
+            </div>
+
+        `;
+
+        reward.classList.remove(
+            "hidden"
+        );
+
+        status.textContent =
+            "🎉 REWARD FOUND!";
+
+    }, 4100);
+
+
+
+    /* =========================
+       STEP 5 — FADE REWARD
+    ========================= */
+
+    setTimeout(() => {
+
+        reward.classList.add(
+            "reward-fade"
+        );
+
+    }, 7000);
+
+
+
+    /* =========================
+       STEP 6 — CLOSE
+    ========================= */
+
+    setTimeout(() => {
+
+        overlay.classList.add(
+            "fading-out"
+        );
+
+    }, 8200);
+
+
+    setTimeout(() => {
+
+        overlay.classList.add(
+            "hidden"
+        );
+
+        overlay.classList.remove(
+            "fading-out"
+        );
+
+        container.classList.remove(
+            "opening",
+            "shaking"
+        );
+
+        reward.classList.add(
+            "hidden"
+        );
+
+        reward.classList.remove(
+            "reward-fade"
+        );
+
+        mysteryBoxOpening = false;
+
+    }, 8800);
+
+}
+
+function pickPet(egg){
+
+    const pets = eggs[egg].pets;
+
+    let luckMultiplier =
+        Math.max(
+            1,
+            Number(luckLevel) || 1
+        );
+
+    // 🍀 Lucky Boost
+    if(luckyBoostActive){
+
+        if(Date.now() < luckyBoostEndTime){
+
+            luckMultiplier *= 2;
+
+        }else{
+
+            luckyBoostActive = false;
+            luckyBoostEndTime = 0;
+
+        }
+    }
+
+    let totalWeight = 0;
+
+    const maxIndex =
+        Math.max(
+            pets.length - 1,
+            1
+        );
+
+    // ⚡ Apply Luck to rarer pets
+    for(let i = 0; i < pets.length; i++){
+
+        const rarityPosition =
+            i / maxIndex;
+
+        const rarityBoost =
+            Math.pow(
+                luckMultiplier,
+                rarityPosition
+            );
+
+        totalWeight +=
+            pets[i][3] * rarityBoost;
+    }
+
+    // 🎲 Roll
+    let roll =
+        Math.random() * totalWeight;
+
+    for(let i = 0; i < pets.length; i++){
+
+        const rarityPosition =
+            i / maxIndex;
+
+        const rarityBoost =
+            Math.pow(
+                luckMultiplier,
+                rarityPosition
+            );
+
+        roll -=
+            pets[i][3] * rarityBoost;
+
+        if(roll < 0){
+
+            return pets[i];
+
+        }
+    }
+
+    return pets[0];
 }
 
 function showHatchAnimation(hatchAmount, hatchedNames){
@@ -3760,12 +5807,51 @@ function showHatchAnimation(hatchAmount, hatchedNames){
     const eggsContainer =
         document.getElementById("hatchAnimationEggs");
 
+    const hatchButton =
+        document.getElementById("hatchButton");
+
+    if(!overlay || !eggsContainer){
+
+        hatchLocked = false;
+
+        if(hatchButton){
+            hatchButton.disabled = false;
+        }
+
+        return;
+    }
+
+
+    /* =========================
+       CLEAR OLD ANIMATION
+    ========================= */
+
     eggsContainer.innerHTML = "";
 
     overlay.classList.remove("hidden");
     overlay.classList.remove("fading-out");
 
+
+    /* =========================
+       HATCH TIMES
+    ========================= */
+
+    let longestDelay = 0;
+
+
+    /* =========================
+       CREATE EGGS
+    ========================= */
+
     for(let i = 0; i < hatchAmount; i++){
+
+        const data = hatchedNames[i];
+
+        if(!data){
+            continue;
+        }
+
+        const rarity = data.rarity;
 
         const egg =
             document.createElement("div");
@@ -3773,77 +5859,334 @@ function showHatchAnimation(hatchAmount, hatchedNames){
         egg.className =
             "hatch-animation-egg shaking";
 
+
+        /* Rarity effects */
+
+        if(rarity === "Ancient"){
+
+            egg.classList.add(
+                "hatch-rarity-ancient",
+                "ancient-hatch-tension"
+            );
+
+        }
+
+        if(rarity === "Celestial"){
+
+            egg.classList.add(
+                "hatch-rarity-celestial",
+                "celestial-hatch-tension"
+            );
+
+        }
+
+        if(rarity === "Chromatic"){
+
+            egg.classList.add(
+                "hatch-rarity-chromatic",
+                "chromatic-hatch-tension"
+            );
+
+        }
+
+
         egg.innerHTML = `
+            <div class="hatch-egg-aura"></div>
+
+            <div class="hatch-egg-energy"></div>
+
             <div class="hatch-egg-emoji">
                 🥚
             </div>
         `;
 
         eggsContainer.appendChild(egg);
+
+
+        /* =========================
+           HATCH TIME
+        ========================= */
+
+        let delay;
+
+        if(rarity === "Ancient"){
+
+            delay = 4000;
+
+        }
+        else if(rarity === "Celestial"){
+
+            delay = 6000;
+
+        }
+        else if(rarity === "Chromatic"){
+
+            delay = 8000;
+
+        }
+        else{
+
+            delay = getFasterHatchTime();
+
+        }
+
+
+        if(delay > longestDelay){
+
+            longestDelay = delay;
+
+        }
+
+
+        /* =========================
+           CRACK EGG
+        ========================= */
+
+        setTimeout(() => {
+
+            if(!egg.isConnected){
+                return;
+            }
+
+            egg.classList.remove(
+                "shaking"
+            );
+
+            egg.classList.add(
+                "cracking"
+            );
+
+        }, delay);
+
+
+        /* =========================
+           REVEAL REWARD
+        ========================= */
+
+        setTimeout(() => {
+
+            if(!egg.isConnected){
+                return;
+            }
+
+            const fullResult =
+                data.name;
+
+            egg.classList.remove(
+                "cracking"
+            );
+
+            egg.classList.add(
+                "hatch-result-revealed"
+            );
+
+            egg.innerHTML = `
+                <div class="
+                    hatch-animation-result
+                    mutation-card
+                    mutation-card-${getMutationClass(fullResult)}
+                ">
+
+                    <div class="
+                        mutation-particles
+                        mutation-particles-${getMutationClass(fullResult)}
+                    "></div>
+
+                    <div class="
+                        hatch-result-emoji
+                        mutation-pet-emoji
+                        mutation-pet-${getMutationClass(fullResult)}
+                    ">
+                        ${emojiForPet(fullResult)}
+                    </div>
+
+                    <div class="
+                        hatch-result-name
+                        mutation-result
+                        mutation-${getMutationClass(fullResult)}
+                    ">
+                        ${colourPetName(fullResult)}
+                    </div>
+
+                    <div class="
+                        hatch-result-rarity
+                        rarity-${data.rarity.toLowerCase()}
+                    ">
+                        ${formatRarity(data.rarity)}
+                    </div>
+
+                </div>
+            `;
+
+        }, delay + 600);
+
     }
+
+
+    /* =========================
+       REWARD FADE
+    ========================= */
+
+    const rewardFadeTime =
+        Math.max(
+            500,
+            1500 - (fasterHatchLevel * 200)
+        );
+
+    overlay.style.setProperty(
+        "--reward-fade-time",
+        `${rewardFadeTime}ms`
+    );
+
+
+    /*
+       Wait until the slowest egg
+       has revealed its reward.
+    */
+
+    const totalAnimationTime =
+        longestDelay + 1200;
+
 
     setTimeout(() => {
 
-        const eggs =
-            document.querySelectorAll(
-                ".hatch-animation-egg"
+        const results =
+            eggsContainer.querySelectorAll(
+                ".hatch-animation-result"
             );
 
-        eggs.forEach((egg, index) => {
 
-            const fullResult =
-                hatchedNames[index];
+        /* =========================
+           FADE REWARDS
+        ========================= */
 
-            const parts =
-                fullResult.split(" ");
-
-            const petName =
-                parts.slice(1).join(" ");
-
-            egg.classList.remove("shaking");
-            egg.classList.add("cracking");
+        results.forEach((result, index) => {
 
             setTimeout(() => {
 
-                egg.classList.remove("cracking");
+                result.classList.add(
+                    "reward-fading"
+                );
 
-                egg.innerHTML = `
-                    <div class="hatch-animation-result">
-
-                        <div class="hatch-result-emoji">
-                            ${emojiForPet(petName)}
-                        </div>
-
-                        <div class="hatch-result-name">
-                            ${fullResult}
-                        </div>
-
-                    </div>
-                `;
-
-            }, 600);
+            }, index * 100);
 
         });
 
-    }, 2000);
 
-    setTimeout(() => {
+        /*
+           Wait until the LAST reward
+           has completely disappeared.
+        */
 
-        overlay.classList.add("fading-out");
+        const unlockDelay =
+            rewardFadeTime +
+            ((results.length - 1) * 100);
 
-        renderInventory();
-        renderIndex();
-        renderEggs();
-        updateUI();
-        save();
 
-        hatchLocked = false;
+        setTimeout(() => {
 
-        document
-            .getElementById("hatchButton")
-            .disabled = false;
 
-    }, 3850);
+            /* =========================
+               HIDE HATCH OVERLAY
+            ========================= */
+
+            overlay.classList.add(
+                "fading-out"
+            );
+
+
+            /*
+               Give the overlay time to
+               visually fade away.
+            */
+
+            setTimeout(() => {
+
+                overlay.classList.add(
+                    "hidden"
+                );
+
+                overlay.classList.remove(
+                    "fading-out"
+                );
+
+                eggsContainer.innerHTML = "";
+
+
+                /* =========================
+                   🔓 UNLOCK HATCHING
+                ========================= */
+
+                hatchLocked = false;
+
+                if(hatchButton){
+
+                    hatchButton.disabled = false;
+
+                }
+
+
+                /* =========================
+                   👁️ EMBRYON CHECK
+                ========================= */
+
+                if(
+                    shouldTriggerEmbryonEvent()
+                ){
+
+                    startEmbryonEvent();
+
+                }
+
+            }, 300);
+
+        }, unlockDelay);
+
+    }, totalAnimationTime);
+
+}
+
+
+
+function getMutationClass(pet){
+
+    if(pet.startsWith("Shiny Dark Matter ")){
+        return "shiny-dark-matter";
+    }
+
+    if(pet.startsWith("Shiny Rainbow ")){
+        return "shiny-rainbow";
+    }
+
+    if(pet.startsWith("Shiny Golden ")){
+        return "shiny-golden";
+    }
+
+    if(pet.startsWith("Shiny Superior ")){
+        return "shiny-superior";
+    }
+
+    if(pet.startsWith("Dark Matter ")){
+        return "dark-matter";
+    }
+
+    if(pet.startsWith("Rainbow ")){
+        return "rainbow";
+    }
+
+    if(pet.startsWith("Golden ")){
+        return "golden";
+    }
+
+    if(pet.startsWith("Superior ")){
+        return "superior";
+    }
+
+    if(pet.startsWith("Shiny ")){
+        return "shiny";
+    }
+
+    return "normal";
 }
 
 function upgradeLuck(){
@@ -3861,8 +6204,9 @@ function upgradeLuck(){
         return;
     }
 
-    const clickSpeedCosts = [10, 20, 30, 40, 50];
-    const cost = clickSpeedCosts[clickSpeedLevel];
+    // Luck
+    const cost =
+        getUpgradeCost(50, luckLevel);
 
     if(gems < cost){
 
@@ -3877,7 +6221,7 @@ function upgradeLuck(){
     luckLevel += 1;
 
     resultEl.textContent =
-        `🎉 Luck upgraded to ${luckLevel}/40! Current: ${(1 + luckLevel * 0.1).toFixed(1)}x`;
+        `🎉 Luck upgraded to ${Number(luckLevel).toFixed(1)}x!`
 
     updateUI();
     save();
@@ -3956,7 +6300,9 @@ function upgradeRebirths(){
         return;
     }
 
-    const cost = 10;
+    // More Rebirths
+    const cost =
+        getUpgradeCost(10, rebirthUpgradeLevel);
 
     if(gems < cost){
 
@@ -4004,18 +6350,28 @@ function updateRebirthButtons(){
 
     function getRebirthCost(amount){
 
-        if(amount <= 1){
-            return rebirthCost;
+        let totalCost = 0;
+        let tempCost = rebirthCost;
+
+        for(let i = 0; i < amount; i++){
+
+            if(
+                tempCost >= Number.MAX_VALUE ||
+                totalCost >= Number.MAX_VALUE - tempCost
+            ){
+                return Number.MAX_VALUE;
+            }
+
+            totalCost += tempCost;
+
+            tempCost =
+                Math.min(
+                    tempCost * 1.5,
+                    Number.MAX_VALUE
+                );
         }
 
-        const cost =
-            rebirthCost *
-            Math.pow(1.5, amount - 1);
-
-        return Math.min(
-            cost,
-            Number.MAX_VALUE
-        );
+        return totalCost;
     }
 
 
@@ -4281,50 +6637,6 @@ function rebirthMultiple(amount){
     save();
 }
 
-function checkAutoRebirth(){
-
-    if(!autoRebirthPurchased){
-        return;
-    }
-
-    if(!autoRebirthEnabled){
-        return;
-    }
-
-    const amount = autoRebirthTarget;
-
-    if(!amount || amount < 1){
-        return;
-    }
-
-    let totalCost = 0;
-    let tempCost = rebirthCost;
-
-    for(let i = 0; i < amount; i++){
-
-        if(
-            tempCost >= Number.MAX_VALUE ||
-            totalCost >= Number.MAX_VALUE - tempCost
-        ){
-            totalCost = Number.MAX_VALUE;
-            break;
-        }
-
-        totalCost += tempCost;
-
-        tempCost =
-            Math.min(
-                tempCost * 1.5,
-                Number.MAX_VALUE
-            );
-    }
-
-    if(coins >= totalCost){
-
-        rebirthMultiple(amount);
-    }
-}
-
 function upgradeClickSpeed(){
 
     if(clickSpeedLevel >= MAX_CLICK_SPEED){
@@ -4340,7 +6652,9 @@ function upgradeClickSpeed(){
         return;
     }
 
-    const cost = 50;
+    // Click Speed
+    const cost =
+        getUpgradeCost(50, clickSpeedLevel);
 
     if(gems < cost){
 
@@ -4379,7 +6693,11 @@ function upgradeMultiplier(){
         return;
     }
 
-    const cost = 10;
+    const cost =
+        getUpgradeCost(
+            10,
+            multiplierLevel
+        );
 
     if(gems < cost){
 
@@ -4415,7 +6733,9 @@ function upgradeHatchAmount(){
         return;
     }
 
-    const cost = 100;
+    // Hatch Amount
+    const cost =
+        getUpgradeCost(100, hatchAmountLevel);
 
     if(gems < cost){
 
@@ -4438,14 +6758,27 @@ function upgradeHatchAmount(){
 
 function clickForCoins(){
 
+    const clickButton = document.getElementById("clickButton");
+
+    clickButton.classList.remove("clicking");
+
+    void clickButton.offsetWidth;
+
+    clickButton.classList.add("clicking");
+
+    setTimeout(() => {
+        clickButton.classList.remove("clicking");
+    }, 90);
+
     if(clickLocked){
         return;
     }
 
     clickLocked = true;
+
     totalClicks++;
 
-    const clickButton =
+    
         document.getElementById("clickButton");
 
     clickButton.disabled = true;
@@ -4490,15 +6823,85 @@ if(clickBoostActive){
 const skinMultiplier =
     clickSkins[equippedClickSkin]?.multiplier || 1;
 
-const earned =
-    clickPower *
-    petMultiplier *
-    clickMultiplier *
-    skinMultiplier *
-    boostMultiplier;
+// 💥 CRIT CHANCE
+const isCrit = Math.random() < critChance;
 
+    let earned =
+        clickPower *
+        petMultiplier *
+        clickMultiplier *
+        skinMultiplier *
+        boostMultiplier;
+
+    if(isCrit){
+        earned *= critMultiplier;
+
+        showCritEffect(earned);
+    }
 
     coins += earned;
+
+const levelUps = [];
+
+for(const pet of equippedPets){
+
+    const beforeLevel =
+        getPetLevelData(pet).level;
+
+    addPetExp(
+        pet,
+        10
+    );
+
+    const afterLevel =
+        getPetLevelData(pet).level;
+
+    if(afterLevel > beforeLevel){
+
+        levelUps.push({
+            petName: pet,
+            level: afterLevel
+        });
+
+    }
+}
+
+if(levelUps.length > 0){
+
+    showPetLevelUpEffect(
+        levelUps
+    );
+}
+
+if(equippedPets.length > 0){
+
+    renderInventory();
+    renderIndex();
+
+}
+
+    const clickButtonRect =
+        clickButton.getBoundingClientRect();
+
+    const coinFloat =
+        document.createElement("div");
+
+    coinFloat.className = "coin-float";
+
+    coinFloat.textContent =
+        "+" + formatCoins(earned) + " 💰";
+
+    coinFloat.style.left =
+        (clickButtonRect.left + clickButtonRect.width / 2) + "px";
+
+    coinFloat.style.top =
+        (clickButtonRect.top + 10) + "px";
+
+    document.body.appendChild(coinFloat);
+
+    setTimeout(() => {
+        coinFloat.remove();
+    }, 800);
 
 
     resultEl.textContent =
@@ -4542,26 +6945,229 @@ function allIndexPets(){
     return output;
 }
 
-function renderIndex(){
-    const sections=document.getElementById("indexSections");
-    const all=allIndexPets();
-    sections.innerHTML=all.map(([section,pets])=>{
-        return `<div class="index-section"><h3>${section}</h3><div class="index-section-grid">
-        ${pets.map(name=>discovered.has(name)
-            ? `<div class="index-card"><div class="emoji">${emojiForPet(name)}</div><strong>${name}</strong><small>Discovered</small></div>`
-            : `<div class="index-card locked"><strong>❓ ???</strong><small>Undiscovered</small></div>`
-        ).join("")}</div></div>`;
-    }).join("");
+function showCritEffect(amount){
 
-    document.getElementById("indexCount").textContent=`${discovered.size} / 246 discovered`;
-    document.getElementById("indexProgress").style.width=`${Math.min(discovered.size/246*100,100)}%`;
+    const effect = document.createElement("div");
+
+    effect.className = "crit-effect";
+
+    effect.innerHTML = `
+        <div class="crit-burst">💥</div>
+        <div class="crit-text">CRITICAL!</div>
+        <div class="crit-coins">+${formatCoins(amount)} 🪙</div>
+    `;
+
+    document.body.appendChild(effect);
+
+    setTimeout(() => {
+        effect.remove();
+    }, 1000);
+}
+
+function showPetLevelUpEffect(levelUps){
+
+    if(!Array.isArray(levelUps) || levelUps.length === 0){
+        return;
+    }
+
+    const effect =
+        document.createElement("div");
+
+    effect.className =
+        "pet-level-up-effect";
+
+    const petList =
+        levelUps.map(up => `
+            <div class="pet-level-up-pet">
+                <div class="pet-level-up-pet-emoji">
+                    ${emojiForPet(up.petName)}
+                </div>
+
+                <div class="pet-level-up-pet-name">
+                    ${colourPetName(up.petName)}
+                </div>
+
+                <div class="pet-level-up-pet-level">
+                    LEVEL ${up.level}
+                </div>
+            </div>
+        `).join("");
+
+    effect.innerHTML = `
+        <div class="pet-level-up-rays">
+            ✨ ✦ ✨
+        </div>
+
+        <div class="pet-level-up-burst">
+            🐾
+        </div>
+
+        <div class="pet-level-up-title">
+            ${levelUps.length === 1
+                ? "PET LEVEL UP!"
+                : "PETS LEVEL UP!"}
+        </div>
+
+        <div class="pet-level-up-pets">
+            ${petList}
+        </div>
+    `;
+
+    document.body.appendChild(effect);
+
+    setTimeout(() => {
+        effect.remove();
+    }, 1800);
+}
+
+function renderIndex(){
+
+    const sections =
+        document.getElementById("indexSections");
+
+    const all =
+        allIndexPets();
+
+
+    sections.innerHTML =
+        all.map(([section,pets]) => {
+
+            return `
+
+                <div class="index-section">
+
+                    <h3>
+                        ${section}
+                    </h3>
+
+
+                    <div class="index-section-grid">
+
+                        ${pets.map(name => {
+
+                            const isDiscovered =
+                                discovered.has(name);
+
+
+                            const rarity =
+                                getPetRarity(name);
+
+
+                            /* =========================
+                               DISCOVERED PET
+                            ========================= */
+
+                            if(isDiscovered){
+
+                                const secretClass =
+                                    rarity === "Secret"
+                                        ? " secret-pet-card"
+                                        : "";
+
+
+                                const secretRarityClass =
+                                    rarity === "Secret"
+                                        ? " secret-pet-rarity"
+                                        : "";
+
+
+                                return `
+
+                                    <div class="
+                                        index-card
+                                        discovered
+                                        ${secretClass}
+                                    ">
+
+                                        <div class="emoji">
+                                            ${emojiForPet(name)}
+                                        </div>
+
+
+                                        <div class="index-pet-name">
+                                            ${colourPetName(name)}
+                                        </div>
+
+
+                                        <div class="
+                                            index-pet-rarity
+                                            rarity-${rarity.toLowerCase()}
+                                            ${secretRarityClass}
+                                        ">
+                                            ${formatRarity(rarity)}
+                                        </div>
+
+
+                                        <div class="index-discovered">
+                                            ✓ DISCOVERED
+                                        </div>
+
+                                    </div>
+
+                                `;
+
+                            }
+
+
+                            /* =========================
+                               LOCKED PET
+                            ========================= */
+
+                            return `
+
+                                <div class="index-card locked">
+
+                                    <div class="emoji">
+                                        ❓
+                                    </div>
+
+
+                                    <div class="index-pet-name">
+                                        ???
+                                    </div>
+
+
+                                    <div class="index-pet-rarity">
+                                        ???
+                                    </div>
+
+
+                                    <div class="index-undiscovered">
+                                        🔒 NOT DISCOVERED
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        }).join("")}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+
+    document.getElementById("indexCount").textContent =
+        `${discovered.size} / 246 discovered`;
+
+
+    document.getElementById("indexProgress").style.width =
+        `${Math.min(
+            discovered.size / 246 * 100,
+            100
+        )}%`;
+
 }
 
 function emojiForPet(name){
     const stripped=name.replace(/^(Shiny Dark Matter |Dark Matter |Shiny Golden |Shiny Rainbow |Shiny Superior |Shiny |Golden |Rainbow |Superior )/,"");
     const p=findPetData(stripped);
     if(p) return p[1];
-    if(stripped==="Embryon") return "🐣";
+    if(stripped==="Embryon") return "👁️";
     if(stripped==="Mystorius") return "🎲";
     return "🐾";
 }
@@ -4683,7 +7289,7 @@ function renderInventory(){
         if(!pet){
 
             equippedBox.innerHTML += `
-                <div class="equipped-slot empty">
+                <div class="equipped-slot">
 
                     <div class="emoji">🐾</div>
 
@@ -4698,14 +7304,87 @@ function renderInventory(){
         }
 
 
+        const petLevelData = getPetLevelData(pet);
+
+const petLevel =
+    Math.max(
+        1,
+        Math.min(
+            MAX_PET_LEVEL,
+            petLevelData.level || 1
+        )
+    );
+
+const petExp =
+    petLevelData.exp || 0;
+
+const petExpRequired =
+    getPetExpRequired(petLevel);
+
+const isMaxLevel =
+    petLevel >= MAX_PET_LEVEL;
+
+const expPercent =
+    isMaxLevel
+        ? 100
+        : Math.min(
+            100,
+            (petExp / petExpRequired) * 100
+        );
+
         equippedBox.innerHTML += `
-            <div class="equipped-slot">
+            <div class="equipped-slot ${
+                getPetRarity(pet) === "Secret"
+                    ? "secret-pet-card"
+                    : ""
+            } ${
+                isMaxLevel
+                    ? "max-level-pet"
+                    : ""
+            }">
 
                 <div class="emoji">
                     ${emojiForPet(pet)}
                 </div>
 
-                <strong>${pet}</strong>
+                <strong>
+                    ${colourPetName(pet)}
+                </strong>
+
+                <div class="pet-rarity rarity-${getPetRarity(pet).toLowerCase()} ${
+                    getPetRarity(pet) === "Secret"
+                        ? "secret-pet-rarity"
+                        : ""
+                }">
+                    ${formatRarity(getPetRarity(pet))}
+                </div>
+
+                <div class="pet-level-display">
+
+                    <div class="pet-level-text">
+                        👑 LEVEL ${petLevel}
+                    </div>
+
+                    <div class="pet-exp-bar">
+
+                        <div
+                            class="pet-exp-fill"
+                            style="width:${expPercent}%"
+                        ></div>
+
+                    </div>
+
+                    <div class="pet-exp-text">
+
+                        ${
+                            isMaxLevel
+                                ? "MAX LEVEL"
+                                : `${formatCoins(petExp)} / ${formatCoins(petExpRequired)} EXP`
+                        }
+
+                    </div>
+
+                </div>
 
                 <small>
                     ×${formatCoins(getPetMultiplier(pet))}
@@ -4800,15 +7479,27 @@ function renderInventory(){
 
 
                 return ` 
-            <div class="pet-card"> 
+            <div class="pet-card ${
+                getPetRarity(name) === "Secret"
+                    ? "secret-pet-card"
+                    : ""
+            }">
  
                 <div class="emoji"> 
                     ${emojiForPet(name)} 
                 </div> 
  
-                <strong>${name}</strong> 
- 
-                <small> 
+                <strong>${colourPetName(name)}</strong>
+
+                <div class="pet-rarity rarity-${getPetRarity(name).toLowerCase()} ${
+                    getPetRarity(name) === "Secret"
+                        ? "secret-pet-rarity"
+                        : ""
+                }">
+                    ${formatRarity(getPetRarity(name))}
+                </div>
+
+                <small>
                     Owned: ${formatCoins(owned)}
                     <br>
                     Equipped: ${formatCoins(equipped)}
@@ -4861,29 +7552,326 @@ function deletePet(name){
         return;
     }
 
-    const confirmed =
-        confirm(
-            `Delete ALL ${formatCoins(available)} unequipped ${name}?\n\n` +
-            `${formatCoins(equipped)} equipped will be kept.\n\n` +
-            `This cannot be undone.`
+
+    /* =========================
+       🗑️ OPEN DELETE GUI
+    ========================= */
+
+    petPendingDeletion = {
+        name: name,
+        owned: owned,
+        equipped: equipped,
+        available: available,
+        deleteAmount: 1
+    };
+
+
+    const overlay =
+        document.getElementById("deletePetOverlay");
+
+    const preview =
+        document.getElementById("deletePetPreview");
+
+    const secretWarning =
+        document.getElementById(
+            "deletePetSecretWarning"
         );
 
-    if(!confirmed){
+
+    const emoji =
+        emojiForPet(name);
+
+    const rarity =
+        getPetRarity(name);
+
+
+    preview.innerHTML = `
+        <div class="delete-pet-emoji">
+            ${emoji}
+        </div>
+
+        <div class="delete-pet-name">
+            ${colourPetName(name)}
+        </div>
+
+        <div style="
+            font-size:13px;
+            color:#aaa;
+            margin-top:6px;
+        ">
+            ${formatCoins(available)} unequipped
+            · ${formatCoins(equipped)} equipped
+        </div>
+    `;
+
+
+    if(rarity === "Secret"){
+
+        secretWarning.classList.remove(
+            "hidden"
+        );
+
+    }else{
+
+        secretWarning.classList.add(
+            "hidden"
+        );
+    }
+
+    updateDeletePetQuantity();
+
+    overlay.classList.remove(
+        "hidden"
+    );
+}
+
+
+/* =========================
+   ❌ CANCEL
+========================= */
+
+function closeDeletePetConfirm(){
+
+    const overlay =
+        document.getElementById(
+            "deletePetOverlay"
+        );
+
+    overlay.classList.add(
+        "hidden"
+    );
+
+    petPendingDeletion = null;
+}
+
+function formatUpgradePrice(amount){
+
+    if(amount >= 1000000000){
+
+        return (
+            (amount / 1000000000)
+                .toFixed(2)
+                .replace(/\.00$/, "")
+                .replace(/(\.\d)0$/, "$1")
+            + "B"
+        );
+
+    }
+
+    if(amount >= 1000000){
+
+        return (
+            (amount / 1000000)
+                .toFixed(2)
+                .replace(/\.00$/, "")
+                .replace(/(\.\d)0$/, "$1")
+            + "M"
+        );
+
+    }
+
+    if(amount >= 1000){
+
+        return (
+            (amount / 1000)
+                .toFixed(2)
+                .replace(/\.00$/, "")
+                .replace(/(\.\d)0$/, "$1")
+            + "K"
+        );
+
+    }
+
+    return amount.toString();
+
+}
+
+function getUpgradeCost(baseCost, level){
+
+    const cost =
+        baseCost * Math.pow(1.5, level);
+
+    return Math.round(cost / 10) * 10;
+
+}
+
+function getFasterHatchTime(){
+
+    const times = [
+        1000, // Level 0
+        867,  // Level 1
+        733,  // Level 2
+        600,  // Level 3
+        467,  // Level 4
+        333   // Level 5
+    ];
+
+    return times[
+        Math.min(
+            fasterHatchLevel,
+            MAX_FASTER_HATCH_LEVEL
+        )
+    ];
+}
+
+function getFasterHatchCost(){
+
+    const baseCost = 20;
+
+    const cost =
+        baseCost *
+        Math.pow(
+            1.5,
+            fasterHatchLevel
+        );
+
+    return Math.round(cost / 10) * 10;
+}
+
+function upgradeFasterHatch(){
+
+    if(
+        fasterHatchLevel >=
+        MAX_FASTER_HATCH_LEVEL
+    ){
+
+        resultEl.textContent =
+            "⚡ Faster Egg Hatch is already MAXED!";
+
+        showNotification(
+            "⚡ Already Maxed!",
+            "Faster Egg Hatch is already level 5/5."
+        );
+
         return;
     }
 
-    inventory[name] = equipped;
+    const cost =
+        getFasterHatchCost();
 
-    if(inventory[name] <= 0){
-        delete inventory[name];
+    if(gems < cost){
+
+        resultEl.textContent =
+            `❌ You need ${formatCoins(cost - gems)} more gems!`;
+
+        return;
     }
 
-    renderInventory();
+    gems -= cost;
+
+    fasterHatchLevel++;
+
+    showNotification(
+        "⚡ Faster Egg Hatch Upgraded!",
+        `Level ${fasterHatchLevel}/5`
+    );
+
     updateUI();
+
     save();
+
 }
 
 function updateUpgradeUI(){
+
+    /* ⚡ Faster Egg Hatch */
+
+    const fasterHatchLevelEl =
+        document.getElementById(
+            "fasterHatchLevel"
+        );
+
+    const fasterHatchCurrentEl =
+        document.getElementById(
+            "fasterHatchCurrent"
+        );
+
+    const fasterHatchNextEl =
+        document.getElementById(
+            "fasterHatchNext"
+        );
+
+    const fasterHatchCostEl =
+        document.getElementById(
+            "fasterHatchCost"
+        );
+
+    const fasterHatchButton =
+        document.getElementById(
+            "fasterHatchUpgrade"
+        );
+
+    if(fasterHatchLevelEl){
+
+        fasterHatchLevelEl.textContent =
+            `${fasterHatchLevel} / ${MAX_FASTER_HATCH_LEVEL}`;
+
+    }
+
+    if(fasterHatchCurrentEl){
+
+        fasterHatchCurrentEl.textContent =
+            `${(
+                getFasterHatchTime() / 1000
+            ).toFixed(2)} seconds`;
+
+    }
+
+    if(fasterHatchNextEl){
+
+        if(
+            fasterHatchLevel >=
+            MAX_FASTER_HATCH_LEVEL
+        ){
+
+            fasterHatchNextEl.textContent =
+                "MAX";
+
+        }else{
+
+            const nextTime =
+                Math.round(
+                    2000 *
+                    Math.pow(
+                        0.8,
+                        fasterHatchLevel + 1
+                    )
+                );
+
+            fasterHatchNextEl.textContent =
+                `${(
+                    nextTime / 1000
+                ).toFixed(2)} seconds`;
+
+        }
+
+    }
+
+    if(fasterHatchCostEl){
+
+        fasterHatchCostEl.textContent =
+            fasterHatchLevel >=
+            MAX_FASTER_HATCH_LEVEL
+
+            ? "MAX"
+
+            : `${formatCoins(
+                getFasterHatchCost()
+            )} gems`;
+
+    }
+
+    if(fasterHatchButton){
+
+        fasterHatchButton.textContent =
+            fasterHatchLevel >=
+            MAX_FASTER_HATCH_LEVEL
+
+            ? "MAXED"
+
+            : "⬆️ UPGRADE";
+
+    }
 
     document.getElementById("upgradeCoins").textContent =
         formatCoins(coins);
@@ -4903,7 +7891,9 @@ function updateUpgradeUI(){
     document.getElementById("clickSpeedCost").textContent =
         clickSpeedLevel >= MAX_CLICK_SPEED
             ? "MAX"
-            : "50 gems";
+            : `${formatUpgradePrice(
+                getUpgradeCost(50, clickSpeedLevel)
+            )} gems`;
 
 
     // CLICK MULTIPLIER
@@ -4912,7 +7902,10 @@ function updateUpgradeUI(){
         `${multiplierLevel} / ${MAX_MULTIPLIER_LEVEL}`;
 
     document.getElementById("multiplierCurrent").textContent =
-        `${Math.min(multiplierLevel, MAX_MULTIPLIER_LEVEL)}x`;
+        `${Math.min(
+            multiplierLevel,
+            MAX_MULTIPLIER_LEVEL
+        )}x`;
 
     document.getElementById("multiplierNext").textContent =
         multiplierLevel >= MAX_MULTIPLIER_LEVEL
@@ -4922,7 +7915,9 @@ function updateUpgradeUI(){
     document.getElementById("multiplierCost").textContent =
         multiplierLevel >= MAX_MULTIPLIER_LEVEL
             ? "MAX"
-            : "10 gems";
+            : `${formatUpgradePrice(
+                getUpgradeCost(10, multiplierLevel)
+            )} gems`;
 
 
     // MORE REBIRTHS
@@ -4941,7 +7936,9 @@ function updateUpgradeUI(){
     document.getElementById("rebirthUpgradeCost").textContent =
         rebirthUpgradeLevel >= MAX_REBIRTH_UPGRADE
             ? "MAX"
-            : "10 gems";
+            : `${formatUpgradePrice(
+                getUpgradeCost(10, rebirthUpgradeLevel)
+            )} gems`;
 
 
     // HATCH AMOUNT
@@ -4960,7 +7957,9 @@ function updateUpgradeUI(){
     document.getElementById("hatchAmountCost").textContent =
         hatchAmountLevel >= MAX_HATCH_AMOUNT_LEVEL
             ? "MAX"
-            : "100 gems";
+            : `${formatUpgradePrice(
+                getUpgradeCost(100, hatchAmountLevel)
+            )} gems`;
 
 
     // LUCK
@@ -4969,17 +7968,19 @@ function updateUpgradeUI(){
         `${luckLevel} / ${MAX_LUCK_LEVEL}`;
 
     document.getElementById("luckCurrent").textContent =
-        `${(1 + luckLevel * 0.1).toFixed(1)}x`;
+        `${Number(luckLevel).toFixed(1)}x`;
 
     document.getElementById("luckNext").textContent =
         luckLevel >= MAX_LUCK_LEVEL
             ? "MAX"
-            : `${(1 + (luckLevel + 1) * 0.1).toFixed(1)}x`;
+            : `${(Number(luckLevel) + 1).toFixed(1)}x`;
 
     document.getElementById("luckCost").textContent =
         luckLevel >= MAX_LUCK_LEVEL
             ? "MAX"
-            : "50 gems";
+            : `${formatUpgradePrice(
+                getUpgradeCost(50, luckLevel)
+            )} gems`;
 
 
     // PET EQUIP
@@ -4988,22 +7989,24 @@ function updateUpgradeUI(){
         getMaxEquipped();
 
     document.getElementById("equipCurrent").textContent =
-        `${MAX_EQUIPPED} / 5 pets`;
+        `${MAX_EQUIPPED} pets`;
 
     document.getElementById("equipNext").textContent =
-        MAX_EQUIPPED >= 5
+        equipUpgradeLevel >= MAX_EQUIP_UPGRADE_LEVEL
             ? "MAX"
             : `${MAX_EQUIPPED + 1} pets`;
 
     document.getElementById("equipCost").textContent =
         equipUpgradeLevel >= MAX_EQUIP_UPGRADE_LEVEL
             ? "MAX"
-            : equipUpgradeLevel === 0
-                ? "500 gems"
-                : "2,000 gems";
+            : formatUpgradePrice(
+                equipUpgradeLevel === 0
+                    ? 1000
+                    : 5000
+            ) + " gems";
 
 
-    // AUTO REBIRTH
+        // AUTO REBIRTH
 
     document.getElementById("autoRebirthStatus").textContent =
         autoRebirthPurchased
@@ -5014,6 +8017,11 @@ function updateUpgradeUI(){
         autoRebirthPurchased
             ? "OWNED"
             : "100 gems";
+
+    document.getElementById("autoRebirthUpgrade").textContent =
+        autoRebirthPurchased
+            ? "OWNED"
+            : "⬆️ PURCHASE";
 }
 
 document.getElementById("hatchButton").addEventListener(
@@ -5084,6 +8092,51 @@ document.getElementById("autoRebirthUpgrade").addEventListener(
     "click",
     upgradeAutoRebirth
 );
+
+document.getElementById("fasterHatchUpgrade") .addEventListener(
+    "click",
+    upgradeFasterHatch
+);
+
+document
+    .getElementById("embryonContinueButton")
+    .addEventListener(
+        "click",
+        closeEmbryonEvent
+    );
+
+function closeEmbryonEvent(){
+
+    const overlay =
+        document.getElementById(
+            "embryonEventOverlay"
+        );
+
+    overlay.classList.add(
+        "hidden"
+    );
+
+    embryonEventActive = false;
+    embryonEventLocked = false;
+    embryonDiceNumber = 0;
+
+    document.getElementById(
+        "embryonNumberGrid"
+    ).innerHTML = "";
+
+    // 🔓 UNLOCK HATCHING AGAIN
+    hatchLocked = false;
+
+    const hatchButton =
+        document.getElementById(
+            "hatchButton"
+        );
+
+    if(hatchButton){
+        hatchButton.disabled = false;
+    }
+
+}
 
 document.getElementById("selectAutoRebirthButton").addEventListener(
     "click",
@@ -5266,6 +8319,11 @@ document
                 .getElementById("adminRebirths")
                 .value;
 
+        const luckValue =
+            document
+                .getElementById("adminLuck")
+                .value;
+
         if(coinsValue !== ""){
             changes.coins =
                 Number(coinsValue);
@@ -5279,6 +8337,15 @@ document
         if(rebirthsValue !== ""){
             changes.rebirths =
                 Number(rebirthsValue);
+        }
+
+        if(luckValue !== ""){
+
+            changes.luckLevel =
+                Math.max(
+                    1,
+                    Number(luckValue)
+                );
         }
 
         if(Object.keys(changes).length === 0){
@@ -5344,6 +8411,17 @@ document
             await load();
 
             updateUI();
+
+            // Make sure the Luck display updates immediately
+            const luckValueEl =
+                document.getElementById("luckValue");
+
+            if(luckValueEl){
+
+                luckValueEl.textContent =
+                    Number(luckLevel).toFixed(1) + "x";
+            }
+
             renderInventory();
             renderIndex();
             renderEggs();
@@ -5392,40 +8470,114 @@ document
             return;
         }
 
-        let error;
+        let error = null;
+
+
+        /* =========================
+        RESET ALL PLAYERS
+        ========================= */
 
         if(adminTargetUserId === "ALL"){
 
-            const {
-                error: resetError
-            } = await supabaseClient
-                .rpc(
-                    "admin_reset_all_players",
-                    {
-                        reset_type:
-                            resetType
-                    }
-                );
+            if(resetType === "upgrades_shop"){
 
-            error = resetError;
+                // Reset upgrades first
+                let result =
+                    await supabaseClient.rpc(
+                        "admin_reset_all_players",
+                        {
+                            reset_type: "upgrades"
+                        }
+                    );
+
+                error = result.error;
+
+                // Only reset shop if upgrades succeeded
+                if(!error){
+
+                    result =
+                        await supabaseClient.rpc(
+                            "admin_reset_all_players",
+                            {
+                                reset_type: "shop"
+                            }
+                        );
+
+                    error = result.error;
+                }
+
+            }else{
+
+                const result =
+                    await supabaseClient.rpc(
+                        "admin_reset_all_players",
+                        {
+                            reset_type:
+                                resetType
+                        }
+                    );
+
+                error = result.error;
+            }
+
+
+        /* =========================
+        RESET ONE PLAYER
+        ========================= */
 
         }else{
 
-            const {
-                error: resetError
-            } = await supabaseClient
-                .rpc(
-                    "admin_reset_player",
-                    {
-                        target_user_id:
-                            adminTargetUserId,
+            if(resetType === "upgrades_shop"){
 
-                        reset_type:
-                            resetType
-                    }
-                );
+                // Reset upgrades first
+                let result =
+                    await supabaseClient.rpc(
+                        "admin_reset_player",
+                        {
+                            target_user_id:
+                                adminTargetUserId,
 
-            error = resetError;
+                            reset_type:
+                                "upgrades"
+                        }
+                    );
+
+                error = result.error;
+
+                // Only reset shop if upgrades succeeded
+                if(!error){
+
+                    result =
+                        await supabaseClient.rpc(
+                            "admin_reset_player",
+                            {
+                                target_user_id:
+                                    adminTargetUserId,
+
+                                reset_type:
+                                    "shop"
+                            }
+                        );
+
+                    error = result.error;
+                }
+
+            }else{
+
+                const result =
+                    await supabaseClient.rpc(
+                        "admin_reset_player",
+                        {
+                            target_user_id:
+                                adminTargetUserId,
+
+                            reset_type:
+                                resetType
+                        }
+                    );
+
+                error = result.error;
+            }
         }
 
         if(error){
@@ -5604,41 +8756,135 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
     mysteryBoxCost =
         Math.floor(mysteryBoxCost * 2.5);
 
+
     const mysteryRoll =
         Math.random() * 100;
 
+
     const mysteryOverlay =
-        document.getElementById("mysteryOverlay");
+        document.getElementById("mysteryBoxOverlay");
 
     const mysteryBoxAnimation =
-        document.querySelector(".mystery-box-animation");
+        document.getElementById("mysteryBoxContainer");
 
     const mysteryReveal =
-        document.getElementById("mysteryReveal");
+        document.getElementById("mysteryBoxReward");
 
     const mysteryRevealText =
-        document.getElementById("mysteryRevealText");
+        document.getElementById("mysteryBoxReward");
 
-    mysteryOverlay.classList.add("active");
 
-    mysteryBoxAnimation.style.display = "block";
-    mysteryReveal.classList.remove("show");
+    /* =========================
+       RESET RARITY
+    ========================= */
+
+    mysteryOverlay.classList.remove(
+        "rarity-common",
+        "rarity-rare",
+        "rarity-epic",
+        "rarity-legendary",
+        "rarity-secret"
+    );
+
+
+    /* =========================
+       OPEN OVERLAY
+    ========================= */
+
+    mysteryOverlay.classList.remove("hidden");
+    mysteryOverlay.classList.remove("fading-out");
+
+
+    mysteryBoxAnimation.classList.remove(
+        "shaking",
+        "opening"
+    );
+
+    void mysteryBoxAnimation.offsetWidth;
+
+    mysteryBoxAnimation.style.display = "flex";
+
+    mysteryBoxAnimation.classList.add("shaking");
+
+
+    mysteryReveal.classList.remove(
+        "show",
+        "fade-out",
+        "hidden"
+    );
+
+    mysteryReveal.style.opacity = "0";
+
 
     resultEl.textContent =
-        "🎲 Opening Mystery Box...";
+        "📦 Mystery Box is opening...";
+
+
+    /* =========================
+       BOX SHAKE
+    ========================= */
 
     setTimeout(() => {
 
-        mysteryBoxAnimation.style.display = "none";
+        resultEl.textContent =
+            "⚡ The box is shaking...";
 
-        mysteryRevealText.textContent = "";
-        mysteryReveal.classList.add("show");
+    }, 500);
+
+
+    /* =========================
+       SECRET / BIG OPENING
+    ========================= */
+
+    setTimeout(() => {
+
+        resultEl.textContent =
+            "💥 IT'S OPENING!";
+
+        mysteryBoxAnimation.classList.remove(
+            "shaking"
+        );
+
+        mysteryBoxAnimation.classList.add(
+            "opening"
+        );
+
+    }, 1200);
+
+
+    /* =========================
+       REVEAL
+    ========================= */
+
+    setTimeout(() => {
+
+        mysteryBoxAnimation.style.display =
+            "none";
+
+
+        mysteryReveal.classList.remove(
+            "hidden",
+            "fade-out"
+        );
+
+
+        mysteryReveal.style.opacity = "1";
+
+        mysteryReveal.classList.add(
+            "show"
+        );
+
 
         // ======================================
-        // 👑 0.01% — SPECIAL MYSTORIUS
+        // 👑 0.01% — SECRET MYSTORIUS
         // ======================================
 
         if(mysteryRoll < 0.01){
+
+            /*
+             * SECRET REWARD
+             * The rarer mutations are still possible.
+             */
 
             const shinyRoll =
                 Math.floor(Math.random() * 100) + 1;
@@ -5652,7 +8898,9 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
             const darkMatterRoll =
                 Math.floor(Math.random() * 100) + 1;
 
+
             let mysteryPet;
+
 
             if(
                 darkMatterRoll === 1 &&
@@ -5713,18 +8961,56 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
             }
 
+
+            /* =========================
+               GIVE SECRET PET
+            ========================= */
+
             inventory[mysteryPet] =
                 (inventory[mysteryPet] || 0) + 1;
 
             discovered.add(mysteryPet);
 
-            mysteryRevealText.textContent =
-                `👑 ${mysteryPet} · ×${formatCoins(getPetMultiplier(mysteryPet))}`;
+            // 🌎 GLOBAL SECRET HATCH
+            broadcastGlobalHatch(
+                mysteryPet,
+                "Secret"
+            );
+
+
+            /* =========================
+               SECRET ANIMATION
+            ========================= */
+
+            mysteryOverlay.classList.add(
+                "rarity-secret"
+            );
+
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">👁️</div>
+
+                <div class="mystery-reward-name">
+                    ${mysteryPet}
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    𝚜𝚎𝚌𝚛𝚎𝚝
+                </div>
+
+                <div>
+                    ×${formatCoins(
+                        getPetMultiplier(mysteryPet)
+                    )}
+                </div>
+            `;
+
 
             resultEl.textContent =
-                `👑 SPECIAL PET DISCOVERED! ✨ ${mysteryPet} · ×${formatCoins(getPetMultiplier(mysteryPet))}`;
+                `👑 SECRET PET DISCOVERED! ✨ ${mysteryPet}`;
 
         }
+
 
         // ======================================
         // 💰 29.99% — 1.2X CURRENT COINS
@@ -5732,18 +9018,38 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 30){
 
+            mysteryOverlay.classList.add(
+                "rarity-common"
+            );
+
+
             const reward =
                 Math.floor(coins * 1.2);
 
+
             coins += reward;
 
-            mysteryRevealText.textContent =
-                `💰 +${formatCoins(reward)} Coins!`;
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    💰
+                </div>
+
+                <div class="mystery-reward-name">
+                    +${formatCoins(reward)} Coins!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    COMMON REWARD
+                </div>
+            `;
+
 
             resultEl.textContent =
                 `🎉 Mystery Box Reward! 💰 +${formatCoins(reward)} coins! · 1.2× current coins`;
 
         }
+
 
         // ======================================
         // 💰 25% — 1.5X CURRENT COINS
@@ -5751,18 +9057,38 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 55){
 
+            mysteryOverlay.classList.add(
+                "rarity-rare"
+            );
+
+
             const reward =
                 Math.floor(coins * 0.5);
 
+
             coins += reward;
 
-            mysteryRevealText.textContent =
-                `💰 +${formatCoins(reward)} Coins!`;
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    💰
+                </div>
+
+                <div class="mystery-reward-name">
+                    +${formatCoins(reward)} Coins!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    RARE REWARD
+                </div>
+            `;
+
 
             resultEl.textContent =
                 `🎉 Mystery Box Reward! 💰 +${formatCoins(reward)} coins! · 1.5× current coins`;
 
         }
+
 
         // ======================================
         // 🍀 20% — LUCKY BOOST
@@ -5770,24 +9096,47 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 75){
 
+            mysteryOverlay.classList.add(
+                "rarity-rare"
+            );
+
+
             luckyBoostActive = true;
 
             shopPurchases++;
 
-            unlockAchievement("Activate Lucky Boost");
+
+            unlockAchievement(
+                "Activate Lucky Boost"
+            );
 
             checkAchievements();
+
 
             luckyBoostEndTime =
                 Date.now() + (300 * 1000);
 
-            mysteryRevealText.textContent =
-                "🍀 Lucky Boost · 5 Minutes!";
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    🍀
+                </div>
+
+                <div class="mystery-reward-name">
+                    Lucky Boost!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    RARE · 5 MINUTES
+                </div>
+            `;
+
 
             resultEl.textContent =
                 "🎉 Mystery Box Reward! 🍀 Lucky Boost activated for 5 minutes!";
 
         }
+
 
         // ======================================
         // ⚡ 12% — 2X COINS BOOST
@@ -5795,18 +9144,37 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 87){
 
+            mysteryOverlay.classList.add(
+                "rarity-epic"
+            );
+
+
             clickBoostActive = true;
 
             clickBoostEndTime =
                 Date.now() + (300 * 1000);
 
-            mysteryRevealText.textContent =
-                "⚡ 2× Coins Boost · 5 Minutes!";
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    ⚡
+                </div>
+
+                <div class="mystery-reward-name">
+                    2× Coins Boost!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    EPIC · 5 MINUTES
+                </div>
+            `;
+
 
             resultEl.textContent =
                 "🎉 Mystery Box Reward! ⚡ 2× Coins Boost activated for 5 minutes!";
 
         }
+
 
         // ======================================
         // 💰 7% — 3X CURRENT COINS
@@ -5814,18 +9182,38 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 94){
 
+            mysteryOverlay.classList.add(
+                "rarity-epic"
+            );
+
+
             const reward =
                 coins * 3;
 
+
             coins += reward;
 
-            mysteryRevealText.textContent =
-                `🎉 JACKPOT! +${formatCoins(reward)} Coins!`;
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    🎉
+                </div>
+
+                <div class="mystery-reward-name">
+                    JACKPOT!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    EPIC · +${formatCoins(reward)} COINS
+                </div>
+            `;
+
 
             resultEl.textContent =
                 `🎉🎉 JACKPOT! 🎉🎉 💰 +${formatCoins(reward)} coins! · 3× current coins`;
 
         }
+
 
         // ======================================
         // 💎 4% — 5X CURRENT COINS
@@ -5833,18 +9221,38 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else if(mysteryRoll < 98){
 
+            mysteryOverlay.classList.add(
+                "rarity-legendary"
+            );
+
+
             const reward =
                 coins * 5;
 
+
             coins += reward;
 
-            mysteryRevealText.textContent =
-                `💎 MEGA JACKPOT! +${formatCoins(reward)} Coins!`;
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    💎
+                </div>
+
+                <div class="mystery-reward-name">
+                    MEGA JACKPOT!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    LEGENDARY · +${formatCoins(reward)} COINS
+                </div>
+            `;
+
 
             resultEl.textContent =
                 `💎💎 MEGA JACKPOT! 💎💎 +${formatCoins(reward)} coins! · 5× current coins`;
 
         }
+
 
         // ======================================
         // 🔥 2% — 10X CURRENT COINS
@@ -5852,36 +9260,125 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
         else{
 
+            mysteryOverlay.classList.add(
+                "rarity-legendary"
+            );
+
+
             const reward =
                 coins * 10;
 
+
             coins += reward;
 
-            mysteryRevealText.textContent =
-                `🔥 ULTRA JACKPOT! +${formatCoins(reward)} Coins!`;
+
+            mysteryRevealText.innerHTML = `
+                <div class="mystery-reward-emoji">
+                    🔥
+                </div>
+
+                <div class="mystery-reward-name">
+                    ULTRA JACKPOT!
+                </div>
+
+                <div class="mystery-reward-rarity">
+                    LEGENDARY · +${formatCoins(reward)} COINS
+                </div>
+            `;
+
 
             resultEl.textContent =
-                `🔥🔥 ULTRA JACKPOT! 🔥🔥 +${formatCoins(reward)} coins! · 10× current coins`;
+                `🔥🔥 ULTRA JACKPOT! 🔥🔥 💰 +${formatCoins(reward)} coins! · 10× current coins`;
 
         }
 
-        setTimeout(() => {
 
-            mysteryOverlay.classList.remove("active");
-            mysteryReveal.classList.remove("show");
-
-            mysteryBoxAnimation.style.display = "none";
-            mysteryRevealText.textContent = "";
-
-        }, 2500);
+        /* =========================
+           SAVE
+        ========================= */
 
         updateUI();
+
         save();
 
-        }, 1000);
+
+        /* =========================
+           FADE REWARD
+        ========================= */
+
+        setTimeout(() => {
+
+            mysteryReveal.classList.add(
+                "fade-out"
+            );
+
+        }, 3000);
+
+
+        /* =========================
+           CLOSE
+        ========================= */
+
+        setTimeout(() => {
+
+            mysteryOverlay.classList.add(
+                "fading-out"
+            );
+
+
+            setTimeout(() => {
+
+                mysteryOverlay.classList.add(
+                    "hidden"
+                );
+
+
+                mysteryOverlay.classList.remove(
+                    "fading-out"
+                );
+
+
+                mysteryOverlay.classList.remove(
+                    "rarity-common",
+                    "rarity-rare",
+                    "rarity-epic",
+                    "rarity-legendary",
+                    "rarity-secret"
+                );
+
+
+                mysteryReveal.classList.remove(
+                    "show",
+                    "fade-out"
+                );
+
+
+                mysteryReveal.style.opacity = "";
+
+
+                mysteryBoxAnimation.classList.remove(
+                    "shaking",
+                    "opening"
+                );
+
+
+                mysteryBoxAnimation.style.display =
+                    "flex";
+
+
+                mysteryRevealText.innerHTML = "";
+
+
+            }, 700);
+
+
+        }, 4200);
+
+
+    }, 1800);
 
 });
-
+    
 document.getElementById("luckyBoostButton").addEventListener("click", () => {
 
     if(coins < luckyBoostCost){
@@ -5952,7 +9449,17 @@ async function restoreLogin(){
         .textContent = "LOGIN";
 
     const loggedInUser =
-        await getCurrentUser();
+    await getCurrentUser();
+
+    setupGlobalPanel();
+
+    await loadGlobalChat();
+
+    await loadGlobalHatches();
+
+    setupGlobalRealtime();
+
+    setupGlobalPanelDrag();
 
     if(!loggedInUser){
 
@@ -6134,7 +9641,9 @@ supabaseClient
 
 setInterval(() => {
 
-    autoRebirthCheck();
+    if(typeof checkAutoRebirth === "function"){
+        checkAutoRebirth();
+    }
 
 }, 100);
 
@@ -6173,3 +9682,166 @@ setInterval(() => {
     updateUI();
 
 }, 1000);
+
+function updateDeletePetQuantity(){
+
+    if(!petPendingDeletion){
+        return;
+    }
+
+    const quantity =
+        petPendingDeletion.deleteAmount || 1;
+
+    const quantityText =
+        document.getElementById(
+            "deletePetQuantity"
+        );
+
+    const maxText =
+        document.getElementById(
+            "deletePetQuantityMax"
+        );
+
+    if(quantityText){
+
+        quantityText.textContent =
+            quantity;
+
+    }
+
+    if(maxText){
+
+        maxText.textContent =
+            `Max: ${petPendingDeletion.available}`;
+
+    }
+
+}
+
+document.addEventListener("click", function(event){
+
+    /* =========================
+       ❌ CANCEL
+    ========================= */
+
+    if(event.target.closest("#cancelDeletePet")){
+
+        closeDeletePetConfirm();
+
+        return;
+    }
+
+
+    /* =========================
+       ➖ DECREASE
+    ========================= */
+
+    if(event.target.closest("#deletePetMinus")){
+
+        if(!petPendingDeletion){
+            return;
+        }
+
+        petPendingDeletion.deleteAmount =
+            Math.max(
+                1,
+                (petPendingDeletion.deleteAmount || 1) - 1
+            );
+
+        updateDeletePetQuantity();
+
+        return;
+    }
+
+
+    /* =========================
+       ➕ INCREASE
+    ========================= */
+
+    if(event.target.closest("#deletePetPlus")){
+
+        if(!petPendingDeletion){
+            return;
+        }
+
+        petPendingDeletion.deleteAmount =
+            Math.min(
+                petPendingDeletion.available,
+                (petPendingDeletion.deleteAmount || 1) + 1
+            );
+
+        updateDeletePetQuantity();
+
+        return;
+    }
+
+
+    /* =========================
+       🗑️ CONFIRM DELETE
+    ========================= */
+
+    if(event.target.closest("#confirmDeletePet")){
+
+        if(!petPendingDeletion){
+            return;
+        }
+
+        const name =
+            petPendingDeletion.name;
+
+        const equipped =
+            petPendingDeletion.equipped;
+
+        const available =
+            petPendingDeletion.available;
+
+        const deleteAmount =
+            Math.min(
+                available,
+                Math.max(
+                    1,
+                    petPendingDeletion.deleteAmount || 1
+                )
+            );
+
+
+        const remaining =
+            available - deleteAmount;
+
+
+        const newTotal =
+            equipped + remaining;
+
+
+        if(newTotal <= 0){
+
+            delete inventory[name];
+
+        }else{
+
+            inventory[name] =
+                newTotal;
+
+        }
+
+
+        renderInventory();
+
+        updateUI();
+
+        save();
+
+
+        showNotification(
+            "🗑️ Pet Deleted",
+            `Deleted ${formatCoins(
+                deleteAmount
+            )} ${name}.`
+        );
+
+
+        closeDeletePetConfirm();
+
+    }
+
+});

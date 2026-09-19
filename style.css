@@ -3136,8 +3136,7 @@ button{
 /* OVERLAY PANELS */
 
 .account-screen,
-.auto-rebirth-panel,
-.admin-panel{
+.auto-rebirth-panel{
 
     background:rgba(2,6,23,.25) !important;
 
@@ -3428,4 +3427,7786 @@ textarea{
     cursor:not-allowed;
     transform:none;
     box-shadow:none;
+}
+
+/* =========================
+   ✨ PET MUTATION COLOURS
+========================= */
+
+.mutation-shiny{
+    color:#fde047;
+    font-weight:900;
+    text-shadow:0 0 8px rgba(253,224,71,.45);
+}
+
+.mutation-golden{
+    color:#facc15;
+    font-weight:900;
+    text-shadow:0 0 8px rgba(250,204,21,.35);
+}
+
+.mutation-rainbow{
+    font-weight:900;
+    text-shadow:0 0 8px rgba(255,255,255,.25);
+}
+
+.mutation-rainbow span:nth-child(1){
+    color:#ef4444;
+}
+
+.mutation-rainbow span:nth-child(2){
+    color:#facc15;
+}
+
+.mutation-rainbow span:nth-child(3){
+    color:#22c55e;
+}
+
+.mutation-rainbow span:nth-child(4){
+    color:#22d3ee;
+}
+
+.mutation-rainbow span:nth-child(5){
+    color:#a855f7;
+}
+
+.mutation-rainbow span:nth-child(6){
+    color:#ef4444;
+}
+
+.mutation-rainbow span:nth-child(7){
+    color:#facc15;
+}
+
+.mutation-dark-matter{
+    color:#a855f7;
+    font-weight:900;
+    text-shadow:
+        0 0 8px rgba(168,85,247,.55),
+        0 0 16px rgba(126,34,206,.3);
+}
+
+.mutation-superior{
+    color:#facc15;
+    font-weight:900;
+    text-shadow:
+        0 0 8px rgba(250,204,21,.5);
+}
+
+/* =========================
+   🌟 PET RARITY COLOURS
+========================= */
+
+.rarity-common{
+    color:#9ca3af;
+}
+
+.rarity-uncommon{
+    color:#86efac;
+}
+
+.rarity-epic{
+    color:#c084fc;
+}
+
+.rarity-legendary{
+    color:#facc15;
+}
+
+.rarity-mythic{
+    color:#f87171;
+}
+
+.rarity-ancient{
+    color:#4ade80;
+}
+
+.rarity-celestial{
+    color:#ffffff;
+    text-shadow:
+        0 0 8px rgba(255,255,255,.7),
+        0 0 18px rgba(255,255,255,.35);
+}
+
+/* =========================
+   🧬 MUTATION HATCH EFFECTS
+========================= */
+
+.mutation-result{
+    position:relative;
+    display:inline-block;
+}
+
+
+/* ✨ SHINY */
+
+.mutation-shiny{
+    animation: shinyPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes shinyPulse{
+    0%,100%{
+        filter:brightness(1);
+        text-shadow:0 0 5px rgba(253,224,71,.3);
+    }
+
+    50%{
+        filter:brightness(1.5);
+        text-shadow:
+            0 0 10px rgba(253,224,71,.8),
+            0 0 22px rgba(253,224,71,.45);
+    }
+}
+
+
+/* 🟡 GOLDEN */
+
+.mutation-golden{
+    animation: goldenGlow 1.4s ease-in-out infinite;
+}
+
+@keyframes goldenGlow{
+    0%,100%{
+        filter:brightness(1);
+        text-shadow:0 0 6px rgba(250,204,21,.35);
+    }
+
+    50%{
+        filter:brightness(1.35);
+        text-shadow:
+            0 0 10px rgba(250,204,21,.8),
+            0 0 24px rgba(250,204,21,.45);
+    }
+}
+
+
+/* 🌈 RAINBOW */
+
+.mutation-rainbow{
+    background:linear-gradient(
+        90deg,
+        #ef4444,
+        #facc15,
+        #22c55e,
+        #22d3ee,
+        #a855f7,
+        #ef4444
+    );
+
+    background-size:300% 100%;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+
+    animation:rainbowWave 2s linear infinite;
+}
+
+@keyframes rainbowWave{
+    0%{
+        background-position:0% 50%;
+    }
+
+    100%{
+        background-position:300% 50%;
+    }
+}
+
+
+/* 🟣 DARK MATTER */
+
+.mutation-dark-matter{
+    animation:darkMatterPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes darkMatterPulse{
+    0%,100%{
+        transform:scale(1);
+        text-shadow:
+            0 0 6px rgba(168,85,247,.4);
+    }
+
+    50%{
+        transform:scale(1.06);
+        text-shadow:
+            0 0 10px rgba(168,85,247,.9),
+            0 0 25px rgba(126,34,206,.7),
+            0 0 40px rgba(88,28,135,.4);
+    }
+}
+
+
+/* ✨🟡 SHINY GOLDEN */
+
+.mutation-shiny-golden{
+    animation:shinyGolden 1s ease-in-out infinite;
+}
+
+@keyframes shinyGolden{
+    0%,100%{
+        filter:brightness(1);
+    }
+
+    50%{
+        filter:brightness(1.55);
+        text-shadow:
+            0 0 8px #fde047,
+            0 0 18px #facc15,
+            0 0 30px rgba(250,204,21,.5);
+    }
+}
+
+
+/* ✨🌈 SHINY RAINBOW */
+
+.mutation-shiny-rainbow{
+    animation:shinyRainbow 1.4s ease-in-out infinite;
+}
+
+@keyframes shinyRainbow{
+    0%,100%{
+        filter:brightness(1);
+    }
+
+    50%{
+        filter:brightness(1.5);
+        text-shadow:
+            0 0 8px rgba(255,255,255,.9),
+            0 0 20px rgba(168,85,247,.7),
+            0 0 30px rgba(34,211,238,.5);
+    }
+}
+
+
+/* ✨🟣 SHINY DARK MATTER */
+
+.mutation-shiny-dark-matter{
+    animation:shinyDarkMatter 1.2s ease-in-out infinite;
+}
+
+@keyframes shinyDarkMatter{
+    0%,100%{
+        filter:brightness(1);
+        text-shadow:
+            0 0 6px rgba(168,85,247,.4);
+    }
+
+    50%{
+        filter:brightness(1.5);
+        text-shadow:
+            0 0 8px #fde047,
+            0 0 18px rgba(168,85,247,.9),
+            0 0 35px rgba(126,34,206,.7);
+    }
+}
+
+
+/* ⭐ SUPERIOR */
+
+.mutation-superior{
+    animation:superiorPower 1.1s ease-in-out infinite;
+}
+
+@keyframes superiorPower{
+    0%,100%{
+        transform:scale(1);
+        text-shadow:
+            0 0 5px rgba(250,204,21,.35);
+    }
+
+    50%{
+        transform:scale(1.08);
+        text-shadow:
+            0 0 10px rgba(250,204,21,.9),
+            0 0 25px rgba(250,204,21,.6);
+    }
+}
+
+
+/* ✨⭐ SHINY SUPERIOR */
+
+.mutation-shiny-superior{
+    animation:shinySuperior 1s ease-in-out infinite;
+}
+
+@keyframes shinySuperior{
+    0%,100%{
+        filter:brightness(1);
+        transform:scale(1);
+    }
+
+    50%{
+        filter:brightness(1.6);
+        transform:scale(1.1);
+
+        text-shadow:
+            0 0 8px #ffffff,
+            0 0 16px #fde047,
+            0 0 30px rgba(250,204,21,.8);
+    }
+}
+
+/* =========================
+   💥 MUTATION CARD EFFECTS
+========================= */
+
+.mutation-card{
+    position:relative;
+    overflow:hidden;
+}
+
+
+/* ✨ SHINY */
+
+.mutation-card-shiny::after{
+    content:"";
+    position:absolute;
+    top:-50%;
+    left:-70%;
+    width:45%;
+    height:200%;
+
+    background:rgba(255,255,255,.35);
+
+    transform:rotate(20deg);
+
+    animation:shinySweep 2s ease-in-out infinite;
+}
+
+@keyframes shinySweep{
+    0%{
+        left:-70%;
+    }
+
+    55%,100%{
+        left:140%;
+    }
+}
+
+
+/* 🟡 GOLDEN */
+
+.mutation-card-golden{
+    box-shadow:
+        0 0 20px rgba(250,204,21,.3),
+        0 0 45px rgba(250,204,21,.15) !important;
+
+    animation:goldenCardPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes goldenCardPulse{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.025);
+    }
+}
+
+
+/* 🌈 RAINBOW */
+
+.mutation-card-rainbow{
+    border-color:rgba(255,255,255,.65) !important;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(239,68,68,.15),
+            rgba(250,204,21,.15),
+            rgba(34,197,94,.15),
+            rgba(34,211,238,.15),
+            rgba(168,85,247,.15)
+        ) !important;
+
+    background-size:300% 300%;
+
+    animation:rainbowCardWave 3s ease-in-out infinite;
+}
+
+@keyframes rainbowCardWave{
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+}
+
+
+/* 🟣 DARK MATTER */
+
+.mutation-card-dark-matter{
+    border-color:rgba(168,85,247,.65) !important;
+
+    box-shadow:
+        0 0 20px rgba(168,85,247,.35),
+        0 0 50px rgba(88,28,135,.25) !important;
+
+    animation:darkMatterCard 2s ease-in-out infinite;
+}
+
+@keyframes darkMatterCard{
+    0%,100%{
+        box-shadow:
+            0 0 15px rgba(168,85,247,.25),
+            0 0 35px rgba(88,28,135,.15);
+    }
+
+    50%{
+        box-shadow:
+            0 0 25px rgba(168,85,247,.6),
+            0 0 65px rgba(88,28,135,.4);
+    }
+}
+
+
+/* ✨🟡 SHINY GOLDEN */
+
+.mutation-card-shiny-golden{
+    border-color:rgba(250,204,21,.7) !important;
+
+    box-shadow:
+        0 0 20px rgba(250,204,21,.4),
+        0 0 45px rgba(250,204,21,.2) !important;
+}
+
+.mutation-card-shiny-golden::after{
+    content:"";
+    position:absolute;
+
+    top:-60%;
+    left:-80%;
+
+    width:40%;
+    height:220%;
+
+    background:rgba(255,255,255,.5);
+
+    transform:rotate(20deg);
+
+    animation:shinyGoldSweep 1.6s ease-in-out infinite;
+}
+
+@keyframes shinyGoldSweep{
+    0%{
+        left:-80%;
+    }
+
+    55%,100%{
+        left:150%;
+    }
+}
+
+
+/* ✨🌈 SHINY RAINBOW */
+
+.mutation-card-shiny-rainbow{
+    border-color:rgba(255,255,255,.8) !important;
+
+    background:
+        linear-gradient(
+            120deg,
+            rgba(239,68,68,.2),
+            rgba(250,204,21,.2),
+            rgba(34,197,94,.2),
+            rgba(34,211,238,.2),
+            rgba(168,85,247,.2)
+        ) !important;
+
+    background-size:400% 400%;
+
+    animation:
+        shinyRainbowCard 2.5s ease-in-out infinite;
+}
+
+@keyframes shinyRainbowCard{
+    0%,100%{
+        background-position:0% 50%;
+        transform:scale(1);
+    }
+
+    50%{
+        background-position:100% 50%;
+        transform:scale(1.035);
+    }
+}
+
+
+/* ✨🟣 SHINY DARK MATTER */
+
+.mutation-card-shiny-dark-matter{
+    border-color:rgba(168,85,247,.8) !important;
+
+    box-shadow:
+        0 0 20px rgba(168,85,247,.5),
+        0 0 45px rgba(250,204,21,.15) !important;
+
+    animation:shinyDarkCard 1.5s ease-in-out infinite;
+}
+
+@keyframes shinyDarkCard{
+    0%,100%{
+        box-shadow:
+            0 0 15px rgba(168,85,247,.3),
+            0 0 25px rgba(250,204,21,.1);
+    }
+
+    50%{
+        box-shadow:
+            0 0 30px rgba(168,85,247,.75),
+            0 0 45px rgba(250,204,21,.3);
+    }
+}
+
+
+/* ⭐ SUPERIOR */
+
+.mutation-card-superior{
+    border-color:rgba(250,204,21,.75) !important;
+
+    box-shadow:
+        0 0 25px rgba(250,204,21,.35) !important;
+
+    animation:superiorCard 1.3s ease-in-out infinite;
+}
+
+@keyframes superiorCard{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.04);
+    }
+}
+
+
+/* ✨⭐ SHINY SUPERIOR */
+
+.mutation-card-shiny-superior{
+    border-color:#fde047 !important;
+
+    box-shadow:
+        0 0 20px rgba(255,255,255,.5),
+        0 0 45px rgba(250,204,21,.5) !important;
+
+    animation:shinySuperiorCard 1s ease-in-out infinite;
+}
+
+@keyframes shinySuperiorCard{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.06);
+        box-shadow:
+            0 0 30px rgba(255,255,255,.8),
+            0 0 65px rgba(250,204,21,.7);
+    }
+}
+
+/* =========================
+   ✨ MUTATION PARTICLES
+========================= */
+
+.mutation-particles{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+}
+
+
+/* 🟡 GOLDEN SPARKLES */
+
+.mutation-particles-golden::before,
+.mutation-particles-shiny-golden::before{
+    content:"✦  ✧  ✦  ✧  ✦";
+
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:22px;
+    letter-spacing:20px;
+
+    color:#fde047;
+
+    text-shadow:
+        0 0 8px #facc15,
+        0 0 18px rgba(250,204,21,.7);
+
+    animation:goldSparkles 1.5s ease-in-out infinite;
+}
+
+@keyframes goldSparkles{
+    0%{
+        opacity:.2;
+        transform:translateY(15px) scale(.8);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateY(-5px) scale(1.15);
+    }
+
+    100%{
+        opacity:.2;
+        transform:translateY(-25px) scale(.8);
+    }
+}
+
+
+/* 🌈 RAINBOW WAVE */
+
+.mutation-particles-rainbow::before,
+.mutation-particles-shiny-rainbow::before{
+    content:"";
+
+    position:absolute;
+
+    width:180%;
+    height:35px;
+
+    left:-40%;
+    top:50%;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #ef4444,
+        #facc15,
+        #22c55e,
+        #22d3ee,
+        #a855f7,
+        transparent
+    );
+
+    filter:blur(8px);
+
+    opacity:.75;
+
+    transform:rotate(-12deg);
+
+    animation:rainbowWaveAcross 2s linear infinite;
+}
+
+@keyframes rainbowWaveAcross{
+    0%{
+        transform:
+            translateX(-60%)
+            rotate(-12deg);
+    }
+
+    100%{
+        transform:
+            translateX(60%)
+            rotate(-12deg);
+    }
+}
+
+
+/* 🟣 DARK MATTER ENERGY */
+
+.mutation-particles-dark-matter::before,
+.mutation-particles-shiny-dark-matter::before{
+    content:"";
+
+    position:absolute;
+
+    width:90px;
+    height:90px;
+
+    left:50%;
+    top:45%;
+
+    margin-left:-45px;
+    margin-top:-45px;
+
+    border-radius:50%;
+
+    border:3px solid rgba(168,85,247,.65);
+
+    box-shadow:
+        0 0 15px rgba(168,85,247,.7),
+        0 0 35px rgba(88,28,135,.6);
+
+    animation:darkOrbit 2s linear infinite;
+}
+
+@keyframes darkOrbit{
+    0%{
+        transform:rotate(0deg) scale(.8);
+        opacity:.3;
+    }
+
+    50%{
+        transform:rotate(180deg) scale(1.15);
+        opacity:.9;
+    }
+
+    100%{
+        transform:rotate(360deg) scale(.8);
+        opacity:.3;
+    }
+}
+
+
+/* ⭐ SUPERIOR STAR BURST */
+
+.mutation-particles-superior::before,
+.mutation-particles-shiny-superior::before{
+    content:"✦";
+
+    position:absolute;
+
+    left:50%;
+    top:45%;
+
+    font-size:80px;
+
+    color:#fde047;
+
+    text-shadow:
+        0 0 10px #ffffff,
+        0 0 25px #facc15,
+        0 0 45px rgba(250,204,21,.7);
+
+    animation:superiorBurst 1.4s ease-in-out infinite;
+}
+
+@keyframes superiorBurst{
+    0%{
+        transform:translate(-50%,-50%) scale(.4) rotate(0deg);
+        opacity:.2;
+    }
+
+    50%{
+        transform:translate(-50%,-50%) scale(1.25) rotate(180deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:translate(-50%,-50%) scale(.4) rotate(360deg);
+        opacity:.2;
+    }
+}
+
+
+/* ✨ SHINY LIGHT SWEEP */
+
+.mutation-particles-shiny::before{
+    content:"";
+
+    position:absolute;
+
+    width:30px;
+    height:180%;
+
+    top:-40%;
+    left:-30%;
+
+    background:rgba(255,255,255,.65);
+
+    transform:rotate(25deg);
+
+    filter:blur(5px);
+
+    animation:shinyLightSweep 1.8s ease-in-out infinite;
+}
+
+@keyframes shinyLightSweep{
+    0%{
+        left:-30%;
+    }
+
+    100%{
+        left:130%;
+    }
+}
+
+
+/* ✨🟣 SHINY DARK MATTER EXTRA LIGHT */
+
+.mutation-particles-shiny-dark-matter::after{
+    content:"✦";
+
+    position:absolute;
+
+    top:12px;
+    right:18px;
+
+    font-size:25px;
+
+    color:#fde047;
+
+    text-shadow:
+        0 0 8px #fde047,
+        0 0 18px #facc15;
+
+    animation:darkStar 1s ease-in-out infinite;
+}
+
+@keyframes darkStar{
+    0%,100%{
+        transform:scale(.7) rotate(0deg);
+        opacity:.3;
+    }
+
+    50%{
+        transform:scale(1.3) rotate(180deg);
+        opacity:1;
+    }
+}
+
+
+/* ✨⭐ SHINY SUPERIOR EXTRA BURST */
+
+.mutation-particles-shiny-superior::after{
+    content:"✦ ✦ ✦";
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:flex-start;
+    justify-content:space-around;
+
+    padding-top:15px;
+
+    color:#ffffff;
+
+    font-size:20px;
+
+    text-shadow:
+        0 0 8px #fde047,
+        0 0 20px #facc15;
+
+    animation:superiorStars 1.1s ease-in-out infinite;
+}
+
+@keyframes superiorStars{
+    0%,100%{
+        opacity:.2;
+        transform:translateY(10px);
+    }
+
+    50%{
+        opacity:1;
+        transform:translateY(-5px);
+    }
+}
+
+/* =========================
+   🐾 MUTATION PET ANIMATIONS
+========================= */
+
+.mutation-pet-emoji{
+    position:relative;
+    z-index:2;
+}
+
+
+/* ✨ SHINY */
+
+.mutation-pet-shiny{
+    animation:
+        shinyPetGlow 1s ease-in-out infinite;
+}
+
+@keyframes shinyPetGlow{
+    0%,100%{
+        transform:scale(1);
+        filter:brightness(1)
+               drop-shadow(0 0 5px rgba(253,224,71,.35));
+    }
+
+    50%{
+        transform:scale(1.08);
+        filter:brightness(1.35)
+               drop-shadow(0 0 18px rgba(253,224,71,.9));
+    }
+}
+
+
+/* 🟡 GOLDEN */
+
+.mutation-pet-golden{
+    animation:
+        goldenPetFloat 1.4s ease-in-out infinite;
+}
+
+@keyframes goldenPetFloat{
+    0%,100%{
+        transform:translateY(0) scale(1);
+        filter:drop-shadow(0 0 8px rgba(250,204,21,.45));
+    }
+
+    50%{
+        transform:translateY(-6px) scale(1.06);
+        filter:drop-shadow(0 0 20px rgba(250,204,21,.9));
+    }
+}
+
+
+/* 🌈 RAINBOW */
+
+.mutation-pet-rainbow{
+    animation:
+        rainbowPetWave 1.8s ease-in-out infinite;
+}
+
+@keyframes rainbowPetWave{
+    0%,100%{
+        transform:
+            translateX(0)
+            rotate(0deg)
+            scale(1);
+    }
+
+    25%{
+        transform:
+            translateX(-5px)
+            rotate(-4deg)
+            scale(1.04);
+    }
+
+    50%{
+        transform:
+            translateX(5px)
+            rotate(4deg)
+            scale(1.08);
+    }
+
+    75%{
+        transform:
+            translateX(-3px)
+            rotate(-2deg)
+            scale(1.04);
+    }
+}
+
+
+/* 🟣 DARK MATTER */
+
+.mutation-pet-dark-matter{
+    animation:
+        darkMatterPet 1.5s ease-in-out infinite;
+}
+
+@keyframes darkMatterPet{
+    0%,100%{
+        transform:scale(1) rotate(0deg);
+
+        filter:
+            drop-shadow(0 0 8px rgba(168,85,247,.45));
+    }
+
+    50%{
+        transform:scale(1.1) rotate(3deg);
+
+        filter:
+            brightness(1.2)
+            drop-shadow(0 0 22px rgba(168,85,247,1))
+            drop-shadow(0 0 40px rgba(88,28,135,.7));
+    }
+}
+
+
+/* ✨🟡 SHINY GOLDEN */
+
+.mutation-pet-shiny-golden{
+    animation:
+        shinyGoldenPet 1s ease-in-out infinite;
+}
+
+@keyframes shinyGoldenPet{
+    0%,100%{
+        transform:scale(1);
+        filter:
+            drop-shadow(0 0 8px rgba(250,204,21,.5));
+    }
+
+    50%{
+        transform:scale(1.1);
+        filter:
+            brightness(1.5)
+            drop-shadow(0 0 12px #ffffff)
+            drop-shadow(0 0 28px #facc15);
+    }
+}
+
+
+/* ✨🌈 SHINY RAINBOW */
+
+.mutation-pet-shiny-rainbow{
+    animation:
+        shinyRainbowPet 1.2s ease-in-out infinite;
+}
+
+@keyframes shinyRainbowPet{
+    0%,100%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+
+    50%{
+        transform:scale(1.1);
+        filter:
+            brightness(1.5)
+            drop-shadow(0 0 12px #ffffff)
+            drop-shadow(0 0 25px rgba(168,85,247,.8));
+    }
+}
+
+
+/* ✨🟣 SHINY DARK MATTER */
+
+.mutation-pet-shiny-dark-matter{
+    animation:
+        shinyDarkPet 1.1s ease-in-out infinite;
+}
+
+@keyframes shinyDarkPet{
+    0%,100%{
+        transform:scale(1);
+        filter:
+            drop-shadow(0 0 8px rgba(168,85,247,.5));
+    }
+
+    50%{
+        transform:scale(1.12);
+        filter:
+            brightness(1.5)
+            drop-shadow(0 0 10px #fde047)
+            drop-shadow(0 0 25px #a855f7)
+            drop-shadow(0 0 45px #6b21a8);
+    }
+}
+
+
+/* ⭐ SUPERIOR */
+
+.mutation-pet-superior{
+    animation:
+        superiorPet 1.2s ease-in-out infinite;
+}
+
+@keyframes superiorPet{
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.12);
+        filter:
+            drop-shadow(0 0 10px #fde047)
+            drop-shadow(0 0 25px rgba(250,204,21,.8));
+    }
+}
+
+
+/* ✨⭐ SHINY SUPERIOR */
+
+.mutation-pet-shiny-superior{
+    animation:
+        shinySuperiorPet 1s ease-in-out infinite;
+}
+
+@keyframes shinySuperiorPet{
+    0%,100%{
+        transform:scale(1) rotate(0deg);
+
+        filter:
+            brightness(1)
+            drop-shadow(0 0 8px #fde047);
+    }
+
+    50%{
+        transform:scale(1.14) rotate(3deg);
+
+        filter:
+            brightness(1.6)
+            drop-shadow(0 0 12px #ffffff)
+            drop-shadow(0 0 30px #fde047)
+            drop-shadow(0 0 45px rgba(250,204,21,.8));
+    }
+}
+
+.hatch-animation-result .hatch-result-rarity{
+    font-size:13px !important;
+    font-weight:800;
+    margin-top:8px;
+    line-height:1.2;
+}
+
+/* =========================
+   💥 MUTATION REVEAL BURSTS
+========================= */
+
+.mutation-card{
+    position:relative;
+}
+
+
+/* ✨ SHINY FLASH */
+
+.mutation-card-shiny{
+    animation:
+        shinyReveal .65s ease-out,
+        shinyCardLoop 1.2s ease-in-out .65s infinite;
+}
+
+@keyframes shinyReveal{
+    0%{
+        transform:scale(.55);
+        filter:brightness(2.5);
+        opacity:0;
+    }
+
+    55%{
+        transform:scale(1.15);
+        filter:brightness(1.8);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+}
+
+
+/* 🟡 GOLDEN BURST */
+
+.mutation-card-golden{
+    animation:
+        goldenReveal .7s ease-out,
+        goldenCardPulse 1.5s ease-in-out .7s infinite;
+}
+
+@keyframes goldenReveal{
+    0%{
+        transform:scale(.45);
+        box-shadow:0 0 0 rgba(250,204,21,0);
+    }
+
+    60%{
+        transform:scale(1.12);
+        box-shadow:
+            0 0 50px rgba(250,204,21,.8),
+            0 0 90px rgba(250,204,21,.35);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+/* 🌈 RAINBOW WAVE REVEAL */
+
+.mutation-card-rainbow{
+    animation:
+        rainbowReveal .8s ease-out,
+        rainbowCardWave 3s ease-in-out .8s infinite;
+}
+
+@keyframes rainbowReveal{
+    0%{
+        transform:scale(.5) rotate(-5deg);
+        filter:brightness(2);
+        opacity:0;
+    }
+
+    45%{
+        transform:scale(1.14) rotate(3deg);
+        filter:brightness(1.5);
+        opacity:1;
+    }
+
+    70%{
+        transform:scale(.96) rotate(-2deg);
+    }
+
+    100%{
+        transform:scale(1) rotate(0deg);
+    }
+}
+
+
+/* 🟣 DARK MATTER COLLAPSE */
+
+.mutation-card-dark-matter{
+    animation:
+        darkMatterReveal .9s ease-out,
+        darkMatterCard 2s ease-in-out .9s infinite;
+}
+
+@keyframes darkMatterReveal{
+    0%{
+        transform:scale(1.35);
+        opacity:0;
+        filter:brightness(.2);
+        box-shadow:0 0 0 transparent;
+    }
+
+    45%{
+        transform:scale(.9);
+        opacity:1;
+        filter:brightness(1.4);
+        box-shadow:
+            0 0 70px rgba(168,85,247,1),
+            0 0 120px rgba(88,28,135,.7);
+    }
+
+    75%{
+        transform:scale(1.08);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+/* ✨🟡 SHINY GOLDEN */
+
+.mutation-card-shiny-golden{
+    animation:
+        shinyGoldenReveal .8s ease-out,
+        goldenCardPulse 1.5s ease-in-out .8s infinite;
+}
+
+@keyframes shinyGoldenReveal{
+    0%{
+        transform:scale(.4);
+        opacity:0;
+        filter:brightness(3);
+    }
+
+    45%{
+        transform:scale(1.18);
+        opacity:1;
+        filter:brightness(2);
+    }
+
+    70%{
+        transform:scale(.94);
+    }
+
+    100%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+}
+
+
+/* ✨🌈 SHINY RAINBOW */
+
+.mutation-card-shiny-rainbow{
+    animation:
+        shinyRainbowReveal .9s ease-out,
+        shinyRainbowCard 2.5s ease-in-out .9s infinite;
+}
+
+@keyframes shinyRainbowReveal{
+    0%{
+        transform:scale(.35);
+        opacity:0;
+        filter:brightness(3);
+    }
+
+    40%{
+        transform:scale(1.2);
+        opacity:1;
+        filter:brightness(2);
+    }
+
+    70%{
+        transform:scale(.95);
+    }
+
+    100%{
+        transform:scale(1);
+        filter:brightness(1);
+    }
+}
+
+
+/* ✨🟣 SHINY DARK MATTER */
+
+.mutation-card-shiny-dark-matter{
+    animation:
+        shinyDarkReveal .85s ease-out,
+        shinyDarkCard 1.5s ease-in-out .85s infinite;
+}
+
+@keyframes shinyDarkReveal{
+    0%{
+        transform:scale(.3);
+        opacity:0;
+        filter:brightness(2);
+    }
+
+    40%{
+        transform:scale(1.2);
+        opacity:1;
+        filter:brightness(1.8);
+        box-shadow:
+            0 0 70px rgba(168,85,247,1),
+            0 0 100px rgba(250,204,21,.4);
+    }
+
+    70%{
+        transform:scale(.94);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+/* ⭐ SUPERIOR */
+
+.mutation-card-superior{
+    animation:
+        superiorReveal .8s ease-out,
+        superiorCard 1.3s ease-in-out .8s infinite;
+}
+
+@keyframes superiorReveal{
+    0%{
+        transform:scale(.35);
+        opacity:0;
+    }
+
+    45%{
+        transform:scale(1.2);
+        opacity:1;
+        box-shadow:
+            0 0 60px rgba(250,204,21,.9),
+            0 0 100px rgba(250,204,21,.4);
+    }
+
+    70%{
+        transform:scale(.95);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+/* ✨⭐ SHINY SUPERIOR */
+
+.mutation-card-shiny-superior{
+    animation:
+        shinySuperiorReveal 1s ease-out,
+        shinySuperiorCard 1s ease-in-out 1s infinite;
+}
+
+@keyframes shinySuperiorReveal{
+    0%{
+        transform:scale(.2) rotate(-10deg);
+        opacity:0;
+        filter:brightness(3);
+    }
+
+    40%{
+        transform:scale(1.25) rotate(5deg);
+        opacity:1;
+        filter:brightness(2);
+        box-shadow:
+            0 0 80px rgba(255,255,255,.9),
+            0 0 130px rgba(250,204,21,.7);
+    }
+
+    70%{
+        transform:scale(.94) rotate(-2deg);
+    }
+
+    100%{
+        transform:scale(1) rotate(0deg);
+        filter:brightness(1);
+    }
+}
+
+.click-button{
+    transition:
+        transform .08s ease,
+        filter .08s ease;
+}
+
+.click-button.clicking{
+    transform:scale(.94);
+    filter:brightness(1.25);
+}
+
+.coin-float{
+    position:absolute;
+    pointer-events:none;
+    color:#facc15;
+    font-size:18px;
+    font-weight:900;
+    text-shadow:0 0 8px rgba(250,204,21,.6);
+    animation:coinFloat .8s ease-out forwards;
+    z-index:1000;
+}
+
+@keyframes coinFloat{
+    0%{
+        transform:translate(-50%,0) scale(.8);
+        opacity:0;
+    }
+
+    20%{
+        transform:translate(-50%,-8px) scale(1);
+        opacity:1;
+    }
+
+    100%{
+        transform:translate(-50%,-55px) scale(1.05);
+        opacity:0;
+    }
+}
+
+.auto-rebirth-owned-button{
+    width:100%;
+    margin-top:10px;
+    padding:11px 14px;
+
+    box-sizing:border-box;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:rgba(139,115,255,.16);
+    color:#c4b5fd;
+
+    border:1px solid rgba(139,115,255,.45);
+    border-radius:10px;
+
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.5px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.06),
+        0 4px 12px rgba(0,0,0,.15);
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
+}
+
+.auto-rebirth-owned-button:hover{
+    background:rgba(139,115,255,.28);
+    color:#ffffff;
+
+    border-color:rgba(167,139,250,.75);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 6px 18px rgba(139,115,255,.22),
+        inset 0 1px 0 rgba(255,255,255,.1);
+}
+
+.auto-rebirth-owned-button:active{
+    transform:translateY(0);
+}
+
+/* AUTO UPGRADE OWNED BUTTONS */
+
+#autoRebirthUpgrade,
+#autoHatchUpgrade{
+    background:linear-gradient(
+        135deg,
+        #7167ff,
+        #8b5cf6
+    ) !important;
+
+    color:#ffffff !important;
+
+    border:1px solid rgba(167,139,250,.7) !important;
+    border-radius:12px;
+
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:.5px;
+
+    box-shadow:
+        0 6px 18px rgba(99,102,241,.28),
+        inset 0 1px 0 rgba(255,255,255,.15);
+
+    transition:
+        transform .15s ease,
+        filter .15s ease,
+        box-shadow .15s ease;
+}
+
+#autoRebirthUpgrade:hover,
+#autoHatchUpgrade:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.1);
+
+    box-shadow:
+        0 8px 22px rgba(99,102,241,.38),
+        inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+#autoRebirthUpgrade:active,
+#autoHatchUpgrade:active{
+    transform:translateY(0);
+}
+
+.luck-display{
+    position:fixed;
+    top:100px;
+    left:240px;
+
+    padding:10px 16px;
+
+    border:1px solid var(--border);
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.025)
+        );
+
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+
+    color:var(--text);
+    font-size:15px;
+    font-weight:800;
+
+    z-index:10;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.3),
+        inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.luck-display span{
+    color:white;
+    font-weight:900;
+}
+
+.pet-rarity{
+    margin-top: 5px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.rarity-ancient{
+    color: #168a45;
+    text-shadow: 0 0 8px rgba(22, 138, 69, 0.35);
+}
+
+/* =========================
+   ADMIN RESET DROPDOWN
+========================= */
+
+#adminResetType{
+    width:100% !important;
+
+    padding:13px !important;
+
+    margin:7px 0 15px !important;
+
+    border:1px solid rgba(255,255,255,.15) !important;
+
+    border-radius:9px !important;
+
+    background:#0f172a !important;
+
+    color:#ffffff !important;
+
+    font-size:15px !important;
+
+    cursor:pointer;
+}
+
+#adminResetType option{
+    background:#0f172a !important;
+    color:#ffffff !important;
+}
+
+#adminResetType option:checked{
+    background:#4c3f8f !important;
+    color:#ffffff !important;
+}
+
+/* ========================================================= */
+/* 🐾 PET INDEX — CLEAN COLLECTION CARDS */
+/* ========================================================= */
+
+.pet-index-card{
+
+    position:relative;
+
+    min-height:210px;
+
+    padding:24px 18px 20px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30,41,70,.72),
+            rgba(15,23,42,.62)
+        );
+
+    border:1px solid rgba(148,163,184,.16);
+
+    border-radius:22px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.05);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    overflow:hidden;
+
+    transition:
+        transform .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease;
+}
+
+
+/* subtle top shine */
+
+.pet-index-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:15%;
+    right:15%;
+
+    height:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.35),
+            transparent
+        );
+
+    opacity:.5;
+}
+
+
+/* hover */
+
+.pet-index-card:hover{
+
+    transform:translateY(-5px);
+
+    border-color:
+        rgba(124,140,255,.35);
+
+    box-shadow:
+        0 16px 38px rgba(0,0,0,.32),
+        0 0 25px rgba(100,114,255,.08);
+}
+
+
+/* ========================================================= */
+/* ICON */
+/* ========================================================= */
+
+.pet-index-icon{
+
+    width:82px;
+    height:82px;
+
+    margin-bottom:13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:46px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.025)
+        );
+
+    border:1px solid rgba(255,255,255,.1);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 8px 20px rgba(0,0,0,.22);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+}
+
+.pet-index-card:hover .pet-index-icon{
+
+    transform:scale(1.06);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.1),
+        0 10px 25px rgba(0,0,0,.3);
+}
+
+
+/* ========================================================= */
+/* PET NAME */
+/* ========================================================= */
+
+.pet-index-name{
+
+    font-size:17px;
+
+    font-weight:900;
+
+    line-height:1.25;
+
+    margin-bottom:6px;
+}
+
+
+/* ========================================================= */
+/* RARITY */
+/* ========================================================= */
+
+.pet-index-rarity{
+
+    font-size:13px;
+
+    font-weight:800;
+
+    letter-spacing:.5px;
+
+    margin-bottom:10px;
+
+    opacity:.95;
+}
+
+
+/* ========================================================= */
+/* STATUS */
+/* ========================================================= */
+
+.pet-index-status{
+
+    padding:5px 11px;
+
+    border-radius:999px;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    letter-spacing:.8px;
+
+    color:#86efac;
+
+    background:
+        rgba(34,197,94,.09);
+
+    border:1px solid
+        rgba(34,197,94,.16);
+}
+
+.pet-index-status.locked{
+
+    color:#94a3b8;
+
+    background:
+        rgba(148,163,184,.06);
+
+    border-color:
+        rgba(148,163,184,.12);
+}
+
+
+/* ========================================================= */
+/* LOCKED PET */
+/* ========================================================= */
+
+.pet-index-locked{
+
+    opacity:.58;
+
+    filter:saturate(.35);
+}
+
+.pet-index-locked .pet-index-icon{
+
+    filter:grayscale(1);
+
+    opacity:.65;
+}
+
+
+/* ========================================================= */
+/* RARITY COLORS */
+/* ========================================================= */
+
+.pet-index-rarity.rarity-common{
+    color:#cbd5e1;
+}
+
+.pet-index-rarity.rarity-uncommon{
+    color:#4ade80;
+}
+
+.pet-index-rarity.rarity-epic{
+    color:#a78bfa;
+}
+
+.pet-index-rarity.rarity-legendary{
+    color:#facc15;
+}
+
+.pet-index-rarity.rarity-mythic{
+    color:#fb7185;
+}
+
+.pet-index-rarity.rarity-ancient{
+    color:#168a45;
+
+    text-shadow:
+        0 0 8px rgba(22,138,69,.35);
+}
+
+.pet-index-rarity.rarity-celestial{
+    color:#67e8f9;
+
+    text-shadow:
+        0 0 9px rgba(103,232,249,.35);
+}
+
+
+/* ========================================================= */
+/* MUTATION ANIMATIONS */
+/* ========================================================= */
+
+/*
+   Your colourPetName() output already applies
+   the mutation classes.
+
+   Make those classes animate inside the Pet Index too.
+*/
+
+.pet-index-name .mutation-shiny{
+    animation:
+        shinyGlow 1.2s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-golden{
+    animation:
+        goldenGlow 1.4s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-rainbow{
+    animation:
+        rainbowWave 2s linear infinite;
+}
+
+.pet-index-name .mutation-dark-matter{
+    animation:
+        darkMatterPulse 1.5s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-shiny-golden{
+    animation:
+        shinyGolden 1s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-shiny-rainbow{
+    animation:
+        shinyRainbow 1.4s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-shiny-dark-matter{
+    animation:
+        shinyDarkMatter 1.2s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-superior{
+    animation:
+        superiorGlow 1.2s ease-in-out infinite;
+}
+
+.pet-index-name .mutation-shiny-superior{
+    animation:
+        shinySuperiorGlow 1s ease-in-out infinite;
+}
+
+.new-pet-discovered{
+    margin-top:8px;
+    color:#ef4444;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:1px;
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 8px rgba(239,68,68,.45);
+
+    animation:newPetDiscoveredPulse 1s ease-in-out infinite;
+}
+
+@keyframes newPetDiscoveredPulse{
+
+    0%,100%{
+        opacity:.75;
+        transform:scale(1);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.05);
+    }
+
+}
+
+/* ========================================================= */
+/* 🔴 NEW PET DISCOVERED */
+/* ========================================================= */
+
+.new-pet-discovered{
+
+    margin-top:8px;
+    margin-bottom:7px;
+
+    padding:4px 12px;
+
+    color:#ff3b3b;
+
+    font-size:12px;
+    font-weight:1000;
+    letter-spacing:1.2px;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 5px rgba(255,59,59,.8),
+        0 0 12px rgba(255,59,59,.55),
+        0 0 22px rgba(255,59,59,.3);
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,59,59,.04),
+            rgba(255,59,59,.14),
+            rgba(255,59,59,.04)
+        );
+
+    border-radius:999px;
+
+    border:1px solid rgba(255,59,59,.22);
+
+    box-shadow:
+        0 0 10px rgba(255,59,59,.15),
+        inset 0 0 10px rgba(255,59,59,.05);
+
+    animation:
+        newPetGlow 1.4s ease-in-out infinite;
+
+}
+
+
+@keyframes newPetGlow{
+
+    0%,100%{
+
+        opacity:.75;
+
+        transform:
+            scale(1);
+
+        text-shadow:
+            0 0 5px rgba(255,59,59,.7),
+            0 0 12px rgba(255,59,59,.4);
+
+        box-shadow:
+            0 0 8px rgba(255,59,59,.12),
+            inset 0 0 8px rgba(255,59,59,.04);
+    }
+
+
+    50%{
+
+        opacity:1;
+
+        transform:
+            scale(1.06);
+
+        text-shadow:
+            0 0 6px rgba(255,59,59,1),
+            0 0 14px rgba(255,59,59,.8),
+            0 0 28px rgba(255,59,59,.5);
+
+        box-shadow:
+            0 0 18px rgba(255,59,59,.28),
+            inset 0 0 12px rgba(255,59,59,.08);
+    }
+
+}
+
+/* ========================================================= */
+/* 🌈 CHROMATIC — ULTRA RARE */
+/* ========================================================= */
+
+.rarity-chromatic{
+    color:#ffffff;
+
+    font-weight:1000;
+    letter-spacing:1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff004c,
+            #ff8a00,
+            #fff200,
+            #00ff88,
+            #00d9ff,
+            #7a5cff,
+            #ff00d4,
+            #ff004c
+        );
+
+    background-size:400% 100%;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+
+    animation:
+        chromaticRarity 2.5s linear infinite,
+        chromaticGlow 1.4s ease-in-out infinite;
+
+    filter:
+        drop-shadow(0 0 4px rgba(255,255,255,.8))
+        drop-shadow(0 0 10px rgba(0,217,255,.55))
+        drop-shadow(0 0 18px rgba(255,0,212,.4));
+}
+
+@keyframes chromaticRarity{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:200% 50%;
+    }
+
+    100%{
+        background-position:400% 50%;
+    }
+
+}
+
+@keyframes chromaticGlow{
+
+    0%,100%{
+
+        filter:
+            drop-shadow(0 0 4px rgba(255,255,255,.7))
+            drop-shadow(0 0 10px rgba(0,217,255,.45))
+            drop-shadow(0 0 18px rgba(255,0,212,.3));
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        filter:
+            drop-shadow(0 0 7px rgba(255,255,255,1))
+            drop-shadow(0 0 16px rgba(0,217,255,.8))
+            drop-shadow(0 0 28px rgba(255,0,212,.65));
+
+        transform:scale(1.035);
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🟢 ANCIENT — ELDER / MYSTICAL */
+/* ========================================================= */
+
+.rarity-ancient{
+
+    color:#35e889;
+
+    font-weight:1000;
+    letter-spacing:1px;
+
+    text-shadow:
+        0 0 4px rgba(53,232,137,.8),
+        0 0 10px rgba(53,232,137,.65),
+        0 0 20px rgba(53,232,137,.45),
+        0 0 34px rgba(53,232,137,.25);
+
+    animation:
+        ancientPulse 1.8s ease-in-out infinite;
+
+}
+
+@keyframes ancientPulse{
+
+    0%,100%{
+
+        text-shadow:
+            0 0 4px rgba(53,232,137,.7),
+            0 0 10px rgba(53,232,137,.5),
+            0 0 20px rgba(53,232,137,.3);
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        text-shadow:
+            0 0 6px rgba(53,232,137,1),
+            0 0 14px rgba(53,232,137,.85),
+            0 0 26px rgba(53,232,137,.6),
+            0 0 42px rgba(53,232,137,.35);
+
+        transform:scale(1.025);
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🔵 CELESTIAL — DIVINE / COSMIC */
+/* ========================================================= */
+
+.rarity-celestial{
+
+    color:#b8f7ff;
+
+    font-weight:1000;
+    letter-spacing:1.2px;
+
+    text-shadow:
+        0 0 5px rgba(103,232,249,.9),
+        0 0 12px rgba(103,232,249,.75),
+        0 0 24px rgba(103,232,249,.5),
+        0 0 40px rgba(103,232,249,.25);
+
+    animation:
+        celestialPulse 1.6s ease-in-out infinite;
+
+}
+
+@keyframes celestialPulse{
+
+    0%,100%{
+
+        text-shadow:
+            0 0 5px rgba(103,232,249,.75),
+            0 0 12px rgba(103,232,249,.55),
+            0 0 24px rgba(103,232,249,.35);
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        text-shadow:
+            0 0 7px rgba(255,255,255,1),
+            0 0 14px rgba(103,232,249,1),
+            0 0 28px rgba(103,232,249,.75),
+            0 0 46px rgba(103,232,249,.45);
+
+        transform:scale(1.035);
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🟠 LEGENDARY — RARE GOLDEN GLOW */
+/* ========================================================= */
+
+.rarity-legendary{
+
+    color:#ffd84d;
+
+    font-weight:1000;
+    letter-spacing:.8px;
+
+    text-shadow:
+        0 0 4px rgba(255,216,77,.75),
+        0 0 10px rgba(255,180,0,.5),
+        0 0 18px rgba(255,160,0,.3);
+
+    animation:
+        legendaryPulse 2s ease-in-out infinite;
+
+}
+
+@keyframes legendaryPulse{
+
+    0%,100%{
+
+        text-shadow:
+            0 0 4px rgba(255,216,77,.65),
+            0 0 10px rgba(255,180,0,.4),
+            0 0 18px rgba(255,160,0,.25);
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        text-shadow:
+            0 0 6px rgba(255,240,150,1),
+            0 0 13px rgba(255,210,60,.75),
+            0 0 24px rgba(255,160,0,.45);
+
+        transform:scale(1.02);
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🔴 MYTHIC — DARK RED / CRIMSON */
+/* ========================================================= */
+
+.rarity-mythic{
+
+    color:#ff5c7a;
+
+    font-weight:1000;
+    letter-spacing:1px;
+
+    text-shadow:
+        0 0 5px rgba(255,92,122,.8),
+        0 0 12px rgba(255,45,80,.6),
+        0 0 22px rgba(255,0,55,.35);
+
+    animation:
+        mythicPulse 1.7s ease-in-out infinite;
+
+}
+
+@keyframes mythicPulse{
+
+    0%,100%{
+
+        text-shadow:
+            0 0 5px rgba(255,92,122,.7),
+            0 0 12px rgba(255,45,80,.45),
+            0 0 22px rgba(255,0,55,.25);
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        text-shadow:
+            0 0 7px rgba(255,180,195,1),
+            0 0 15px rgba(255,55,90,.85),
+            0 0 28px rgba(255,0,55,.55);
+
+        transform:scale(1.025);
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🥚 RARITY HATCH ANIMATIONS */
+/* ========================================================= */
+
+
+/* ========================================================= */
+/* 🟢 ANCIENT — MYSTICAL ENERGY */
+/* ========================================================= */
+
+.hatch-animation-egg.hatch-rarity-ancient{
+
+    animation:
+        ancientEggShake .18s ease-in-out infinite alternate,
+        ancientEggPulse 1.8s ease-in-out infinite;
+
+    will-change:transform;
+
+}
+
+.hatch-rarity-ancient .hatch-egg-aura{
+
+    position:absolute;
+    inset:-18px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(53,232,137,.35) 0%,
+            rgba(53,232,137,.18) 35%,
+            transparent 70%
+        );
+
+    filter:blur(5px);
+
+    animation:
+        ancientAura 1.8s ease-in-out infinite;
+
+    will-change:transform,opacity;
+
+}
+
+.hatch-rarity-ancient .hatch-egg-energy{
+
+    position:absolute;
+    inset:-8px;
+
+    border:2px solid rgba(53,232,137,.45);
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 12px rgba(53,232,137,.6),
+        0 0 25px rgba(53,232,137,.35);
+
+    animation:
+        ancientEnergy 1.3s linear infinite;
+
+}
+
+@keyframes ancientEggShake{
+
+    0%{
+        transform:rotate(-5deg) translateX(-3px);
+    }
+
+    100%{
+        transform:rotate(5deg) translateX(3px);
+    }
+
+}
+
+@keyframes ancientEggPulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+}
+
+@keyframes ancientAura{
+
+    0%,100%{
+        transform:scale(.95);
+        opacity:.45;
+    }
+
+    50%{
+        transform:scale(1.08);
+        opacity:.85;
+    }
+
+}
+
+@keyframes ancientEnergy{
+
+    0%{
+        transform:scale(.75) rotate(0deg);
+        opacity:.2;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1.3) rotate(180deg);
+        opacity:0;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🔵 CELESTIAL — DIVINE ENERGY */
+/* ========================================================= */
+
+.hatch-animation-egg.hatch-rarity-celestial{
+
+    animation:
+        celestialEggFloat 1s ease-in-out infinite,
+        celestialEggShake .2s ease-in-out infinite alternate,
+        celestialEggPulse 1.4s ease-in-out infinite;
+
+    will-change:transform;
+
+}
+
+.hatch-rarity-celestial .hatch-egg-aura{
+
+    position:absolute;
+    inset:-28px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(103,232,249,.5) 0%,
+            rgba(103,232,249,.25) 30%,
+            rgba(255,255,255,.12) 45%,
+            transparent 72%
+        );
+
+    filter:blur(7px);
+
+    animation:
+        celestialAura 1.5s ease-in-out infinite;
+
+    will-change:transform,opacity;
+
+}
+
+.hatch-rarity-celestial .hatch-egg-energy{
+
+    position:absolute;
+    inset:-18px;
+
+    border:3px solid rgba(103,232,249,.65);
+
+    border-top-color:white;
+    border-bottom-color:transparent;
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 15px rgba(103,232,249,.8),
+        0 0 35px rgba(103,232,249,.45);
+
+    animation:
+        celestialRing 1.1s linear infinite;
+
+}
+
+@keyframes celestialEggFloat{
+
+    0%,100%{
+        margin-top:0;
+    }
+
+    50%{
+        margin-top:-10px;
+    }
+
+}
+
+@keyframes celestialEggShake{
+
+    0%{
+        transform:rotate(-6deg);
+    }
+
+    100%{
+        transform:rotate(6deg);
+    }
+
+}
+
+@keyframes celestialEggPulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.11);
+    }
+
+}
+
+@keyframes celestialAura{
+
+    0%,100%{
+        opacity:.5;
+        transform:scale(.95);
+    }
+
+    50%{
+        opacity:1;
+        transform:scale(1.12);
+    }
+
+}
+
+@keyframes celestialRing{
+
+    0%{
+        transform:rotate(0deg) scale(.8);
+        opacity:.3;
+    }
+
+    50%{
+        opacity:1;
+    }
+
+    100%{
+        transform:rotate(360deg) scale(1.35);
+        opacity:0;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🌈 CHROMATIC — ABSOLUTE CHAOS */
+/* ========================================================= */
+
+.hatch-animation-egg.hatch-rarity-chromatic{
+
+    animation:
+        chromaticEggShake .08s ease-in-out infinite alternate,
+        chromaticEggPulse 1.2s ease-in-out infinite;
+
+    z-index:10;
+
+    will-change:transform;
+
+}
+
+.hatch-rarity-chromatic .hatch-egg-aura{
+
+    position:absolute;
+    inset:-45px;
+
+    border-radius:50%;
+
+    background:
+        conic-gradient(
+            #ff004c,
+            #ff8a00,
+            #fff200,
+            #00ff88,
+            #00d9ff,
+            #7a5cff,
+            #ff00d4,
+            #ff004c
+        );
+
+    filter:blur(15px);
+
+    opacity:.8;
+
+    animation:
+        chromaticAura 1.1s ease-in-out infinite;
+
+    will-change:transform,opacity;
+
+}
+
+.hatch-rarity-chromatic .hatch-egg-energy{
+
+    position:absolute;
+    inset:-18px;
+
+    border-radius:50%;
+
+    border:3px solid rgba(255,255,255,.75);
+
+    background:transparent;
+
+    box-shadow:
+        0 0 12px rgba(0,217,255,.65),
+        0 0 24px rgba(255,0,212,.45),
+        0 0 45px rgba(255,0,212,.25);
+
+    animation:
+        chromaticRing 1.4s linear infinite;
+
+    will-change:transform;
+
+}
+
+@keyframes chromaticEggShake{
+
+    0%{
+        transform:
+            translate(-7px,-3px)
+            rotate(-10deg)
+            scale(1);
+    }
+
+    100%{
+        transform:
+            translate(7px,3px)
+            rotate(10deg)
+            scale(1.05);
+    }
+
+}
+
+@keyframes chromaticEggPulse{
+
+    0%,100%{
+
+        filter:
+            drop-shadow(0 0 5px white)
+            drop-shadow(0 0 15px #00d9ff);
+
+        transform:scale(1);
+    }
+
+    50%{
+
+        filter:
+            drop-shadow(0 0 12px white)
+            drop-shadow(0 0 30px #ff00d4)
+            drop-shadow(0 0 45px #00d9ff);
+
+        transform:scale(1.15);
+    }
+
+}
+
+@keyframes chromaticAura{
+
+    0%{
+        transform:rotate(0deg) scale(.92);
+        opacity:.55;
+    }
+
+    50%{
+        transform:rotate(180deg) scale(1.16);
+        opacity:1;
+    }
+
+    100%{
+        transform:rotate(360deg) scale(.92);
+        opacity:.55;
+    }
+
+}
+
+@keyframes chromaticRing{
+
+    0%{
+        transform:rotate(0deg) scale(.7);
+        opacity:.3;
+    }
+
+    50%{
+        transform:rotate(180deg) scale(1.1);
+        opacity:1;
+    }
+
+    100%{
+        transform:rotate(360deg) scale(1.45);
+        opacity:.1;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 💥 RARITY BURSTS WHEN THE EGG CRACKS */
+/* ========================================================= */
+
+.ancient-hatch-burst{
+
+    animation:
+        ancientBurst .6s ease-out forwards !important;
+
+}
+
+.celestial-hatch-burst{
+
+    animation:
+        celestialBurst .6s ease-out forwards !important;
+
+}
+
+.chromatic-hatch-burst{
+
+    animation:
+        chromaticBurst .6s ease-out forwards !important;
+
+}
+
+
+/* ========================================================= */
+/* 🟢 ANCIENT BURST */
+/* ========================================================= */
+
+@keyframes ancientBurst{
+
+    0%{
+        filter:
+            drop-shadow(0 0 5px rgba(53,232,137,.5));
+
+        transform:scale(1);
+    }
+
+    50%{
+        filter:
+            drop-shadow(0 0 25px rgba(53,232,137,1))
+            drop-shadow(0 0 50px rgba(53,232,137,.8));
+
+        transform:scale(1.18);
+    }
+
+    100%{
+        filter:
+            drop-shadow(0 0 45px rgba(53,232,137,1));
+
+        transform:scale(1.35);
+
+        opacity:0;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🔵 CELESTIAL BURST */
+/* ========================================================= */
+
+@keyframes celestialBurst{
+
+    0%{
+        filter:
+            drop-shadow(0 0 8px rgba(103,232,249,.6));
+
+        transform:scale(1);
+    }
+
+    50%{
+        filter:
+            drop-shadow(0 0 30px white)
+            drop-shadow(0 0 60px rgba(103,232,249,1));
+
+        transform:scale(1.3);
+    }
+
+    100%{
+        filter:
+            drop-shadow(0 0 70px white)
+            drop-shadow(0 0 100px rgba(103,232,249,1));
+
+        transform:scale(1.55);
+
+        opacity:0;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🌈 CHROMATIC BURST — MASSIVE */
+/* ========================================================= */
+
+@keyframes chromaticBurst{
+
+    0%{
+
+        filter:
+            brightness(1)
+            drop-shadow(0 0 10px white);
+
+        transform:
+            scale(1)
+            rotate(0deg);
+    }
+
+    35%{
+
+        filter:
+            brightness(2)
+            drop-shadow(0 0 25px white)
+            drop-shadow(0 0 55px #ff00d4)
+            drop-shadow(0 0 80px #00d9ff);
+
+        transform:
+            scale(1.35)
+            rotate(8deg);
+    }
+
+    70%{
+
+        filter:
+            brightness(3)
+            drop-shadow(0 0 40px white)
+            drop-shadow(0 0 80px #ff00d4)
+            drop-shadow(0 0 120px #00d9ff);
+
+        transform:
+            scale(1.65)
+            rotate(-8deg);
+    }
+
+    100%{
+
+        filter:
+            brightness(4)
+            drop-shadow(0 0 100px white)
+            drop-shadow(0 0 150px #ff00d4)
+            drop-shadow(0 0 180px #00d9ff);
+
+        transform:
+            scale(1.9)
+            rotate(0deg);
+
+        opacity:0;
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🟢 ANCIENT — LONG TENSION */
+/* ========================================================= */
+
+.ancient-hatch-tension{
+
+    animation:
+        ancientTension .8s ease-in-out infinite alternate !important;
+
+}
+
+@keyframes ancientTension{
+
+    from{
+
+        transform:
+            scale(1)
+            rotate(-4deg);
+
+        filter:
+            drop-shadow(
+                0 0 8px
+                rgba(53,232,137,.5)
+            );
+    }
+
+    to{
+
+        transform:
+            scale(1.08)
+            rotate(4deg);
+
+        filter:
+            drop-shadow(
+                0 0 22px
+                rgba(53,232,137,1)
+            )
+            drop-shadow(
+                0 0 40px
+                rgba(53,232,137,.5)
+            );
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🔵 CELESTIAL — LONGER TENSION */
+/* ========================================================= */
+
+.celestial-hatch-tension{
+
+    animation:
+        celestialTension .6s ease-in-out infinite alternate !important;
+
+}
+
+@keyframes celestialTension{
+
+    from{
+
+        transform:
+            scale(1)
+            rotate(-5deg);
+
+        filter:
+            brightness(1)
+            drop-shadow(
+                0 0 10px
+                rgba(103,232,249,.6)
+            );
+    }
+
+    to{
+
+        transform:
+            scale(1.13)
+            rotate(5deg);
+
+        filter:
+            brightness(1.35)
+            drop-shadow(
+                0 0 28px
+                rgba(103,232,249,1)
+            )
+            drop-shadow(
+                0 0 55px
+                rgba(255,255,255,.45)
+            );
+    }
+
+}
+
+
+/* ========================================================= */
+/* 🌈 CHROMATIC — MAXIMUM TENSION */
+/* ========================================================= */
+
+.chromatic-hatch-tension{
+
+    animation:
+        chromaticTension .25s ease-in-out infinite alternate !important;
+
+}
+
+@keyframes chromaticTension{
+
+    from{
+
+        transform:
+            scale(1)
+            rotate(-7deg);
+
+        filter:
+            brightness(1)
+            drop-shadow(0 0 10px white)
+            drop-shadow(0 0 20px #00d9ff);
+    }
+
+    to{
+
+        transform:
+            scale(1.16)
+            rotate(7deg);
+
+        filter:
+            brightness(1.8)
+            drop-shadow(0 0 20px white)
+            drop-shadow(0 0 45px #00d9ff)
+            drop-shadow(0 0 65px #ff00d4);
+    }
+
+}
+
+
+/* ========================================================= */
+/* ✨ HATCH OVERLAY FADE */
+/* ========================================================= */
+
+.hatch-animation-overlay.fading-out{
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:
+        opacity .35s ease;
+
+}
+
+
+/* ========================================================= */
+/* 🐣 HATCH RESULT APPEAR + SLOW FADE */
+/* ========================================================= */
+
+.hatch-animation-result{
+
+    animation:
+        hatchResultAppear
+        .45s
+        ease-out
+        forwards;
+
+}
+
+
+/* Reward appears */
+@keyframes hatchResultAppear{
+
+    0%{
+
+        opacity:0;
+
+        transform:
+            scale(.65)
+            translateY(15px);
+    }
+
+    70%{
+
+        opacity:1;
+
+        transform:
+            scale(1.08)
+            translateY(0);
+    }
+
+    100%{
+
+        opacity:1;
+
+        transform:
+            scale(1)
+            translateY(0);
+    }
+
+}
+
+
+.hatch-animation-result.reward-fading{
+    animation:
+        hatchResultFade
+        var(--reward-fade-time, 1.5s)
+        ease-in-out
+        forwards;
+}
+
+
+@keyframes hatchResultFade{
+
+    0%{
+
+        opacity:1;
+
+        transform:
+            scale(1)
+            translateY(0);
+    }
+
+    100%{
+
+        opacity:0;
+
+        transform:
+            scale(.88)
+            translateY(-12px);
+    }
+
+}
+
+#fasterHatchUpgrade{
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        box-shadow .15s ease;
+
+}
+
+#fasterHatchUpgrade:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* =========================================================
+   👁️ EMBRYON SECRET EVENT — CINEMATIC EDITION
+   ========================================================= */
+
+.embryon-event-overlay{
+    position:fixed;
+    inset:0;
+    z-index:10000;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(105,35,180,.30) 0%,
+            rgba(40,15,90,.22) 25%,
+            rgba(4,3,18,.94) 65%,
+            #010108 100%
+        );
+
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+
+    animation:embryonOverlayIn .7s ease-out;
+}
+
+.embryon-event-overlay::before{
+    content:"";
+
+    position:absolute;
+    inset:-50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(170,80,255,.14) 0 2px,
+            transparent 3px
+        );
+
+    background-size:55px 55px;
+
+    animation:
+        embryonStars
+        18s
+        linear
+        infinite;
+
+    pointer-events:none;
+}
+
+.embryon-event-overlay::after{
+    content:"";
+
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(150,70,255,.08) 50%,
+            transparent 100%
+        );
+
+    animation:
+        embryonScan
+        5s
+        linear
+        infinite;
+
+    pointer-events:none;
+}
+
+.embryon-event-overlay.hidden{
+    display:none;
+}
+
+@keyframes embryonOverlayIn{
+
+    0%{
+        opacity:0;
+    }
+
+    100%{
+        opacity:1;
+    }
+
+}
+
+@keyframes embryonStars{
+
+    0%{
+        transform:rotate(0deg) translate(0,0);
+    }
+
+    100%{
+        transform:rotate(360deg) translate(40px,20px);
+    }
+
+}
+
+@keyframes embryonScan{
+
+    0%{
+        transform:translateX(-100%);
+    }
+
+    100%{
+        transform:translateX(100%);
+    }
+
+}
+
+
+/* =========================================================
+   MAIN EVENT WINDOW
+   ========================================================= */
+
+.embryon-event-screen{
+    position:relative;
+
+    width:min(950px,94vw);
+    min-height:650px;
+
+    padding:45px 45px 50px;
+
+    border-radius:32px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(19,8,42,.98),
+            rgba(5,7,24,.98)
+        );
+
+    border:2px solid rgba(190,120,255,.65);
+
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.04),
+        0 0 30px rgba(140,60,255,.55),
+        0 0 100px rgba(100,30,255,.28),
+        inset 0 0 60px rgba(110,40,200,.10);
+
+    overflow:hidden;
+
+    animation:
+        embryonScreenAppear
+        .8s
+        cubic-bezier(.16,1,.3,1);
+}
+
+.embryon-event-screen::before{
+    content:"";
+
+    position:absolute;
+    inset:8px;
+
+    border-radius:25px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    pointer-events:none;
+}
+
+.embryon-event-screen::after{
+    content:"";
+
+    position:absolute;
+
+    width:500px;
+    height:500px;
+
+    left:50%;
+    top:48%;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(150,60,255,.12),
+            transparent 70%
+        );
+
+    animation:
+        embryonCorePulse
+        3s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+}
+
+@keyframes embryonScreenAppear{
+
+    0%{
+        opacity:0;
+        transform:scale(.82) translateY(40px);
+    }
+
+    70%{
+        opacity:1;
+        transform:scale(1.02) translateY(0);
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+
+}
+
+@keyframes embryonCorePulse{
+
+    0%,100%{
+        opacity:.45;
+        transform:translate(-50%,-50%) scale(.85);
+    }
+
+    50%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.15);
+    }
+
+}
+
+
+/* =========================================================
+   TOP LABEL
+   ========================================================= */
+
+.embryon-event-screen::marker{
+    display:none;
+}
+
+.embryon-dialogue::before{
+    content:"✦  SECRET ENCOUNTER  ✦";
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-size:12px;
+    font-weight:1000;
+
+    letter-spacing:4px;
+
+    color:#c88cff;
+
+    opacity:.75;
+}
+
+
+/* =========================================================
+   EMBRYON — TOP RIGHT
+   ========================================================= */
+
+.embryon-character{
+    position:absolute;
+
+    top:24px;
+    right:25px;
+
+    width:145px;
+
+    padding:14px 10px 12px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(100,40,170,.30),
+            rgba(20,5,50,.55)
+        );
+
+    border:1px solid rgba(190,120,255,.35);
+
+    box-shadow:
+        0 0 20px rgba(150,70,255,.25),
+        inset 0 0 20px rgba(160,80,255,.08);
+
+    text-align:center;
+
+    z-index:5;
+
+    animation:
+        embryonFloat
+        2.5s
+        ease-in-out
+        infinite;
+}
+
+.embryon-character-emoji{
+    width:82px;
+    height:82px;
+
+    margin:auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    font-size:58px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(150,70,255,.30),
+            rgba(30,5,70,.55)
+        );
+
+    border:2px solid rgba(210,160,255,.45);
+
+    box-shadow:
+        0 0 15px rgba(160,80,255,.8),
+        0 0 40px rgba(120,40,255,.55),
+        inset 0 0 25px rgba(180,90,255,.25);
+}
+
+.embryon-name{
+    margin-top:9px;
+
+    font-size:16px;
+    font-weight:1000;
+
+    letter-spacing:2px;
+
+    color:#e4c8ff;
+
+    text-shadow:
+        0 0 8px rgba(190,110,255,.9),
+        0 0 20px rgba(130,50,255,.6);
+}
+
+@keyframes embryonFloat{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-9px);
+    }
+
+}
+
+
+/* =========================================================
+   DIALOGUE
+   ========================================================= */
+
+.embryon-dialogue{
+    position:relative;
+    z-index:3;
+
+    margin:145px auto 35px;
+
+    max-width:700px;
+    min-height:90px;
+
+    padding:25px 30px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:22px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(120,55,200,.15),
+            rgba(255,255,255,.035)
+        );
+
+    border:1px solid rgba(205,160,255,.28);
+
+    box-shadow:
+        0 0 25px rgba(130,60,230,.16),
+        inset 0 0 25px rgba(180,100,255,.05);
+
+    color:#fff;
+
+    font-size:26px;
+    font-weight:1000;
+
+    letter-spacing:.4px;
+
+    text-shadow:
+        0 0 12px rgba(255,255,255,.25);
+
+    animation:
+        embryonDialogueGlow
+        2.5s
+        ease-in-out
+        infinite;
+}
+
+@keyframes embryonDialogueGlow{
+
+    0%,100%{
+        box-shadow:
+            0 0 20px rgba(130,60,230,.12),
+            inset 0 0 25px rgba(180,100,255,.04);
+    }
+
+    50%{
+        box-shadow:
+            0 0 35px rgba(150,70,255,.28),
+            inset 0 0 35px rgba(180,100,255,.08);
+    }
+
+}
+
+
+/* =========================================================
+   DICE CHAMBER
+   ========================================================= */
+
+.embryon-dice-area{
+    position:relative;
+    z-index:3;
+
+    margin-top:30px;
+}
+
+.embryon-dice{
+    position:relative;
+
+    width:135px;
+    height:135px;
+
+    margin:0 auto;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #7f3ee0,
+            #32105f
+        );
+
+    border:3px solid rgba(235,210,255,.8);
+
+    color:white;
+
+    font-size:58px;
+    font-weight:1000;
+
+    box-shadow:
+        0 0 15px rgba(170,90,255,.8),
+        0 0 40px rgba(120,40,255,.65),
+        0 0 90px rgba(100,30,255,.3),
+        inset 0 0 30px rgba(255,255,255,.08);
+
+    animation:
+        embryonDiceIdle
+        2s
+        ease-in-out
+        infinite;
+}
+
+.embryon-dice::before{
+    content:"";
+
+    position:absolute;
+    inset:-13px;
+
+    border-radius:35px;
+
+    border:1px solid rgba(220,170,255,.35);
+
+    animation:
+        embryonDiceRing
+        2s
+        linear
+        infinite;
+}
+
+.embryon-dice::after{
+    content:"";
+
+    position:absolute;
+    inset:-28px;
+
+    border-radius:45px;
+
+    border:1px solid rgba(170,90,255,.15);
+
+    animation:
+        embryonDiceRing
+        3s
+        linear
+        infinite reverse;
+}
+
+@keyframes embryonDiceIdle{
+
+    0%,100%{
+        transform:translateY(0) rotate(0deg);
+    }
+
+    50%{
+        transform:translateY(-7px) rotate(2deg);
+    }
+
+}
+
+@keyframes embryonDiceRing{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+.embryon-dice.rolling{
+    animation:
+        embryonDiceRoll
+        .16s
+        linear
+        infinite;
+}
+
+@keyframes embryonDiceRoll{
+
+    0%{
+        transform:
+            rotate(0deg)
+            scale(1);
+    }
+
+    25%{
+        transform:
+            rotate(90deg)
+            scale(1.12);
+    }
+
+    50%{
+        transform:
+            rotate(180deg)
+            scale(.94);
+    }
+
+    75%{
+        transform:
+            rotate(270deg)
+            scale(1.12);
+    }
+
+    100%{
+        transform:
+            rotate(360deg)
+            scale(1);
+    }
+
+}
+
+.embryon-dice-text{
+    margin-top:25px;
+
+    font-size:17px;
+    font-weight:900;
+
+    letter-spacing:2px;
+
+    color:#d5bce9;
+
+    text-transform:uppercase;
+
+    text-shadow:
+        0 0 10px rgba(180,120,255,.45);
+}
+
+
+/* =========================================================
+   GUESS SECTION
+   ========================================================= */
+
+.embryon-guess-area{
+    position:relative;
+    z-index:4;
+
+    margin-top:25px;
+
+    animation:
+        guessAreaAppear
+        .5s
+        ease-out;
+}
+
+@keyframes guessAreaAppear{
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+.embryon-guess-title{
+    margin-bottom:22px;
+
+    font-size:22px;
+    font-weight:1000;
+
+    letter-spacing:1px;
+
+    color:#f1e5ff;
+
+    text-shadow:
+        0 0 12px rgba(180,100,255,.55);
+}
+
+.embryon-number-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,1fr);
+
+    gap:11px;
+
+    width:min(650px,90%);
+
+    margin:0 auto;
+}
+
+.embryon-number-button{
+    position:relative;
+
+    min-height:52px;
+
+    border-radius:14px;
+
+    border:1px solid rgba(190,120,255,.35);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(110,45,180,.30),
+            rgba(30,10,60,.65)
+        );
+
+    color:#fff;
+
+    font-size:19px;
+    font-weight:1000;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.3),
+        inset 0 0 12px rgba(180,90,255,.06);
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
+}
+
+.embryon-number-button:hover{
+    transform:
+        translateY(-4px)
+        scale(1.05);
+
+    border-color:
+        rgba(225,190,255,.8);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(150,70,230,.65),
+            rgba(55,15,100,.85)
+        );
+
+    box-shadow:
+        0 8px 25px rgba(120,40,255,.35),
+        0 0 18px rgba(180,90,255,.3);
+}
+
+.embryon-number-button:active{
+    transform:
+        scale(.94);
+}
+
+.embryon-number-button:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+}
+
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
+.embryon-result-area{
+    position:relative;
+    z-index:5;
+
+    margin-top:30px;
+
+    padding:30px;
+
+    border-radius:25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.05),
+            rgba(120,50,200,.08)
+        );
+
+    border:1px solid rgba(210,170,255,.28);
+
+    box-shadow:
+        0 0 35px rgba(130,60,230,.2);
+
+    animation:
+        embryonResultAppear
+        .7s
+        cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes embryonResultAppear{
+
+    0%{
+        opacity:0;
+        transform:
+            scale(.65)
+            translateY(30px);
+    }
+
+    70%{
+        opacity:1;
+        transform:
+            scale(1.04)
+            translateY(0);
+    }
+
+    100%{
+        opacity:1;
+        transform:
+            scale(1);
+    }
+
+}
+
+#embryonResultTitle{
+    font-size:38px;
+    font-weight:1000;
+
+    letter-spacing:2px;
+
+    color:#ffe06a;
+
+    text-shadow:
+        0 0 8px rgba(255,220,80,.9),
+        0 0 25px rgba(255,180,40,.65),
+        0 0 55px rgba(255,130,20,.3);
+
+    animation:
+        caughtTitlePulse
+        1.3s
+        ease-in-out
+        infinite;
+}
+
+@keyframes caughtTitlePulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.045);
+    }
+
+}
+
+#embryonResultPet{
+    margin-top:22px;
+
+    font-size:26px;
+    font-weight:1000;
+
+    color:white;
+
+    text-shadow:
+        0 0 12px rgba(255,255,255,.25);
+}
+
+.embryon-continue-button{
+    margin-top:28px;
+
+    padding:15px 45px;
+
+    border-radius:15px;
+
+    border:1px solid rgba(230,200,255,.55);
+
+    background:
+        linear-gradient(
+            135deg,
+            #8e45ed,
+            #4c1c9a
+        );
+
+    color:#fff;
+
+    font-size:18px;
+    font-weight:1000;
+
+    letter-spacing:1px;
+
+    cursor:pointer;
+
+    box-shadow:
+        0 0 20px rgba(130,60,230,.55),
+        inset 0 1px rgba(255,255,255,.18);
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.embryon-continue-button:hover{
+    transform:
+        translateY(-3px)
+        scale(1.03);
+
+    box-shadow:
+        0 0 30px rgba(160,80,255,.75),
+        0 8px 25px rgba(60,20,130,.4);
+}
+
+.embryon-continue-button:active{
+    transform:
+        scale(.96);
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:600px){
+
+    .embryon-event-screen{
+        width:94vw;
+        min-height:600px;
+
+        padding:
+            30px
+            18px
+            35px;
+    }
+
+    .embryon-character{
+        top:15px;
+        right:15px;
+
+        width:105px;
+    }
+
+    .embryon-character-emoji{
+        width:60px;
+        height:60px;
+
+        font-size:40px;
+    }
+
+    .embryon-name{
+        font-size:12px;
+    }
+
+    .embryon-dialogue{
+        margin-top:105px;
+
+        font-size:19px;
+        padding:20px;
+    }
+
+    .embryon-number-grid{
+        gap:7px;
+    }
+
+    .embryon-number-button{
+        min-height:45px;
+        font-size:16px;
+    }
+
+    .embryon-dice{
+        width:105px;
+        height:105px;
+
+        font-size:45px;
+    }
+
+    #embryonResultTitle{
+        font-size:28px;
+    }
+
+}
+
+/* =========================================================
+   ☠️ 𝕊𝔼ℂℝ𝔼𝕋 — MYSTERIOUS SECRET RARITY
+   👁️ EMBRYON
+   ========================================================= */
+
+.mysterious-secret-rarity{
+
+    position:relative;
+
+    display:inline-block;
+
+    padding:7px 18px;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 50%,
+            rgba(90,20,130,.35),
+            rgba(5,5,8,.96) 65%
+        );
+
+    border:1px solid rgba(125,70,170,.7);
+
+    color:#d8b5ff;
+
+    font-size:16px;
+
+    font-weight:1000;
+
+    letter-spacing:3px;
+
+    font-family:
+        "Times New Roman",
+        serif;
+
+    text-shadow:
+        0 0 5px rgba(210,160,255,.9),
+        0 0 15px rgba(150,70,255,.8),
+        0 0 30px rgba(90,20,150,.7);
+
+    box-shadow:
+        0 0 8px rgba(100,30,150,.6),
+        0 0 25px rgba(80,20,130,.35),
+        inset 0 0 18px rgba(100,30,150,.18);
+
+    animation:
+        mysteriousSecretPulse
+        2.2s
+        ease-in-out
+        infinite;
+
+}
+
+
+/* DARK MOVING ENERGY */
+
+.mysterious-secret-rarity::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:-100%;
+
+    background:
+        conic-gradient(
+            from 0deg,
+            transparent,
+            rgba(180,100,255,.18),
+            transparent,
+            rgba(80,0,130,.22),
+            transparent
+        );
+
+    animation:
+        mysteriousSecretSpin
+        4s
+        linear
+        infinite;
+
+    pointer-events:none;
+
+}
+
+
+/* DARK GLITCH LINE */
+
+.mysterious-secret-rarity::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:-20%;
+
+    top:0;
+
+    width:20%;
+
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.35),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    animation:
+        mysteriousSecretScan
+        3.5s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes mysteriousSecretPulse{
+
+    0%,100%{
+
+        transform:scale(1);
+
+        color:#c99aff;
+
+        text-shadow:
+            0 0 5px rgba(210,160,255,.8),
+            0 0 15px rgba(150,70,255,.6),
+            0 0 30px rgba(80,20,130,.5);
+
+        box-shadow:
+            0 0 8px rgba(100,30,150,.5),
+            0 0 25px rgba(80,20,130,.25),
+            inset 0 0 18px rgba(100,30,150,.15);
+
+    }
+
+    50%{
+
+        transform:scale(1.045);
+
+        color:#f0dcff;
+
+        text-shadow:
+            0 0 7px white,
+            0 0 18px #b56cff,
+            0 0 35px #7620c0,
+            0 0 60px rgba(80,0,150,.7);
+
+        box-shadow:
+            0 0 12px rgba(150,70,220,.8),
+            0 0 35px rgba(100,30,170,.45),
+            0 0 65px rgba(60,0,120,.25),
+            inset 0 0 25px rgba(130,50,190,.2);
+
+    }
+
+}
+
+
+@keyframes mysteriousSecretSpin{
+
+    from{
+
+        transform:
+            rotate(0deg);
+
+    }
+
+    to{
+
+        transform:
+            rotate(360deg);
+
+    }
+
+}
+
+
+@keyframes mysteriousSecretScan{
+
+    0%{
+
+        left:-25%;
+
+        opacity:0;
+
+    }
+
+    20%{
+
+        opacity:1;
+
+    }
+
+    45%{
+
+        opacity:0;
+
+    }
+
+    100%{
+
+        left:125%;
+
+        opacity:0;
+
+    }
+
+}
+
+
+/* =========================================================
+   EMBRYON PET CARD
+   ========================================================= */
+
+.embryon-secret-pet{
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(80,20,120,.25),
+            rgba(3,3,7,.98) 65%
+        );
+
+    border:1px solid rgba(130,70,180,.55);
+
+    box-shadow:
+
+        0 0 10px rgba(90,20,140,.35),
+
+        0 0 30px rgba(60,10,100,.25),
+
+        inset 0 0 25px rgba(100,30,150,.08);
+
+    animation:
+        embryonSecretCard
+        3s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes embryonSecretCard{
+
+    0%,100%{
+
+        box-shadow:
+
+            0 0 10px rgba(90,20,140,.3),
+
+            0 0 25px rgba(60,10,100,.2),
+
+            inset 0 0 25px rgba(100,30,150,.06);
+
+    }
+
+    50%{
+
+        box-shadow:
+
+            0 0 15px rgba(130,60,200,.55),
+
+            0 0 45px rgba(80,20,140,.35),
+
+            inset 0 0 35px rgba(120,40,180,.12);
+
+    }
+
+}
+
+
+/* =========================================================
+   EMBRYON NAME
+   ========================================================= */
+
+.embryon-secret-name{
+
+    color:#eee0ff;
+
+    font-weight:1000;
+
+    letter-spacing:2px;
+
+    text-shadow:
+
+        0 0 6px rgba(255,255,255,.8),
+
+        0 0 15px rgba(160,80,255,.8),
+
+        0 0 35px rgba(90,20,150,.6);
+
+}
+
+
+/* =========================================================
+   SECRET ICON
+   ========================================================= */
+
+.embryon-secret-icon{
+
+    display:inline-block;
+
+    font-size:28px;
+
+    filter:
+        drop-shadow(
+            0 0 7px rgba(170,80,255,.9)
+        );
+
+    animation:
+        secretEyePulse
+        1.8s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes secretEyePulse{
+
+    0%,100%{
+
+        transform:
+            scale(1)
+            rotate(0deg);
+
+        opacity:.8;
+
+    }
+
+    50%{
+
+        transform:
+            scale(1.12)
+            rotate(3deg);
+
+        opacity:1;
+
+        filter:
+            drop-shadow(
+                0 0 15px rgba(190,100,255,1)
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   𝕊𝔼ℂℝ𝔼𝕋 TEXT EFFECT
+   ========================================================= */
+
+.secret-rarity-text{
+
+    font-family:
+        "Times New Roman",
+        serif;
+
+    font-size:18px;
+
+    font-weight:1000;
+
+    letter-spacing:3px;
+
+    color:#d8b5ff;
+
+    text-shadow:
+
+        0 0 5px rgba(220,180,255,.9),
+
+        0 0 15px rgba(150,70,255,.8),
+
+        0 0 35px rgba(90,20,150,.6);
+
+    animation:
+        secretTextFlicker
+        2.8s
+        infinite;
+
+}
+
+
+@keyframes secretTextFlicker{
+
+    0%,18%,20%,22%,65%,100%{
+
+        opacity:1;
+
+    }
+
+    19%,21%{
+
+        opacity:.55;
+
+    }
+
+    66%{
+
+        opacity:.75;
+
+    }
+
+}
+
+
+/* =========================================================
+   DARK VOID PARTICLES
+   ========================================================= */
+
+.embryon-secret-pet::before{
+
+    content:"✦  ·  ✧  ·  ✦  ·  ⋆  ·  ✧";
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    pointer-events:none;
+
+    color:rgba(180,100,255,.12);
+
+    font-size:22px;
+
+    letter-spacing:18px;
+
+    animation:
+        secretParticles
+        6s
+        linear
+        infinite;
+
+}
+
+
+@keyframes secretParticles{
+
+    0%{
+
+        transform:
+            translateY(15px)
+            rotate(0deg);
+
+        opacity:.15;
+
+    }
+
+    50%{
+
+        opacity:.5;
+
+    }
+
+    100%{
+
+        transform:
+            translateY(-15px)
+            rotate(180deg);
+
+        opacity:.15;
+
+    }
+
+}
+
+
+/* =========================================================
+   SECRET PET HOVER
+   ========================================================= */
+
+.embryon-secret-pet:hover{
+
+    transform:
+        translateY(-7px)
+        scale(1.035);
+
+    border-color:
+        rgba(200,150,255,.9);
+
+    box-shadow:
+
+        0 0 15px rgba(150,70,230,.8),
+
+        0 0 45px rgba(100,30,170,.55),
+
+        0 0 80px rgba(70,10,120,.3),
+
+        inset 0 0 30px rgba(150,60,220,.15);
+
+}
+
+/* =========================================================
+   👁️ 𝕊𝔼ℂℝ𝔼𝕋 PETS
+   INVENTORY + PET INDEX
+   ========================================================= */
+
+.secret-pet-card{
+    position:relative;
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(80,30,120,.35),
+            rgba(8,5,12,.98) 70%
+        ) !important;
+
+    border:2px solid rgba(150,80,210,.85) !important;
+
+    box-shadow:
+        0 0 10px rgba(120,50,180,.7),
+        0 0 30px rgba(90,30,150,.45),
+        inset 0 0 25px rgba(120,50,180,.12);
+
+    animation:
+        secretCardGlow
+        3s
+        ease-in-out
+        infinite;
+
+    /* IMPORTANT: don't change grid sizing */
+    width:auto;
+    height:auto;
+    min-width:0;
+    min-height:0;
+    box-sizing:border-box;
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.secret-pet-card::before{
+    content:"";
+    position:absolute;
+    inset:5px;
+
+    border-radius:inherit;
+
+    border:1px solid rgba(210,150,255,.18);
+
+    pointer-events:none;
+}
+
+.secret-pet-card::after{
+    content:"";
+
+    position:absolute;
+
+    width:160%;
+    height:40%;
+
+    left:-30%;
+    top:-20%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(200,120,255,.15),
+            transparent
+        );
+
+    transform:rotate(-18deg);
+
+    animation:
+        secretCardSweep
+        4s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+}
+
+@keyframes secretCardGlow{
+
+    0%,100%{
+        border-color:rgba(120,60,170,.7);
+
+        box-shadow:
+            0 0 10px rgba(100,40,160,.5),
+            0 0 25px rgba(80,25,130,.3),
+            inset 0 0 25px rgba(120,50,180,.08);
+    }
+
+    50%{
+        border-color:rgba(200,130,255,.95);
+
+        box-shadow:
+            0 0 15px rgba(160,80,230,.9),
+            0 0 40px rgba(110,40,180,.55),
+            0 0 70px rgba(80,20,130,.3),
+            inset 0 0 30px rgba(150,60,220,.15);
+    }
+}
+
+@keyframes secretCardSweep{
+
+    0%{
+        transform:
+            translateX(-70%)
+            rotate(-18deg);
+        opacity:0;
+    }
+
+    30%{
+        opacity:1;
+    }
+
+    65%{
+        opacity:0;
+    }
+
+    100%{
+        transform:
+            translateX(70%)
+            rotate(-18deg);
+        opacity:0;
+    }
+}
+
+.secret-pet-card:hover{
+    border-color:rgba(225,180,255,.98);
+
+    box-shadow:
+        0 0 18px rgba(170,90,240,.95),
+        0 0 45px rgba(110,40,180,.65),
+        0 0 85px rgba(70,15,120,.3),
+        inset 0 0 35px rgba(150,60,220,.18);
+}
+
+
+/* DARK INNER BORDER */
+
+.secret-pet-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    inset:5px;
+
+    border-radius:13px;
+
+    border:1px solid rgba(190,120,255,.16);
+
+    pointer-events:none;
+
+}
+
+
+/* MOVING VOID LIGHT */
+
+.secret-pet-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:160%;
+
+    height:35%;
+
+    left:-30%;
+
+    top:-20%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(180,100,255,.12),
+            transparent
+        );
+
+    transform:rotate(-18deg);
+
+    animation:
+        secretCardSweep
+        4s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+
+}
+
+
+/* =========================================================
+   SECRET CARD GLOW
+   ========================================================= */
+
+@keyframes secretCardGlow{
+
+    0%,100%{
+
+        border-color:
+            rgba(105,55,145,.65);
+
+        box-shadow:
+
+            0 0 8px rgba(90,25,130,.45),
+
+            0 0 25px rgba(65,15,100,.25),
+
+            inset 0 0 25px rgba(100,30,150,.08);
+
+    }
+
+    50%{
+
+        border-color:
+            rgba(175,100,230,.9);
+
+        box-shadow:
+
+            0 0 12px rgba(130,55,190,.75),
+
+            0 0 35px rgba(90,25,145,.45),
+
+            0 0 60px rgba(60,10,100,.20),
+
+            inset 0 0 30px rgba(130,45,190,.13);
+
+    }
+
+}
+
+
+@keyframes secretCardSweep{
+
+    0%{
+
+        transform:
+            translateX(-70%)
+            rotate(-18deg);
+
+        opacity:0;
+
+    }
+
+    30%{
+
+        opacity:1;
+
+    }
+
+    65%{
+
+        opacity:0;
+
+    }
+
+    100%{
+
+        transform:
+            translateX(70%)
+            rotate(-18deg);
+
+        opacity:0;
+
+    }
+
+}
+
+
+/* =========================================================
+   SECRET PET IMAGE / EMOJI
+   ========================================================= */
+
+.secret-pet-card img,
+.secret-pet-card .pet-emoji{
+
+    filter:
+
+        drop-shadow(
+            0 0 8px rgba(160,80,230,.8)
+        )
+
+        drop-shadow(
+            0 0 20px rgba(90,20,150,.5)
+        );
+
+}
+
+
+/* =========================================================
+   SECRET PET NAME
+   ========================================================= */
+
+.secret-pet-card .pet-name{
+
+    color:#eee1ff;
+
+    font-weight:1000;
+
+    text-shadow:
+
+        0 0 6px rgba(255,255,255,.75),
+
+        0 0 15px rgba(160,80,255,.8),
+
+        0 0 30px rgba(80,15,130,.6);
+
+}
+
+
+/* =========================================================
+   𝕊𝔼ℂℝ𝔼𝕋 RARITY LABEL
+   ========================================================= */
+
+.secret-pet-card .pet-rarity{
+
+    display:inline-block;
+
+    padding:5px 12px;
+
+    margin-top:5px;
+
+    border-radius:9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #050505,
+            #170821,
+            #030303
+        );
+
+    border:1px solid rgba(150,80,200,.65);
+
+    color:#d8b5ff;
+
+    font-family:
+        "Times New Roman",
+        serif;
+
+    font-size:14px;
+
+    font-weight:1000;
+
+    letter-spacing:2px;
+
+    text-shadow:
+
+        0 0 5px rgba(220,180,255,.9),
+
+        0 0 15px rgba(150,70,255,.7);
+
+    box-shadow:
+
+        0 0 8px rgba(100,30,150,.45),
+
+        inset 0 0 12px rgba(100,30,150,.15);
+
+}
+
+
+/* =========================================================
+   SECRET CARD HOVER
+   ========================================================= */
+
+.secret-pet-card:hover{
+
+    transform:
+        translateY(-6px)
+        scale(1.035);
+
+    border-color:
+        rgba(220,170,255,.95);
+
+    box-shadow:
+
+        0 0 15px rgba(160,80,230,.9),
+
+        0 0 40px rgba(100,30,170,.55),
+
+        0 0 80px rgba(70,10,120,.25),
+
+        inset 0 0 35px rgba(150,60,220,.15);
+
+}
+
+
+/* =========================================================
+   ☠️ SECRET HEADER / PANEL
+   ========================================================= */
+
+.secret-pet-panel{
+
+    position:relative;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15,7,22,.98),
+            rgba(3,3,7,.98)
+        );
+
+    border:1px solid rgba(120,65,160,.6);
+
+    border-radius:20px;
+
+    box-shadow:
+
+        0 0 15px rgba(80,20,120,.25),
+
+        inset 0 0 35px rgba(100,30,150,.08);
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:600px){
+
+    .secret-pet-card{
+
+        border-width:1px;
+
+        box-shadow:
+            0 0 8px rgba(100,30,150,.45);
+
+    }
+
+}
+
+/* 👁️ 𝕊𝔼ℂℝ𝔼𝕋 RARITY LABEL */
+
+.secret-pet-rarity{
+
+    background:
+        linear-gradient(
+            135deg,
+            #020204,
+            #100719,
+            #020204
+        ) !important;
+
+    border:1px solid rgba(170,90,230,.75) !important;
+
+    color:#d9b6ff !important;
+
+    font-weight:1000 !important;
+
+    letter-spacing:3px;
+
+    text-shadow:
+        0 0 5px rgba(230,200,255,.9),
+        0 0 15px rgba(150,70,255,.8),
+        0 0 30px rgba(90,20,150,.6);
+
+    box-shadow:
+        0 0 10px rgba(100,30,150,.55),
+        inset 0 0 15px rgba(100,30,150,.15);
+
+    animation:
+        secretRarityPulse
+        2s
+        ease-in-out
+        infinite;
+}
+
+@keyframes secretRarityPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 8px rgba(100,30,150,.45),
+            inset 0 0 12px rgba(100,30,150,.12);
+    }
+
+    50%{
+        box-shadow:
+            0 0 18px rgba(160,70,230,.8),
+            0 0 35px rgba(90,20,150,.4),
+            inset 0 0 18px rgba(130,50,190,.2);
+    }
+
+}
+
+/* 👁️ SECRET PETS — KEEP THE NORMAL INVENTORY GRID */
+
+#inventoryGrid .secret-pet-card{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+    margin:0;
+}
+
+/* Keep equipped Secret cards looking exactly the same */
+#equippedGrid .secret-pet-card{
+    box-sizing:border-box;
+}
+
+/* 👁️ SECRET EFFECT FOR EQUIPPED EMBRYON */
+
+#equippedGrid .secret-pet-card{
+    animation:
+        secretCardGlow
+        3s
+        ease-in-out
+        infinite !important;
+
+    border-color:
+        rgba(150,80,210,.85) !important;
+
+    box-shadow:
+        0 0 10px rgba(120,50,180,.7),
+        0 0 30px rgba(90,30,150,.45),
+        inset 0 0 25px rgba(120,50,180,.12);
+}
+
+#equippedGrid .secret-pet-card::after{
+    content:"";
+
+    position:absolute;
+
+    width:160%;
+    height:40%;
+
+    left:-30%;
+    top:-20%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(200,120,255,.15),
+            transparent
+        );
+
+    transform:rotate(-18deg);
+
+    animation:
+        secretCardSweep
+        4s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+}
+
+/* 👁️ SECRET EQUIPPED PET — FORCE FULL SECRET EFFECT */
+
+#equippedGrid .equipped-slot.secret-pet-card{
+
+    position:relative;
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(80,30,120,.35),
+            rgba(8,5,12,.98) 70%
+        ) !important;
+
+    border:2px solid rgba(150,80,210,.85) !important;
+
+    box-shadow:
+        0 0 10px rgba(120,50,180,.7),
+        0 0 30px rgba(90,30,150,.45),
+        inset 0 0 25px rgba(120,50,180,.12) !important;
+
+    animation:
+        secretCardGlow
+        3s
+        ease-in-out
+        infinite !important;
+
+    box-sizing:border-box;
+}
+
+
+/* Purple moving sweep */
+
+#equippedGrid .equipped-slot.secret-pet-card::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:160%;
+    height:40%;
+
+    left:-30%;
+    top:-20%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(200,120,255,.15),
+            transparent
+        );
+
+    transform:rotate(-18deg);
+
+    animation:
+        secretCardSweep
+        4s
+        ease-in-out
+        infinite;
+
+    pointer-events:none;
+}
+
+/* =========================
+   INDEX SECRET PET
+   Clean style
+========================= */
+
+.index-section-grid .secret-pet-card{
+
+    animation:none !important;
+
+    background:transparent !important;
+
+    border:none !important;
+
+    box-shadow:none !important;
+
+    overflow:visible;
+
+}
+
+
+.index-section-grid .secret-pet-card::before,
+.index-section-grid .secret-pet-card::after{
+
+    display:none !important;
+
+    animation:none !important;
+
+}
+
+
+.index-section-grid .secret-pet-rarity{
+
+    background:none !important;
+
+    border:none !important;
+
+    box-shadow:none !important;
+
+    animation:none !important;
+
+    color:#d9b6ff !important;
+
+    text-shadow:
+        0 0 5px rgba(230,200,255,.8),
+        0 0 12px rgba(150,70,255,.6);
+
+}
+
+/* =====================================================
+   📦 MYSTERY BOX OPENING
+===================================================== */
+
+.mystery-box-overlay{
+
+    position:fixed;
+    inset:0;
+
+    z-index:99999;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(60,20,100,.55),
+            rgba(0,0,0,.97) 75%
+        );
+
+    backdrop-filter:blur(8px);
+
+    opacity:1;
+
+    visibility:visible;
+
+    transition:
+        opacity .7s ease,
+        visibility .7s ease;
+
+}
+
+
+/* HIDDEN */
+
+.mystery-box-overlay.hidden{
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+}
+
+
+/* FADE OUT */
+
+.mystery-box-overlay.fading-out{
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+}
+
+
+/* SCREEN */
+
+.mystery-box-screen{
+
+    width:min(520px,90vw);
+
+    min-height:520px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    text-align:center;
+
+    position:relative;
+
+}
+
+
+/* TITLE */
+
+.mystery-box-title{
+
+    font-size:30px;
+
+    font-weight:1000;
+
+    letter-spacing:3px;
+
+    margin-bottom:45px;
+
+    color:white;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.8),
+        0 0 30px rgba(160,80,255,.8);
+
+    animation:
+        mysteryTitlePulse
+        1.5s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes mysteryTitlePulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.05);
+    }
+
+}
+
+
+/* BOX CONTAINER */
+
+.mystery-box-container{
+
+    width:260px;
+
+    height:260px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    position:relative;
+
+}
+
+
+/* BOX */
+
+.mystery-box{
+
+    font-size:130px;
+
+    position:relative;
+
+    z-index:2;
+
+    filter:
+        drop-shadow(
+            0 0 10px rgba(255,190,50,.8)
+        );
+
+    animation:
+        mysteryBoxIdle
+        1.2s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes mysteryBoxIdle{
+
+    0%,100%{
+        transform:
+            translateY(0)
+            rotate(-2deg);
+    }
+
+    50%{
+        transform:
+            translateY(-12px)
+            rotate(2deg);
+    }
+
+}
+
+
+/* GLOW */
+
+.mystery-box-glow{
+
+    position:absolute;
+
+    width:190px;
+    height:190px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,190,50,.65),
+            rgba(150,60,255,.3),
+            transparent 70%
+        );
+
+    filter:blur(12px);
+
+    animation:
+        mysteryGlow
+        1.5s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes mysteryGlow{
+
+    0%,100%{
+        transform:scale(.85);
+        opacity:.55;
+    }
+
+    50%{
+        transform:scale(1.25);
+        opacity:1;
+    }
+
+}
+
+
+/* SHAKE */
+
+.mystery-box-container.shaking .mystery-box{
+
+    animation:
+        mysteryShake
+        .08s
+        linear
+        infinite;
+
+}
+
+
+.mystery-box-container.shaking .mystery-box-glow{
+
+    animation:
+        mysteryGlowStrong
+        .25s
+        ease-in-out
+        infinite;
+
+}
+
+
+@keyframes mysteryShake{
+
+    0%{
+        transform:translateX(-8px) rotate(-5deg);
+    }
+
+    25%{
+        transform:translateX(8px) rotate(5deg);
+    }
+
+    50%{
+        transform:translateX(-10px) rotate(-7deg);
+    }
+
+    75%{
+        transform:translateX(10px) rotate(7deg);
+    }
+
+    100%{
+        transform:translateX(0) rotate(0);
+    }
+
+}
+
+
+@keyframes mysteryGlowStrong{
+
+    0%,100%{
+        transform:scale(.9);
+        opacity:.6;
+    }
+
+    50%{
+        transform:scale(1.5);
+        opacity:1;
+    }
+
+}
+
+
+/* OPEN */
+
+.mystery-box-container.opening .mystery-box{
+
+    animation:
+        mysteryOpen
+        .8s
+        ease-out
+        forwards;
+
+}
+
+
+@keyframes mysteryOpen{
+
+    0%{
+        transform:scale(1);
+        opacity:1;
+    }
+
+    45%{
+        transform:scale(1.35) rotate(-8deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(2.3) rotate(8deg);
+        opacity:0;
+    }
+
+}
+
+
+.mystery-box-container.opening .mystery-box-glow{
+
+    animation:
+        mysteryExplosion
+        .8s
+        ease-out
+        forwards;
+
+}
+
+
+@keyframes mysteryExplosion{
+
+    0%{
+        transform:scale(.8);
+        opacity:.7;
+    }
+
+    100%{
+        transform:scale(3);
+        opacity:0;
+    }
+
+}
+
+
+/* STATUS */
+
+.mystery-box-status{
+
+    min-height:32px;
+
+    margin-top:20px;
+
+    font-size:18px;
+
+    font-weight:800;
+
+    color:#ddd;
+
+    letter-spacing:1px;
+
+}
+
+
+/* REWARD */
+
+#mysteryReveal{
+
+    position:absolute;
+
+    inset:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:10;
+
+    opacity:0;
+
+    visibility:hidden;
+
+    transform:
+        scale(.7)
+        translateY(20px);
+
+    transition:
+        opacity .7s ease,
+        transform .7s ease,
+        visibility .7s ease;
+
+}
+
+
+#mysteryReveal.show{
+
+    opacity:1;
+
+    visibility:visible;
+
+    transform:
+        scale(1)
+        translateY(0);
+
+}
+
+
+#mysteryReveal.fade-out{
+
+    opacity:0 !important;
+
+    visibility:hidden;
+
+    transform:
+        scale(.85)
+        translateY(-20px);
+
+}
+
+
+/* REWARD EMOJI */
+
+.mystery-reward-emoji{
+
+    font-size:110px;
+
+    margin-bottom:20px;
+
+    filter:
+        drop-shadow(
+            0 0 20px rgba(255,255,255,.8)
+        );
+
+    animation:
+        mysteryRewardPop
+        .7s
+        cubic-bezier(.17,.67,.35,1.4);
+
+}
+
+
+@keyframes mysteryRewardPop{
+
+    0%{
+        transform:scale(0) rotate(-15deg);
+        opacity:0;
+    }
+
+    70%{
+        transform:scale(1.2) rotate(5deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1) rotate(0);
+        opacity:1;
+    }
+
+}
+
+
+/* REWARD NAME */
+
+.mystery-reward-name{
+
+    font-size:30px;
+
+    font-weight:1000;
+
+    margin-bottom:10px;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.8),
+        0 0 25px rgba(150,80,255,.7);
+
+}
+
+
+/* REWARD RARITY */
+
+.mystery-reward-rarity{
+
+    font-size:18px;
+
+    font-weight:900;
+
+    letter-spacing:2px;
+
+}
+
+/* =========================================
+   MYSTERY BOX - RARITY ANIMATIONS
+   ========================================= */
+
+.mystery-box-overlay.rarity-common {
+    background: radial-gradient(circle at center, rgba(255,255,255,.12), rgba(0,0,0,.96) 75%);
+}
+
+.mystery-box-overlay.rarity-rare {
+    background: radial-gradient(circle at center, rgba(50,150,255,.25), rgba(0,0,0,.96) 75%);
+}
+
+.mystery-box-overlay.rarity-epic {
+    background: radial-gradient(circle at center, rgba(160,60,255,.35), rgba(0,0,0,.97) 75%);
+}
+
+.mystery-box-overlay.rarity-legendary {
+    background: radial-gradient(circle at center, rgba(255,180,20,.45), rgba(0,0,0,.98) 75%);
+}
+
+.mystery-box-overlay.rarity-secret {
+    background:
+        radial-gradient(circle at center,
+            rgba(120,0,255,.65),
+            rgba(20,0,45,.9) 45%,
+            rgba(0,0,0,1) 80%);
+}
+
+/* Extra glow around the whole screen */
+.mystery-box-overlay.rarity-secret::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at 50% 45%,
+            rgba(190,80,255,.35),
+            transparent 35%);
+    animation: secretScreenPulse 1s ease-in-out infinite;
+}
+
+@keyframes secretScreenPulse {
+    0%,100% {
+        opacity:.35;
+        transform:scale(1);
+    }
+    50% {
+        opacity:1;
+        transform:scale(1.15);
+    }
+}
+
+/* Secret box shake */
+.mystery-box-overlay.rarity-secret
+.mystery-box-container.shaking .mystery-box {
+    animation: secretShake .045s linear infinite;
+}
+
+@keyframes secretShake {
+    0% { transform:translate(0,0) rotate(0deg) scale(1); }
+    25% { transform:translate(-8px,4px) rotate(-4deg) scale(1.04); }
+    50% { transform:translate(8px,-4px) rotate(4deg) scale(1.08); }
+    75% { transform:translate(-6px,-3px) rotate(-3deg) scale(1.04); }
+    100% { transform:translate(6px,3px) rotate(3deg) scale(1.08); }
+}
+
+/* Secret opening */
+.mystery-box-overlay.rarity-secret
+.mystery-box-container.opening .mystery-box {
+    animation: secretOpen 1.4s ease-out forwards;
+}
+
+@keyframes secretOpen {
+    0% {
+        transform:scale(1);
+        opacity:1;
+        filter:drop-shadow(0 0 20px rgba(180,80,255,.8));
+    }
+
+    35% {
+        transform:scale(1.35) rotate(8deg);
+        filter:
+            drop-shadow(0 0 30px rgba(180,80,255,1))
+            drop-shadow(0 0 70px rgba(255,255,255,.8));
+    }
+
+    65% {
+        transform:scale(1.8) rotate(-8deg);
+        filter:
+            drop-shadow(0 0 50px rgba(200,100,255,1))
+            drop-shadow(0 0 120px rgba(255,255,255,1));
+    }
+
+    100% {
+        transform:scale(3.5);
+        opacity:0;
+        filter:
+            drop-shadow(0 0 100px rgba(200,100,255,1))
+            drop-shadow(0 0 200px white);
+    }
+}
+
+/* Massive secret explosion */
+.mystery-box-overlay.rarity-secret
+.mystery-box-container.opening .mystery-box-glow {
+    animation: secretExplosion 1.4s ease-out forwards;
+}
+
+@keyframes secretExplosion {
+    0% {
+        transform:scale(.5);
+        opacity:.3;
+    }
+
+    40% {
+        transform:scale(2);
+        opacity:1;
+    }
+
+    70% {
+        transform:scale(4);
+        opacity:1;
+    }
+
+    100% {
+        transform:scale(8);
+        opacity:0;
+    }
+}
+
+/* Secret reward */
+.mystery-box-overlay.rarity-secret .mystery-box-reward {
+    text-shadow:
+        0 0 10px white,
+        0 0 25px #b45cff,
+        0 0 50px #8a2be2,
+        0 0 100px #6a00ff;
+}
+
+.mystery-box-overlay.rarity-secret .mystery-reward-emoji {
+    font-size:110px;
+    animation: secretPetReveal 1.5s cubic-bezier(.17,.67,.3,1.4);
+}
+
+@keyframes secretPetReveal {
+    0% {
+        transform:scale(0) rotate(-180deg);
+        opacity:0;
+    }
+
+    50% {
+        transform:scale(1.5) rotate(15deg);
+        opacity:1;
+    }
+
+    75% {
+        transform:scale(.85) rotate(-8deg);
+    }
+
+    100% {
+        transform:scale(1) rotate(0);
+        opacity:1;
+    }
+}
+
+.mystery-box-overlay.rarity-secret .mystery-reward-name {
+    font-size:36px;
+    font-weight:900;
+    animation: secretNameGlow 1.2s ease-in-out infinite;
+}
+
+@keyframes secretNameGlow {
+    0%,100% {
+        transform:scale(1);
+    }
+
+    50% {
+        transform:scale(1.08);
+    }
+}
+
+.mystery-box-overlay.rarity-secret .mystery-reward-rarity {
+    font-size:24px;
+    font-weight:900;
+}
+
+/* =========================================
+   🗑️ DELETE PET GUI
+   ========================================= */
+
+.delete-pet-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(120,30,160,.35),
+            rgba(0,0,0,.94) 75%
+        );
+
+    backdrop-filter:blur(10px);
+
+    opacity:1;
+    transition:opacity .3s ease;
+}
+
+.delete-pet-overlay.hidden{
+    display:none;
+}
+
+.delete-pet-modal{
+    width:min(430px,92vw);
+    padding:30px 25px;
+
+    text-align:center;
+
+    border:2px solid rgba(210,100,255,.55);
+    border-radius:24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35,15,55,.98),
+            rgba(10,8,20,.98)
+        );
+
+    box-shadow:
+        0 0 25px rgba(170,70,255,.35),
+        0 0 80px rgba(120,40,200,.2);
+
+    animation:deleteModalPop .35s cubic-bezier(.17,.67,.3,1.4);
+}
+
+@keyframes deleteModalPop{
+
+    0%{
+        opacity:0;
+        transform:scale(.7) translateY(30px);
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+}
+
+.delete-pet-icon{
+    font-size:55px;
+
+    margin-bottom:8px;
+
+    filter:
+        drop-shadow(0 0 10px rgba(255,80,80,.7));
+
+    animation:deleteIconPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes deleteIconPulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.12);
+    }
+}
+
+.delete-pet-title{
+    font-size:30px;
+    font-weight:1000;
+    letter-spacing:1px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.4),
+        0 0 25px rgba(190,80,255,.7);
+
+    margin-bottom:8px;
+}
+
+.delete-pet-warning{
+    color:#bdb5c8;
+    font-size:15px;
+    margin-bottom:20px;
+}
+
+.delete-pet-preview{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    min-height:130px;
+
+    margin:0 auto 18px;
+
+    padding:15px;
+
+    border-radius:18px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(150,60,220,.22),
+            rgba(20,10,30,.7)
+        );
+
+    border:1px solid rgba(190,100,255,.35);
+
+    box-shadow:
+        inset 0 0 25px rgba(150,50,255,.12);
+}
+
+.delete-pet-preview > .delete-pet-emoji{
+    font-size:65px;
+}
+
+.delete-pet-preview{
+    font-size:65px;
+}
+
+.delete-pet-name{
+    font-size:20px;
+    font-weight:900;
+    color:#fff;
+    margin-top:6px;
+}
+
+.delete-pet-secret-warning{
+
+    margin:12px 0 18px;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    background:rgba(110,30,170,.2);
+
+    border:1px solid rgba(190,90,255,.5);
+
+    color:#d9b6ff;
+
+    font-weight:800;
+
+    font-size:13px;
+
+    text-shadow:
+        0 0 8px rgba(180,90,255,.6);
+}
+
+.delete-pet-secret-warning.hidden{
+    display:none;
+}
+
+.delete-pet-buttons{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+}
+
+.delete-pet-buttons button{
+
+    flex:1;
+
+    min-height:50px;
+
+    border:none;
+    border-radius:13px;
+
+    font-size:15px;
+    font-weight:900;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease,
+        box-shadow .15s ease;
+}
+
+.delete-pet-buttons button:hover{
+    transform:translateY(-2px);
+    filter:brightness(1.12);
+}
+
+.delete-pet-buttons button:active{
+    transform:scale(.96);
+}
+
+.delete-pet-cancel{
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #3a3542,
+            #24202b
+        );
+
+    box-shadow:
+        0 0 15px rgba(100,90,120,.25);
+}
+
+.delete-pet-confirm{
+
+    color:#fff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #b72d55,
+            #731b3c
+        );
+
+    box-shadow:
+        0 0 18px rgba(220,50,100,.35);
+}
+
+.delete-pet-confirm:hover{
+    box-shadow:
+        0 0 28px rgba(220,50,100,.55);
+}
+
+/* 🗑️ DELETE PET QUANTITY */
+
+.delete-pet-quantity{
+    margin:15px 0 20px;
+    text-align:center;
+}
+
+.delete-pet-quantity-label{
+    font-size:13px;
+    font-weight:900;
+    color:#aaa;
+    margin-bottom:10px;
+    letter-spacing:1px;
+}
+
+.delete-pet-quantity-controls{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+}
+
+.delete-pet-quantity-controls button{
+    width:48px;
+    height:48px;
+    border:none;
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #3a3542,
+            #211d27
+        );
+
+    color:white;
+    font-size:28px;
+    font-weight:900;
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
+}
+
+.delete-pet-quantity-controls button:hover{
+    transform:scale(1.08);
+    filter:brightness(1.2);
+}
+
+.delete-pet-quantity-controls button:active{
+    transform:scale(.94);
+}
+
+#deletePetQuantity{
+    min-width:55px;
+    font-size:28px;
+    font-weight:1000;
+    color:white;
+
+    text-shadow:
+        0 0 10px rgba(200,100,255,.8);
+}
+
+.delete-pet-quantity-max{
+    margin-top:7px;
+    font-size:12px;
+    color:#888;
+}
+
+.crit-effect{
+    position:fixed;
+    left:50%;
+    top:45%;
+    transform:translate(-50%,-50%);
+    z-index:999999;
+    pointer-events:none;
+    text-align:center;
+    animation:critPop 1s cubic-bezier(.17,.67,.3,1.4) forwards;
+}
+
+.crit-burst{
+    font-size:80px;
+    filter:
+        drop-shadow(0 0 10px #fff)
+        drop-shadow(0 0 25px #ff9d00)
+        drop-shadow(0 0 50px #ff4500);
+    animation:critSpin .7s ease-out;
+}
+
+.crit-text{
+    margin-top:-8px;
+    font-size:42px;
+    font-weight:1000;
+    color:#fff;
+    letter-spacing:2px;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 15px #ffd000,
+        0 0 30px #ff7300,
+        0 0 60px #ff2a00;
+}
+
+.crit-coins{
+    margin-top:5px;
+    font-size:22px;
+    font-weight:900;
+    color:#ffd84d;
+    text-shadow:
+        0 0 10px #ffb300,
+        0 0 25px #ff6500;
+}
+
+@keyframes critPop{
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.2);
+    }
+
+    20%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.25);
+    }
+
+    45%{
+        transform:translate(-50%,-55%) scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-85%) scale(1.15);
+    }
+}
+
+@keyframes critSpin{
+    0%{
+        transform:scale(.2) rotate(-180deg);
+    }
+
+    60%{
+        transform:scale(1.2) rotate(15deg);
+    }
+
+    100%{
+        transform:scale(1) rotate(0deg);
+    }
+}
+
+.pet-level-display{
+    width:100%;
+    margin:10px 0 12px;
+    text-align:center;
+}
+
+.pet-level-text{
+    font-size:14px;
+    font-weight:1000;
+    letter-spacing:1px;
+    color:#fff;
+    margin-bottom:6px;
+    text-shadow:
+        0 0 8px rgba(190,100,255,.8),
+        0 0 18px rgba(120,50,255,.5);
+}
+
+.pet-exp-bar{
+    width:100%;
+    height:10px;
+    overflow:hidden;
+    border-radius:999px;
+    background:rgba(0,0,0,.45);
+    border:1px solid rgba(190,110,255,.35);
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,.7),
+        0 0 8px rgba(160,70,255,.15);
+}
+
+.pet-exp-fill{
+    height:100%;
+    border-radius:999px;
+    background:
+        linear-gradient(
+            90deg,
+            #7b2cff,
+            #c05cff,
+            #ffffff
+        );
+    box-shadow:
+        0 0 8px rgba(190,90,255,.9),
+        0 0 18px rgba(150,50,255,.6);
+    transition:width .35s ease;
+}
+
+.pet-exp-text{
+    margin-top:4px;
+    font-size:11px;
+    font-weight:800;
+    color:#aaa;
+}
+
+.max-level-pet{
+    position:relative;
+}
+
+.max-level-pet .pet-level-text{
+    color:#ffe58a;
+    text-shadow:
+        0 0 8px rgba(255,210,60,.9),
+        0 0 20px rgba(255,150,20,.7),
+        0 0 35px rgba(255,80,0,.4);
+}
+
+.max-level-pet .pet-exp-bar{
+    border-color:rgba(255,205,70,.65);
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,.7),
+        0 0 12px rgba(255,180,30,.45);
+}
+
+.max-level-pet .pet-exp-fill{
+    width:100% !important;
+    background:
+        linear-gradient(
+            90deg,
+            #ff9d00,
+            #ffe45c,
+            #ffffff,
+            #ff9d00
+        );
+    background-size:200% 100%;
+    animation:maxLevelBar 2s linear infinite;
+}
+
+@keyframes maxLevelBar{
+    0%{
+        background-position:0% 50%;
+    }
+
+    100%{
+        background-position:200% 50%;
+    }
+}
+
+.pet-level-up-effect{
+    position:fixed;
+    left:50%;
+    top:45%;
+    transform:translate(-50%,-50%);
+    z-index:999999;
+    pointer-events:none;
+    text-align:center;
+
+    animation:
+        petLevelUpPop
+        1.6s
+        cubic-bezier(.17,.67,.3,1.25)
+        forwards;
+}
+
+.pet-level-up-rays{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+
+    width:260px;
+    height:260px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:45px;
+    letter-spacing:35px;
+
+    color:#ffffff;
+
+    text-shadow:
+        0 0 10px #fff,
+        0 0 25px #c05cff,
+        0 0 55px #7b2cff;
+
+    animation:
+        petLevelUpSpin
+        1.6s
+        linear
+        infinite;
+}
+
+.pet-level-up-burst{
+    position:relative;
+
+    font-size:90px;
+
+    filter:
+        drop-shadow(0 0 10px #fff)
+        drop-shadow(0 0 25px #c05cff)
+        drop-shadow(0 0 60px #7b2cff);
+
+    animation:
+        petLevelUpBurst
+        .8s
+        cubic-bezier(.17,.67,.3,1.4);
+}
+
+.pet-level-up-title{
+    position:relative;
+
+    margin-top:-8px;
+
+    font-size:46px;
+    font-weight:1000;
+    letter-spacing:3px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 5px #fff,
+        0 0 15px #c05cff,
+        0 0 35px #7b2cff,
+        0 0 70px #5a00ff;
+}
+
+.pet-level-up-name{
+    position:relative;
+
+    margin-top:6px;
+
+    font-size:22px;
+    font-weight:900;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 10px rgba(255,255,255,.9),
+        0 0 25px rgba(190,90,255,.8);
+}
+
+.pet-level-up-level{
+    position:relative;
+
+    margin-top:8px;
+
+    font-size:28px;
+    font-weight:1000;
+    letter-spacing:2px;
+
+    color:#ffe58a;
+
+    text-shadow:
+        0 0 8px #ffd000,
+        0 0 20px #ff9d00,
+        0 0 40px #ff6500;
+}
+
+@keyframes petLevelUpPop{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            scale(.15);
+    }
+
+    18%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.25);
+    }
+
+    35%{
+        transform:
+            translate(-50%,-50%)
+            scale(.95);
+    }
+
+    55%{
+        transform:
+            translate(-50%,-55%)
+            scale(1.05);
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-85%)
+            scale(1.15);
+    }
+}
+
+@keyframes petLevelUpBurst{
+
+    0%{
+        transform:scale(.1) rotate(-180deg);
+        opacity:0;
+    }
+
+    55%{
+        transform:scale(1.35) rotate(20deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1) rotate(0deg);
+        opacity:1;
+    }
+}
+
+@keyframes petLevelUpSpin{
+
+    0%{
+        transform:
+            translate(-50%,-50%)
+            rotate(0deg)
+            scale(.5);
+        opacity:0;
+    }
+
+    25%{
+        opacity:1;
+    }
+
+    100%{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg)
+            scale(1.4);
+        opacity:0;
+    }
+}
+
+.pet-level-up-effect{
+    position:fixed;
+    left:50%;
+    top:45%;
+    transform:translate(-50%,-50%);
+    z-index:999999;
+    pointer-events:none;
+    text-align:center;
+
+    width:min(92vw,650px);
+
+    animation:
+        petLevelUpPop
+        1.8s
+        cubic-bezier(.17,.67,.3,1.25)
+        forwards;
+}
+
+.pet-level-up-rays{
+    position:absolute;
+    left:50%;
+    top:45%;
+
+    width:300px;
+    height:300px;
+
+    transform:translate(-50%,-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:50px;
+    letter-spacing:30px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 10px #fff,
+        0 0 30px #c05cff,
+        0 0 70px #7b2cff;
+
+    animation:
+        petLevelUpSpin
+        1.8s
+        linear
+        infinite;
+}
+
+.pet-level-up-burst{
+    position:relative;
+
+    font-size:85px;
+
+    filter:
+        drop-shadow(0 0 10px #fff)
+        drop-shadow(0 0 30px #c05cff)
+        drop-shadow(0 0 70px #7b2cff);
+
+    animation:
+        petLevelUpBurst
+        .8s
+        cubic-bezier(.17,.67,.3,1.4);
+}
+
+.pet-level-up-title{
+    position:relative;
+
+    margin-top:-5px;
+
+    font-size:42px;
+    font-weight:1000;
+    letter-spacing:3px;
+
+    color:#fff;
+
+    text-shadow:
+        0 0 5px #fff,
+        0 0 15px #c05cff,
+        0 0 35px #7b2cff,
+        0 0 70px #5a00ff;
+}
+
+.pet-level-up-pets{
+    position:relative;
+
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:12px;
+
+    margin-top:16px;
+}
+
+.pet-level-up-pet{
+    min-width:120px;
+    padding:12px 16px;
+
+    border-radius:14px;
+
+    background:rgba(15,10,25,.88);
+    border:1px solid rgba(190,100,255,.6);
+
+    box-shadow:
+        0 0 12px rgba(160,70,255,.35),
+        inset 0 0 15px rgba(120,40,200,.15);
+
+    animation:
+        petLevelUpCard
+        .5s
+        cubic-bezier(.17,.67,.3,1.4)
+        both;
+}
+
+.pet-level-up-pet:nth-child(2){
+    animation-delay:.08s;
+}
+
+.pet-level-up-pet:nth-child(3){
+    animation-delay:.16s;
+}
+
+.pet-level-up-pet:nth-child(4){
+    animation-delay:.24s;
+}
+
+.pet-level-up-pet:nth-child(5){
+    animation-delay:.32s;
+}
+
+.pet-level-up-pet-emoji{
+    font-size:42px;
+}
+
+.pet-level-up-pet-name{
+    margin-top:3px;
+
+    font-size:16px;
+    font-weight:900;
+    color:#fff;
+}
+
+.pet-level-up-pet-level{
+    margin-top:4px;
+
+    font-size:18px;
+    font-weight:1000;
+
+    color:#ffe58a;
+
+    text-shadow:
+        0 0 8px #ffd000,
+        0 0 18px #ff9d00;
+}
+
+@keyframes petLevelUpPop{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            scale(.2);
+    }
+
+    18%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.12);
+    }
+
+    35%{
+        transform:
+            translate(-50%,-50%)
+            scale(.96);
+    }
+
+    55%{
+        transform:
+            translate(-50%,-55%)
+            scale(1);
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-80%)
+            scale(1.04);
+    }
+}
+
+@keyframes petLevelUpBurst{
+
+    0%{
+        transform:scale(.1) rotate(-180deg);
+        opacity:0;
+    }
+
+    55%{
+        transform:scale(1.3) rotate(20deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1) rotate(0deg);
+        opacity:1;
+    }
+}
+
+@keyframes petLevelUpSpin{
+
+    0%{
+        transform:
+            translate(-50%,-50%)
+            rotate(0deg)
+            scale(.5);
+        opacity:0;
+    }
+
+    20%{
+        opacity:1;
+    }
+
+    100%{
+        transform:
+            translate(-50%,-50%)
+            rotate(360deg)
+            scale(1.5);
+        opacity:0;
+    }
+}
+
+@keyframes petLevelUpCard{
+
+    0%{
+        opacity:0;
+        transform:translateY(25px) scale(.7);
+    }
+
+    100%{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+/* =========================================================
+   🌎 GLOBAL PANEL — CLEAN REBUILD
+   ========================================================= */
+
+.global-panel{
+    position:fixed;
+
+    top:140px;
+    right:0;
+
+    bottom:auto;
+    left:auto;
+
+    width:320px;
+    max-width:calc(100vw - 10px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,16,30,.97),
+            rgba(8,8,14,.98)
+        );
+
+    border:1px solid rgba(180,100,255,.35);
+
+    border-radius:18px;
+
+    box-shadow:
+        0 0 25px rgba(120,50,255,.18),
+        inset 0 0 25px rgba(120,50,255,.05);
+
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+
+    overflow:hidden;
+
+    z-index:999999;
+
+    color:white;
+
+    cursor:grab;
+
+    touch-action:none;
+
+    user-select:none;
+}
+
+.global-panel:active{
+    cursor:grabbing;
+}
+
+#globalChatInput{
+    cursor:text;
+    user-select:text;
+    touch-action:auto;
+}
+
+@media(max-width:700px){
+
+    .global-panel{
+        width:290px;
+        max-width:calc(100vw - 10px);
+    }
+
+}
+
+
+/* =========================================================
+   🌎 GLOBAL TITLE
+   ========================================================= */
+
+.global-panel-title{
+    padding:14px 16px 10px;
+
+    font-size:18px;
+
+    font-weight:1000;
+
+    letter-spacing:1px;
+
+    text-shadow:
+        0 0 8px rgba(190,100,255,.7);
+}
+
+
+/* =========================================================
+   🔘 GLOBAL TABS
+   ========================================================= */
+
+.global-tabs{
+    display:flex;
+
+    padding:0 10px 10px;
+
+    gap:7px;
+}
+
+.global-tab{
+    flex:1;
+
+    min-height:40px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.04);
+
+    color:#aaa;
+
+    font-size:12px;
+
+    font-weight:1000;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        background .15s ease,
+        color .15s ease,
+        border-color .15s ease;
+}
+
+.global-tab:hover{
+    transform:translateY(-1px);
+
+    background:rgba(255,255,255,.08);
+
+    color:white;
+}
+
+.global-tab.active{
+    color:white;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(130,50,255,.55),
+            rgba(190,80,255,.25)
+        );
+
+    border-color:rgba(190,100,255,.55);
+
+    box-shadow:
+        0 0 12px rgba(150,60,255,.25);
+}
+
+
+/* =========================================================
+   📜 GLOBAL FEED
+   ========================================================= */
+
+.global-feed{
+    max-height:260px;
+
+    overflow-y:auto;
+
+    scroll-behavior:smooth;
+
+    scrollbar-width:thin;
+
+    scrollbar-color:
+        rgba(180,100,255,.45)
+        transparent;
+}
+
+.global-feed.hidden{
+    display:none;
+}
+
+.global-empty{
+    padding:35px 15px;
+
+    text-align:center;
+
+    color:#777;
+
+    font-size:13px;
+}
+
+
+/* =========================================================
+   🥚 GLOBAL HATCH CARDS
+   ========================================================= */
+
+.global-hatch{
+    position:relative;
+
+    margin-bottom:8px;
+
+    padding:10px 12px;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.035);
+
+    border:1px solid rgba(255,255,255,.07);
+
+    overflow:hidden;
+
+    animation:globalHatchIn .35s ease-out;
+}
+
+
+/* TEXT IS ALWAYS CRISP */
+
+.global-hatch-username,
+.global-hatch-pet,
+.global-hatch-rarity,
+.global-hatch-time{
+    position:relative;
+
+    z-index:5;
+
+    filter:none !important;
+
+    -webkit-filter:none !important;
+
+    opacity:1 !important;
+
+    visibility:visible !important;
+
+    transform:none !important;
+}
+
+.global-hatch-username{
+    font-size:11px;
+
+    font-weight:800;
+
+    color:#999;
+}
+
+.global-hatch-pet{
+    margin-top:3px;
+
+    font-size:15px;
+
+    font-weight:1000;
+
+    color:white;
+}
+
+.global-hatch-rarity{
+    margin-top:4px;
+
+    font-size:11px;
+
+    font-weight:1000;
+
+    letter-spacing:1px;
+}
+
+.global-hatch-time{
+    margin-top:4px;
+
+    font-size:10px;
+
+    color:#666;
+}
+
+
+/* =========================================================
+   🔥 ANCIENT
+   ========================================================= */
+
+.global-hatch.rarity-ancient{
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,180,40,.10),
+            rgba(255,120,20,.025)
+        );
+
+    border-color:rgba(255,190,60,.55);
+
+    box-shadow:
+        0 0 12px rgba(255,180,40,.16),
+        inset 0 0 15px rgba(255,170,30,.04);
+}
+
+.global-hatch.rarity-ancient .global-hatch-rarity{
+    color:#ffd45c;
+
+    text-shadow:
+        0 0 5px rgba(255,190,50,.55);
+}
+
+
+/* =========================================================
+   ✨ CELESTIAL
+   ========================================================= */
+
+.global-hatch.rarity-celestial{
+    background:
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(190,80,255,.13),
+            transparent 55%
+        ),
+        rgba(255,255,255,.025);
+
+    border-color:rgba(190,100,255,.7);
+
+    box-shadow:
+        0 0 15px rgba(170,70,255,.22),
+        inset 0 0 18px rgba(170,70,255,.05);
+
+    animation:
+        globalHatchIn .35s ease-out,
+        celestialPulse 2.5s ease-in-out infinite;
+}
+
+.global-hatch.rarity-celestial .global-hatch-rarity{
+    color:#d9a0ff;
+
+    text-shadow:
+        0 0 5px rgba(192,92,255,.65),
+        0 0 12px rgba(123,44,255,.35);
+}
+
+
+/* =========================================================
+   🌈 CHROMATIC
+   ========================================================= */
+
+#globalHatchesFeed .chromatic-test-card{
+    position:relative !important;
+
+    display:block !important;
+
+    width:100% !important;
+
+    box-sizing:border-box !important;
+
+    padding:14px !important;
+
+    margin:0 0 10px 0 !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255,40,40,.10),
+            rgba(255,210,40,.08),
+            rgba(50,255,100,.08),
+            rgba(40,150,255,.08),
+            rgba(180,50,255,.10)
+        ) !important;
+
+    border:2px solid #ff3b3b !important;
+
+    border-radius:14px !important;
+
+    color:white !important;
+
+    opacity:1 !important;
+
+    visibility:visible !important;
+
+    filter:none !important;
+
+    transform:none !important;
+
+    overflow:hidden !important;
+
+    animation:
+        chromaticCardPulse 2.5s ease-in-out infinite,
+        chromaticBorder 4s linear infinite !important;
+}
+
+
+/* Moving light */
+
+#globalHatchesFeed .chromatic-test-card::before{
+    content:"" !important;
+
+    position:absolute !important;
+
+    top:0 !important;
+
+    left:-120% !important;
+
+    width:80% !important;
+
+    height:100% !important;
+
+    background:
+        linear-gradient(
+            110deg,
+            transparent,
+            rgba(255,255,255,.38),
+            transparent
+        ) !important;
+
+    transform:skewX(-20deg) !important;
+
+    pointer-events:none !important;
+
+    z-index:1 !important;
+
+    animation:
+        chromaticSweep 2.8s ease-in-out infinite !important;
+}
+
+
+/* Chromatic content */
+
+#globalHatchesFeed .chromatic-test-card div{
+    position:relative !important;
+
+    z-index:3 !important;
+
+    display:block !important;
+
+    color:white !important;
+
+    font-size:14px !important;
+
+    line-height:1.5 !important;
+
+    opacity:1 !important;
+
+    visibility:visible !important;
+
+    filter:none !important;
+
+    transform:none !important;
+}
+
+#globalHatchesFeed .chromatic-test-card div:first-child{
+    font-weight:800 !important;
+
+    text-shadow:
+        0 0 5px rgba(255,255,255,.3) !important;
+}
+
+#globalHatchesFeed .chromatic-test-card div:nth-child(2){
+    margin-top:4px !important;
+
+    font-weight:900 !important;
+
+    text-shadow:
+        0 0 5px rgba(255,255,255,.2) !important;
+}
+
+#globalHatchesFeed .chromatic-test-card div:nth-child(3){
+    margin-top:7px !important;
+
+    font-size:15px !important;
+
+    font-weight:1000 !important;
+
+    letter-spacing:1px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff3030,
+            #ffd630,
+            #42ff63,
+            #3c9cff,
+            #b64cff,
+            #ff3030
+        ) !important;
+
+    background-size:300% 100% !important;
+
+    -webkit-background-clip:text !important;
+
+    background-clip:text !important;
+
+    -webkit-text-fill-color:transparent !important;
+
+    animation:
+        chromaticText 2s linear infinite !important;
+}
+
+#globalHatchesFeed .chromatic-test-card div:nth-child(4){
+    margin-top:4px !important;
+
+    color:rgba(255,255,255,.55) !important;
+
+    font-size:11px !important;
+}
+
+
+/* =========================================================
+   👁️ SECRET
+   ========================================================= */
+
+.global-hatch.rarity-secret{
+    position:relative;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            rgba(170,60,255,.22),
+            rgba(20,5,35,.96) 70%
+        );
+
+    border:1px solid rgba(190,80,255,.9);
+
+    box-shadow:
+        0 0 12px rgba(180,70,255,.45),
+        0 0 28px rgba(140,40,255,.28),
+        inset 0 0 20px rgba(150,40,255,.12);
+
+    animation:
+        secretGlobalIn .8s cubic-bezier(.17,.67,.3,1.4),
+        secretGlobalPulse 1.8s ease-in-out infinite;
+}
+
+
+/* Secret glow layer */
+
+.global-hatch.rarity-secret::before{
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle at 50% 20%,
+            rgba(220,130,255,.18),
+            transparent 60%
+        );
+
+    z-index:1;
+
+    animation:
+        secretGlobalSweep 2.5s ease-in-out infinite;
+}
+
+
+/* Secret text stays ABOVE glow */
+
+.global-hatch.rarity-secret .global-hatch-username,
+.global-hatch.rarity-secret .global-hatch-pet,
+.global-hatch.rarity-secret .global-hatch-rarity,
+.global-hatch.rarity-secret .global-hatch-time{
+    position:relative;
+
+    z-index:5;
+
+    filter:none !important;
+
+    -webkit-filter:none !important;
+
+    opacity:1 !important;
+
+    visibility:visible !important;
+
+    transform:none !important;
+}
+
+.global-hatch.rarity-secret .global-hatch-pet{
+    font-size:18px;
+
+    color:white;
+
+    text-shadow:
+        0 0 5px rgba(255,255,255,.45),
+        0 0 12px rgba(192,92,255,.55);
+}
+
+.global-hatch.rarity-secret .global-hatch-rarity{
+    font-size:14px;
+
+    color:#e1b7ff;
+
+    text-shadow:
+        0 0 5px rgba(192,92,255,.55),
+        0 0 12px rgba(123,44,255,.4);
+}
+
+
+/* =========================================================
+   💬 GLOBAL CHAT
+   ========================================================= */
+
+.global-chat-message{
+    padding:8px 10px;
+
+    margin-bottom:6px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.035);
+
+    border:1px solid rgba(255,255,255,.05);
+
+    animation:globalChatIn .25s ease-out;
+}
+
+.global-chat-username{
+    font-size:11px;
+
+    font-weight:1000;
+
+    color:#c58cff;
+}
+
+.global-chat-text{
+    margin-top:2px;
+
+    font-size:13px;
+
+    color:#eee;
+
+    word-break:break-word;
+}
+
+
+/* =========================================================
+   💬 CHAT INPUT
+   ========================================================= */
+
+.global-chat-input-area{
+    display:flex;
+
+    gap:7px;
+
+    padding:10px;
+
+    border-top:1px solid rgba(255,255,255,.07);
+}
+
+.global-chat-input-area.hidden{
+    display:none;
+}
+
+#globalChatInput{
+    flex:1;
+
+    min-width:0;
+
+    height:40px;
+
+    padding:0 12px;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    border-radius:10px;
+
+    outline:none;
+
+    background:rgba(0,0,0,.35);
+
+    color:white;
+
+    font-size:14px;
+
+    cursor:text;
+}
+
+#globalChatInput:focus{
+    border-color:rgba(190,100,255,.6);
+
+    box-shadow:
+        0 0 10px rgba(150,60,255,.15);
+}
+
+#globalChatSend{
+    width:42px;
+
+    height:40px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7b2cff,
+            #c05cff
+        );
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:1000;
+
+    cursor:pointer;
+
+    transition:
+        transform .15s ease,
+        filter .15s ease;
+}
+
+#globalChatSend:hover{
+    transform:scale(1.05);
+
+    filter:brightness(1.15);
+}
+
+
+/* =========================================================
+   ✨ GENERAL ANIMATIONS
+   ========================================================= */
+
+@keyframes globalHatchIn{
+
+    from{
+        opacity:0;
+
+        transform:
+            translateX(30px)
+            scale(.94);
+    }
+
+    to{
+        opacity:1;
+
+        transform:
+            translateX(0)
+            scale(1);
+    }
+}
+
+
+@keyframes globalChatIn{
+
+    from{
+        opacity:0;
+
+        transform:
+            translateY(8px);
+    }
+
+    to{
+        opacity:1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+/* =========================================================
+   ✨ CELESTIAL PULSE
+   ========================================================= */
+
+@keyframes celestialPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 12px rgba(170,70,255,.18),
+            inset 0 0 15px rgba(170,70,255,.04);
+    }
+
+    50%{
+        box-shadow:
+            0 0 22px rgba(170,70,255,.32),
+            inset 0 0 20px rgba(170,70,255,.07);
+    }
+}
+
+
+/* =========================================================
+   👁️ SECRET ANIMATIONS
+   ========================================================= */
+
+@keyframes secretGlobalIn{
+
+    from{
+        opacity:0;
+
+        transform:
+            scale(.7)
+            translateY(15px);
+    }
+
+    to{
+        opacity:1;
+
+        transform:
+            scale(1)
+            translateY(0);
+    }
+}
+
+
+@keyframes secretGlobalPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 10px rgba(180,70,255,.4),
+            0 0 25px rgba(140,40,255,.2),
+            inset 0 0 18px rgba(150,40,255,.1);
+    }
+
+    50%{
+        box-shadow:
+            0 0 18px rgba(210,100,255,.65),
+            0 0 40px rgba(140,40,255,.35),
+            inset 0 0 25px rgba(150,40,255,.18);
+    }
+}
+
+
+@keyframes secretGlobalSweep{
+
+    0%,100%{
+        opacity:.35;
+
+        transform:scale(.8);
+    }
+
+    50%{
+        opacity:.8;
+
+        transform:scale(1.15);
+    }
+}
+
+
+/* =========================================================
+   🌈 CHROMATIC ANIMATIONS
+   ========================================================= */
+
+@keyframes chromaticBorder{
+
+    0%{
+        border-color:#ff3030;
+
+        box-shadow:
+            0 0 9px rgba(255,48,48,.35);
+    }
+
+    20%{
+        border-color:#ffd630;
+
+        box-shadow:
+            0 0 13px rgba(255,214,48,.4);
+    }
+
+    40%{
+        border-color:#42ff63;
+
+        box-shadow:
+            0 0 13px rgba(66,255,99,.4);
+    }
+
+    60%{
+        border-color:#3c9cff;
+
+        box-shadow:
+            0 0 15px rgba(60,156,255,.45);
+    }
+
+    80%{
+        border-color:#b64cff;
+
+        box-shadow:
+            0 0 17px rgba(182,76,255,.5);
+    }
+
+    100%{
+        border-color:#ff3030;
+
+        box-shadow:
+            0 0 9px rgba(255,48,48,.35);
+    }
+}
+
+
+@keyframes chromaticText{
+
+    0%{
+        background-position:0% 50%;
+    }
+
+    100%{
+        background-position:300% 50%;
+    }
+}
+
+
+@keyframes chromaticSweep{
+
+    0%{
+        left:-120%;
+    }
+
+    45%{
+        left:140%;
+    }
+
+    100%{
+        left:140%;
+    }
+}
+
+
+@keyframes chromaticCardPulse{
+
+    0%,100%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.015);
+    }
+}
+
+
+/* =========================================================
+   🖱️ DRAGGING
+   ========================================================= */
+
+.global-panel,
+.global-panel *{
+    user-select:none;
+}
+
+#globalChatInput{
+    user-select:text;
+}
+
+.global-tab,
+#globalChatSend{
+    cursor:pointer;
 }

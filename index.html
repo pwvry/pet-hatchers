@@ -59,6 +59,74 @@
 
 </header>
 
+<!-- 🌎 GLOBAL PANEL -->
+    <div id="globalPanel" class="global-panel">
+
+        <div class="global-panel-title">
+            🌎 GLOBAL
+        </div>
+
+        <div class="global-tabs">
+            <button
+                id="globalHatchesTab"
+                class="global-tab active"
+                type="button"
+            >
+                🥚 HATCHES
+            </button>
+
+            <button
+                id="globalChatTab"
+                class="global-tab"
+                type="button"
+            >
+                💬 CHAT
+            </button>
+        </div>
+
+        <!-- HATCH FEED -->
+        <div
+            id="globalHatchesFeed"
+            class="global-feed"
+        >
+            <div class="global-empty">
+                🥚 Waiting for rare hatches...
+            </div>
+        </div>
+
+        <!-- CHAT FEED -->
+        <div
+            id="globalChatFeed"
+            class="global-feed hidden"
+        >
+            <div class="global-empty">
+                💬 No messages yet...
+            </div>
+        </div>
+
+        <!-- CHAT INPUT -->
+        <div
+            id="globalChatInputArea"
+            class="global-chat-input-area hidden"
+        >
+            <input
+                id="globalChatInput"
+                type="text"
+                maxlength="100"
+                placeholder="Say something..."
+                autocomplete="off"
+            >
+
+            <button
+                id="globalChatSend"
+                type="button"
+            >
+                ➤
+            </button>
+        </div>
+
+    </div>
+
 
 <div id="accountScreen" class="account-screen">
 
@@ -109,6 +177,10 @@
 <!-- ========================= -->
 
 <div id="gameScreen" class="game-layout hidden">
+
+    <div id="luckDisplay" class="luck-display">
+        🍀 Luck = <span id="luckValue">1.0x</span>
+    </div>
 
     <aside class="sidebar">
 
@@ -586,20 +658,7 @@
                         </strong>
                     </div>
 
-                    <div
-                        class="upgrade-info"
-                        id="autoRebirthTargetInfo"
-                    >
-                        Target:
-                        <strong id="autoRebirthTarget">
-                            Rebirth ×1
-                        </strong>
-                    </div>
-
-                    <div
-                        class="upgrade-info"
-                        id="autoRebirthCostInfo"
-                    >
+                    <div class="upgrade-info">
                         💎 Cost:
                         <strong id="autoRebirthCost">
                             100 gems
@@ -611,6 +670,50 @@
                         class="upgrade-buy-button"
                     >
                         ⬆️ PURCHASE
+                    </button>
+
+                </div>
+
+                <!-- ⚡ FASTER EGG HATCH -->
+                <div class="upgrade-item">
+
+                    <div class="upgrade-title">
+                        ⚡ Faster Egg Hatch
+                    </div>
+
+                    <div class="upgrade-info">
+                        Level:
+                        <strong id="fasterHatchLevel">
+                            0 / 5
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Current:
+                        <strong id="fasterHatchCurrent">
+                            2.00 seconds
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        Next:
+                        <strong id="fasterHatchNext">
+                            1.60 seconds
+                        </strong>
+                    </div>
+
+                    <div class="upgrade-info">
+                        💎 Cost:
+                        <strong id="fasterHatchCost">
+                            20 gems
+                        </strong>
+                    </div>
+
+                    <button
+                        id="fasterHatchUpgrade"
+                        class="upgrade-buy-button"
+                    >
+                        ⬆️ UPGRADE
                     </button>
 
                 </div>
@@ -1161,6 +1264,96 @@
 
 </div>
 
+<!-- ========================= -->
+<!-- HATCHING ANIMATION -->
+<!-- ========================= -->
+
+<div
+    id="hatchAnimationOverlay"
+    class="hatch-animation-overlay hidden"
+>
+
+    <div
+        id="hatchAnimationEggs"
+        class="hatch-animation-eggs"
+    ></div>
+
+</div>
+
+<!-- 👁️ EMBRYON SECRET EVENT -->
+<div id="embryonEventOverlay" class="embryon-event-overlay hidden">
+
+    <div class="embryon-event-screen">
+
+        <!-- Embryon -->
+        <div class="embryon-character">
+            <div class="embryon-character-emoji">
+                👁️
+            </div>
+
+            <div class="embryon-name">
+                Embryon
+            </div>
+        </div>
+
+        <!-- Dialogue -->
+        <div id="embryonDialogue" class="embryon-dialogue">
+            You have been chosen...
+        </div>
+
+        <!-- Dice -->
+        <div id="embryonDiceArea" class="embryon-dice-area">
+
+            <div id="embryonDice" class="embryon-dice">
+                ?
+            </div>
+
+            <div id="embryonDiceText" class="embryon-dice-text">
+                Embryon is rolling the dice...
+            </div>
+
+        </div>
+
+        <!-- Number selection -->
+        <div
+            id="embryonGuessArea"
+            class="embryon-guess-area hidden"
+        >
+
+            <div class="embryon-guess-title">
+                🎲 Pick a number between 1–20
+            </div>
+
+            <div
+                id="embryonNumberGrid"
+                class="embryon-number-grid"
+            ></div>
+
+        </div>
+
+        <!-- Result -->
+        <div
+            id="embryonResultArea"
+            class="embryon-result-area hidden"
+        >
+
+            <div id="embryonResultTitle"></div>
+
+            <div id="embryonResultPet"></div>
+
+            <button
+                id="embryonContinueButton"
+                class="embryon-continue-button"
+            >
+                CONTINUE
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <div id="autoRebirthPanel" class="auto-rebirth-panel hidden">
 
     <div class="auto-rebirth-card">
@@ -1267,6 +1460,18 @@
                 placeholder="Rebirths"
             >
 
+            <label>
+                🍀 Luck
+            </label>
+
+            <input
+                type="number"
+                id="adminLuck"
+                placeholder="Luck"
+                min="1"
+                step="0.1"
+            >
+
             <button id="adminSaveButton">
                 💾 SAVE CHANGES
             </button>
@@ -1306,14 +1511,126 @@
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="game.js?v=6"></script>
 
-<div id="hatchAnimationOverlay" class="hatch-animation-overlay hidden">
+<!-- 📦 MYSTERY BOX OPENING -->
+<div id="mysteryBoxOverlay" class="mystery-box-overlay hidden">
 
-    <div id="hatchAnimationEggs" class="hatch-animation-eggs"></div>
+    <div class="mystery-box-screen">
+
+        <div id="mysteryBoxTitle" class="mystery-box-title">
+            📦 MYSTERY BOX
+        </div>
+
+        <div id="mysteryBoxContainer" class="mystery-box-container">
+
+            <div id="mysteryBoxGlow" class="mystery-box-glow"></div>
+
+            <div id="mysteryBox" class="mystery-box">
+                📦
+            </div>
+
+        </div>
+
+        <div
+            id="mysteryBoxStatus"
+            class="mystery-box-status"
+        >
+            Opening...
+        </div>
+
+        <div
+            id="mysteryBoxReward"
+            class="mystery-box-reward hidden"
+        ></div>
+
+    </div>
+
+</div>
+
+<!-- 🗑️ PET DELETE CONFIRMATION -->
+<div id="deletePetOverlay" class="delete-pet-overlay hidden">
+
+    <div class="delete-pet-modal">
+
+        <div class="delete-pet-icon">
+            🗑️
+        </div>
+
+        <div class="delete-pet-title">
+            DELETE PET?
+        </div>
+
+        <div class="delete-pet-warning">
+            Are you sure you want to delete this pet?
+        </div>
+
+        <div id="deletePetPreview" class="delete-pet-preview">
+            👁️
+            <div class="delete-pet-name">
+                Pet
+            </div>
+        </div>
+
+        <div id="deletePetSecretWarning"
+             class="delete-pet-secret-warning hidden">
+            ⚠️ This is a SECRET pet!
+            <br>
+            This action cannot be undone.
+        </div>
+
+        <div class="delete-pet-quantity">
+
+            <div class="delete-pet-quantity-label">
+                HOW MANY TO DELETE?
+            </div>
+
+            <div class="delete-pet-quantity-controls">
+
+                <button
+                    type="button"
+                    id="deletePetMinus">
+                    −
+                </button>
+
+                <span id="deletePetQuantity">
+                    1
+                </span>
+
+                <button
+                    type="button"
+                    id="deletePetPlus">
+                    +
+                </button>
+
+            </div>
+
+            <div id="deletePetQuantityMax"
+                class="delete-pet-quantity-max">
+                Max: 1
+            </div>
+
+        </div>
+
+        <div class="delete-pet-buttons">
+
+            <button
+                id="cancelDeletePet"
+                class="delete-pet-cancel">
+                ❌ CANCEL
+            </button>
+
+            <button
+                id="confirmDeletePet"
+                class="delete-pet-confirm">
+                🗑️ DELETE
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
