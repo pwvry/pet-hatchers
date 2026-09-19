@@ -30,6 +30,7 @@ const GLOBAL_CHAT_COOLDOWN = 1500;
 let accountResetVersion = 0;
 let loadingOnlineSave = false;
 let autoRebirthPurchased = false;
+let adminResetInProgress = false;
 let autoRebirthEnabled = false;
 let autoRebirthTarget = 1;
 
@@ -631,7 +632,7 @@ let darkMatterCrafts = 0;
 let superiorCrafts = 0;
 
 let clickBoostCost = 250000;
-let mysteryBoxCost = 1000000;
+let mysteryBoxCost = 1000000000;
 let luckyBoostCost = 500000;
 let shopClickMultiplierCost = 1000000;
 
@@ -2404,6 +2405,11 @@ async function saveOnline(){
         return;
     }
 
+    // 🚫 Don't save while an admin reset is happening
+    if(adminResetInProgress){
+        return;
+    }
+
     if(accountResetVersion !== 0){
         return;
     }
@@ -2556,11 +2562,21 @@ async function liveSync(){
 
         rebirths = d.rebirths ?? rebirths;
 
+        rebirthCost = Number(d.rebirthCost ?? 100);
+
+        if(Number(rebirths) === 0){
+            rebirthCost = 100;
+        }
+
         if(d.rebirths === 0){
             rebirthCost = 100;
             clickPower = 1;
         }else{
-            rebirthCost = d.rebirthCost ?? rebirthCost;
+            rebirthCost = Number(d.rebirthCost ?? 100);
+
+            if(rebirths === 0){
+                rebirthCost = 100;
+            }
             clickPower = d.clickPower ?? clickPower;
         }
         rebirthUpgradeLevel =
@@ -2728,16 +2744,45 @@ async function load(){
         if(accountResetVersion > 0){
 
             console.warn(
-                "Account has a pending reset. Save was NOT deleted."
+                "🔄 Account reset detected. Loading reset data..."
             );
 
-            loadingOnlineSave = false;
-            return;
+            // The server has already written the reset state
+            // into game_data. Load that data normally.
+
+            if(data.game_data){
+
+                raw =
+                    JSON.stringify(
+                        data.game_data
+                    );
+
+                localStorage.setItem(
+                    SAVE_KEY,
+                    raw
+                );
+
+                console.log(
+                    "🔄 RESET DATA LOADED:",
+                    data.game_data
+                );
+
+                console.log(
+                    "🔄 RESET REBIRTH CHECK:",
+                    {
+                        rebirths: data.game_data?.rebirths,
+                        rebirthCost: data.game_data?.rebirthCost
+                    }
+                );
+
+            }
 
         }else{
 
             raw =
-                JSON.stringify(data.game_data);
+                JSON.stringify(
+                    data.game_data
+                );
 
             localStorage.setItem(
                 SAVE_KEY,
@@ -2776,7 +2821,21 @@ async function load(){
         playTime=d.playTime ?? playTime;
         clickPower=d.clickPower ?? clickPower;
         rebirths=d.rebirths ?? rebirths;
-        rebirthCost=d.rebirthCost ?? rebirthCost;
+        rebirthCost = Number(d.rebirthCost);
+
+        console.log(
+            "🔍 REBIRTH COST FROM DATABASE:",
+            d.rebirthCost
+        );
+
+        if(!Number.isFinite(rebirthCost)){
+            rebirthCost = 100;
+        }
+
+        console.log(
+            "💰 REBIRTH COST AFTER LOAD:",
+            rebirthCost
+        );
 
         rebirthUpgradeLevel =
             Math.min(
@@ -8335,8 +8394,12 @@ document
         }
 
         if(rebirthsValue !== ""){
-            changes.rebirths =
-                Number(rebirthsValue);
+            changes.rebirths = Number(rebirthsValue);
+
+            if(Number(rebirthsValue) === 0){
+                changes.rebirthCost = 100;
+                changes.clickPower = 1;
+            }
         }
 
         if(luckValue !== ""){
@@ -8470,18 +8533,29 @@ document
             return;
         }
 
+        // 🔒 BLOCK ALL AUTOSAVES DURING ADMIN RESET
+        adminResetInProgress = true;
+
+        if(onlineSaveTimer){
+            clearTimeout(onlineSaveTimer);
+            onlineSaveTimer = null;
+        }
+
+        // Wait for an already-running save to finish
+        while(onlineSaveInProgress){
+            await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
         let error = null;
 
-
         /* =========================
-        RESET ALL PLAYERS
+           RESET ALL PLAYERS
         ========================= */
 
         if(adminTargetUserId === "ALL"){
 
             if(resetType === "upgrades_shop"){
 
-                // Reset upgrades first
                 let result =
                     await supabaseClient.rpc(
                         "admin_reset_all_players",
@@ -8492,7 +8566,6 @@ document
 
                 error = result.error;
 
-                // Only reset shop if upgrades succeeded
                 if(!error){
 
                     result =
@@ -8512,50 +8585,40 @@ document
                     await supabaseClient.rpc(
                         "admin_reset_all_players",
                         {
-                            reset_type:
-                                resetType
+                            reset_type: resetType
                         }
                     );
 
                 error = result.error;
             }
 
-
         /* =========================
-        RESET ONE PLAYER
+           RESET ONE PLAYER
         ========================= */
 
         }else{
 
             if(resetType === "upgrades_shop"){
 
-                // Reset upgrades first
                 let result =
                     await supabaseClient.rpc(
                         "admin_reset_player",
                         {
-                            target_user_id:
-                                adminTargetUserId,
-
-                            reset_type:
-                                "upgrades"
+                            target_user_id: adminTargetUserId,
+                            reset_type: "upgrades"
                         }
                     );
 
                 error = result.error;
 
-                // Only reset shop if upgrades succeeded
                 if(!error){
 
                     result =
                         await supabaseClient.rpc(
                             "admin_reset_player",
                             {
-                                target_user_id:
-                                    adminTargetUserId,
-
-                                reset_type:
-                                    "shop"
+                                target_user_id: adminTargetUserId,
+                                reset_type: "shop"
                             }
                         );
 
@@ -8568,11 +8631,8 @@ document
                     await supabaseClient.rpc(
                         "admin_reset_player",
                         {
-                            target_user_id:
-                                adminTargetUserId,
-
-                            reset_type:
-                                resetType
+                            target_user_id: adminTargetUserId,
+                            reset_type: resetType
                         }
                     );
 
@@ -8580,12 +8640,18 @@ document
             }
         }
 
+        /* =========================
+           RESET FAILED
+        ========================= */
+
         if(error){
 
             console.error(
                 "Admin reset error:",
                 error
             );
+
+            adminResetInProgress = false;
 
             alert(
                 "Reset failed: " +
@@ -8595,11 +8661,10 @@ document
             return;
         }
 
-        /*
-         * If we reset the current player,
-         * reload their state from Supabase
-         * so the change happens immediately.
-         */
+        /* =========================
+           RELOAD RESET DATA
+        ========================= */
+
         if(
             adminTargetUserId === "ALL" ||
             adminTargetUserId === currentUser.id
@@ -8607,13 +8672,49 @@ document
 
             await load();
 
+            console.log(
+                "🔥 ADMIN RESET LOAD RESULT:",
+                {
+                    rebirths,
+                    rebirthCost,
+                    clickPower
+                }
+            );
+
+            /*
+             * Force the rebirth reset locally.
+             * The database should already contain these values.
+             */
+            if(resetType === "rebirths"){
+
+                rebirths = 0;
+                rebirthCost = 100;
+                clickPower = 1;
+
+                console.log(
+                    "🔥 REBIRTH RESET APPLIED:",
+                    {
+                        rebirths,
+                        rebirthCost,
+                        clickPower
+                    }
+                );
+
+                // Allow this one corrected reset save
+                adminResetInProgress = false;
+
+                await saveOnline();
+            }
+
             updateUI();
             renderInventory();
             renderIndex();
             renderEggs();
             updateRebirthButtons();
-
         }
+
+        // 🔓 ALLOW SAVING AGAIN
+        adminResetInProgress = false;
 
         alert(
             adminTargetUserId === "ALL"
@@ -8754,7 +8855,7 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
     checkAchievements();
 
     mysteryBoxCost =
-        Math.floor(mysteryBoxCost * 2.5);
+        Math.floor(mysteryBoxCost * 1.1);
 
 
     const mysteryRoll =
