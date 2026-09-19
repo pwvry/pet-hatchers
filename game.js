@@ -2332,131 +2332,204 @@ function getGameData(){
 function save(){
 
     if(loadingOnlineSave){
-        console.log("⏳ SAVE BLOCKED: Online save is still loading.");
+
+        console.log(
+            "⏳ SAVE BLOCKED: Game is still loading."
+        );
+
         return;
     }
+
 
     const gameData =
         getGameData();
 
-    /*
-     * ALWAYS save locally immediately.
-     */
+
+    // 💾 ALWAYS save locally
     localStorage.setItem(
         SAVE_KEY,
         JSON.stringify(gameData)
     );
 
 
-    /*
-     * ONLINE SAVE
-     *
-     * Wait 5 seconds before uploading.
-     *
-     * If the player clicks multiple times during
-     * those 5 seconds, they all get combined into
-     * ONE Supabase upload.
-     */
+    // 🌎 SAVE ONLINE IMMEDIATELY
     if(currentUser){
 
-        if(onlineSaveTimer){
-            clearTimeout(onlineSaveTimer);
-        }
-
-        onlineSaveTimer =
-        setTimeout(
-            saveOnline,
-            1000
-        );
+        saveOnline(gameData);
     }
 
 
-    /*
-     * LEADERBOARD SAVE
-     *
-     * Don't upload leaderboard data on every click.
-     * Wait 60 seconds instead.
-     */
-    if(currentUser){
+    // 🏆 Leaderboard stays separate
+    if(
+        currentUser &&
+        !leaderboardSaveTimer
+    ){
 
-        if(!leaderboardSaveTimer){
+        leaderboardSaveTimer =
+            setTimeout(
+                async () => {
 
-            leaderboardSaveTimer =
-                setTimeout(
-                    async () => {
+                    leaderboardSaveTimer = null;
 
-                        leaderboardSaveTimer = null;
+                    await saveLeaderboardStats();
 
-                        await saveLeaderboardStats();
-
-                    },
-                    60000
-                );
-        }
+                },
+                60000
+            );
     }
+
 }
 
 
-async function saveOnline(){
-
-    onlineSaveTimer = null;
+async function saveOnline(gameData = null){
 
     if(!currentUser){
-        return;
+
+        console.log(
+            "❌ SAVE: No logged-in user."
+        );
+
+        return false;
     }
 
-    // 🚫 Don't save while an admin reset is happening
+
     if(adminResetInProgress){
-        return;
+
+        console.log(
+            "🚫 SAVE BLOCKED: Admin reset."
+        );
+
+        return false;
     }
 
-    if(accountResetVersion !== 0){
-        return;
-    }
 
-    if(accountResetVersion !== 0){
-        return;
-    }
+    const dataToSave =
+        gameData || getGameData();
 
-    const gameData =
-        getGameData();
 
     onlineSaveInProgress = true;
 
+
     try{
 
+        console.log(
+            "💾 SAVING TO DATABASE:",
+            {
+                user: currentUser.id,
+                coins: dataToSave.coins,
+                gems: dataToSave.gems,
+                rebirths: dataToSave.rebirths,
+                luck: dataToSave.luckLevel
+            }
+        );
+
+
+        /*
+         * FIRST:
+         * Try updating the existing player.
+         */
+
         const {
-            error
+            data: updatedRows,
+            error: updateError
         } = await supabaseClient
             .from("player_data")
-            .upsert({
-                user_id: currentUser.id,
-                game_data: gameData,
+            .update({
+                game_data: dataToSave,
                 reset_version: 0,
-                updated_at: new Date().toISOString()
-            });
+                updated_at:
+                    new Date().toISOString()
+            })
+            .eq(
+                "user_id",
+                currentUser.id
+            )
+            .select("user_id");
 
-        if(error){
+
+        if(updateError){
 
             console.error(
-                "Online save error:",
-                error
+                "❌ PLAYER UPDATE ERROR:",
+                updateError
             );
 
+            return false;
         }
+
+
+        /*
+         * If a row existed, we're finished.
+         */
+
+        if(
+            updatedRows &&
+            updatedRows.length > 0
+        ){
+
+            console.log(
+                "✅ PLAYER UPDATED SUCCESSFULLY"
+            );
+
+            return true;
+        }
+
+
+        /*
+         * No player row exists yet.
+         * Create it.
+         */
+
+        const {
+            error: insertError
+        } = await supabaseClient
+            .from("player_data")
+            .insert({
+                user_id: currentUser.id,
+
+                game_data: dataToSave,
+
+                reset_version: 0,
+
+                updated_at:
+                    new Date().toISOString()
+            });
+
+
+        if(insertError){
+
+            console.error(
+                "❌ PLAYER INSERT ERROR:",
+                insertError
+            );
+
+            return false;
+        }
+
+
+        console.log(
+            "✅ PLAYER CREATED SUCCESSFULLY"
+        );
+
+        return true;
+
 
     }catch(error){
 
         console.error(
-            "Online save exception:",
+            "❌ SAVE EXCEPTION:",
             error
         );
+
+        return false;
+
 
     }finally{
 
         onlineSaveInProgress = false;
 
     }
+
 }
 
 let liveSyncInterval = null;
