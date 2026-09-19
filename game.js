@@ -2332,7 +2332,7 @@ function getGameData(){
 function save(){
 
     if(loadingOnlineSave){
-        console.warn("SAVE BLOCKED: Online save is still loading.");
+        console.log("⏳ SAVE BLOCKED: Online save is still loading.");
         return;
     }
 
@@ -2407,6 +2407,10 @@ async function saveOnline(){
 
     // 🚫 Don't save while an admin reset is happening
     if(adminResetInProgress){
+        return;
+    }
+
+    if(accountResetVersion !== 0){
         return;
     }
 
@@ -3015,7 +3019,28 @@ async function load(){
         );
     }
 
-    loadingOnlineSave = false;
+loadingOnlineSave = false;
+
+// 🔥 Refresh the game UI with the values just loaded from Supabase
+if(typeof updateUI === "function"){
+    updateUI();
+}
+
+if(typeof renderEggs === "function"){
+    renderEggs();
+}
+
+if(typeof updateRebirthButtons === "function"){
+    updateRebirthButtons();
+}
+
+console.log("🌎 FINAL ONLINE VALUES:", {
+    user: currentUser?.id,
+    luckLevel,
+    coins,
+    gems,
+    rebirths
+});
     
 }
 
@@ -8542,6 +8567,19 @@ document
             return;
         }
 
+        adminResetInProgress = true;
+
+        if(onlineSaveTimer){
+            clearTimeout(onlineSaveTimer);
+            onlineSaveTimer = null;
+        }
+
+        while(onlineSaveInProgress){
+            await new Promise(resolve =>
+                setTimeout(resolve, 50)
+            );
+        }
+
         const changes = {};
 
         const coinsValue =
@@ -8564,24 +8602,32 @@ document
                 .getElementById("adminLuck")
                 .value;
 
+
         if(coinsValue !== ""){
             changes.coins =
                 Number(coinsValue);
         }
+
 
         if(gemsValue !== ""){
             changes.gems =
                 Number(gemsValue);
         }
 
+
         if(rebirthsValue !== ""){
-            changes.rebirths = Number(rebirthsValue);
+
+            changes.rebirths =
+                Number(rebirthsValue);
 
             if(Number(rebirthsValue) === 0){
+
                 changes.rebirthCost = 100;
                 changes.clickPower = 1;
+
             }
         }
+
 
         if(luckValue !== ""){
 
@@ -8590,25 +8636,33 @@ document
                     1,
                     Number(luckValue)
                 );
+
         }
 
+
         if(Object.keys(changes).length === 0){
-            alert("Enter at least one value.");
+
+            alert(
+                "Enter at least one value."
+            );
+
+            adminResetInProgress = false;
             return;
         }
 
-        let error;
+
+        let error = null;
+
 
         if(adminTargetUserId === "ALL"){
 
             const {
                 error: updateError
-            } = await supabaseClient
-                .rpc(
+            } =
+                await supabaseClient.rpc(
                     "admin_update_all_players",
                     {
-                        changes:
-                            changes
+                        changes: changes
                     }
                 );
 
@@ -8618,34 +8672,42 @@ document
 
             const {
                 error: updateError
-            } = await supabaseClient
-                .rpc(
+            } =
+                await supabaseClient.rpc(
                     "admin_update_player",
                     {
                         target_user_id:
                             adminTargetUserId,
 
-                        changes:
-                            changes
+                        changes: changes
                     }
                 );
 
             error = updateError;
         }
 
+
         if(error){
 
-            console.error("ADMIN ERROR MESSAGE:", error?.message);
-            console.error("ADMIN ERROR DETAILS:", error?.details);
-            console.error("ADMIN ERROR HINT:", error?.hint);
-            console.error("ADMIN ERROR CODE:", error?.code);
-
-            alert(
-                "Admin update failed."
+            console.error(
+                "ADMIN ERROR:",
+                error
             );
 
+            alert(
+                "Admin update failed: " +
+                error.message
+            );
+
+            adminResetInProgress = false;
             return;
         }
+
+
+        /*
+         * If changing the current player,
+         * reload the authoritative database state.
+         */
 
         if(
             adminTargetUserId === "ALL" ||
@@ -8656,21 +8718,45 @@ document
 
             updateUI();
 
-            // Make sure the Luck display updates immediately
-            const luckValueEl =
-                document.getElementById("luckValue");
-
-            if(luckValueEl){
-
-                luckValueEl.textContent =
-                    Number(luckLevel).toFixed(1) + "x";
-            }
-
             renderInventory();
             renderIndex();
             renderEggs();
             updateRebirthButtons();
+
+
+            const luckValueEl =
+                document.getElementById(
+                    "luckValue"
+                );
+
+            if(luckValueEl){
+
+                luckValueEl.textContent =
+                    Number(luckLevel).toFixed(1) +
+                    "x";
+
+            }
+
+
+            /*
+             * IMPORTANT:
+             * Save the freshly loaded state so the
+             * local/online state matches the admin change.
+             */
+
+            if(
+                adminTargetUserId === currentUser.id
+            ){
+
+                await saveOnline();
+
+            }
+
         }
+
+
+        adminResetInProgress = false;
+
 
         alert(
             adminTargetUsername +
