@@ -2598,6 +2598,11 @@ async function liveSync(){
         hatchAmountLevel =
             d.hatchAmountLevel ?? hatchAmountLevel;
 
+        console.log("🔥 LOADING LUCK FROM SAVE:", {
+            user: currentUser?.id,
+            databaseLuck: d.luckLevel
+        });
+
         luckLevel =
             d.luckLevel ?? luckLevel;
 
@@ -2716,6 +2721,11 @@ function startLiveSync(){
 }
 
 async function load(){
+
+    console.log("🔥 LOAD START:", {
+        currentUser: currentUser?.id,
+        hasLocalSave: !!localStorage.getItem(SAVE_KEY)
+    });
 
     loadingOnlineSave = true;
 
@@ -8413,21 +8423,37 @@ document.getElementById("toggleAutoRebirthButton").addEventListener(
     toggleAutoRebirth
 );
 
+// =========================================================
+// 👑 FULL ADMIN PLAYER CONTROL CENTRE
+// =========================================================
+
+adminEditingData = null;
+
+// =========================================================
+// LOAD PLAYER LIST
+// =========================================================
+
 async function loadAdminPlayers(){
 
     const playerSelect =
         document.getElementById("adminPlayerSearch");
 
+    if(!playerSelect){
+        console.error("❌ adminPlayerSearch not found");
+        return;
+    }
+
     const {
         data,
         error
-    } = await supabaseClient
-        .rpc("admin_get_players");
+    } = await supabaseClient.rpc(
+        "admin_get_players"
+    );
 
     if(error){
 
         console.error(
-            "Admin player list error:",
+            "❌ Admin player list error:",
             error
         );
 
@@ -8437,10 +8463,6 @@ async function loadAdminPlayers(){
     playerSelect.innerHTML = `
         <option value="">
             SELECT PLAYER
-        </option>
-
-        <option value="ALL">
-            🌎 ALL PLAYERS
         </option>
     `;
 
@@ -8454,9 +8476,12 @@ async function loadAdminPlayers(){
             document.createElement("option");
 
         option.value =
-            player.username;
+            player.user_id;
 
         option.textContent =
+            player.username;
+
+        option.dataset.username =
             player.username;
 
         playerSelect.appendChild(option);
@@ -8465,542 +8490,1317 @@ async function loadAdminPlayers(){
 
 }
 
-document
-    .getElementById("adminSearchButton")
-    .addEventListener("click", async () => {
 
-        const selectedPlayer =
-            document
-                .getElementById("adminPlayerSearch")
-                .value;
+// =========================================================
+// CREATE NUMBER FIELD
+// =========================================================
 
-        const result =
-            document
-                .getElementById("adminPlayerResult");
+function adminNumberField(
+    label,
+    key,
+    value,
+    container
+){
 
-        const controls =
-            document
-                .getElementById("adminControls");
+    const wrapper =
+        document.createElement("label");
 
-        result.textContent = "";
-        controls.classList.add("hidden");
+    wrapper.innerHTML = `
+        ${label}
 
-        if(!selectedPlayer){
+        <input
+            type="number"
+            data-admin-key="${key}"
+            value="${Number(value) || 0}"
+        >
+    `;
 
-            result.textContent =
-                "Select a player.";
+    container.appendChild(wrapper);
 
-            return;
+}
+
+
+// =========================================================
+// CREATE CHECKBOX
+// =========================================================
+
+function adminCheckbox(
+    label,
+    key,
+    checked,
+    container
+){
+
+    const wrapper =
+        document.createElement("label");
+
+    wrapper.className =
+        "admin-check-item";
+
+    wrapper.innerHTML = `
+        <input
+            type="checkbox"
+            data-admin-check="${key}"
+            ${checked ? "checked" : ""}
+        >
+
+        <span>
+            ${escapeGlobalText(String(label))}
+        </span>
+    `;
+
+    container.appendChild(wrapper);
+
+}
+
+
+// =========================================================
+// RENDER SELECTED PLAYER
+// =========================================================
+
+function renderAdminPlayer(data){
+
+    adminEditingData =
+        structuredClone(data || {});
+
+    const d =
+        adminEditingData;
+
+
+    // =====================================================
+    // BASIC VALUES
+    // =====================================================
+
+    document
+        .getElementById("adminCoins")
+        .value =
+        Number(d.coins ?? 0);
+
+    document
+        .getElementById("adminGems")
+        .value =
+        Number(d.gems ?? 0);
+
+    document
+        .getElementById("adminRebirths")
+        .value =
+        Number(d.rebirths ?? 0);
+
+    document
+        .getElementById("adminClickPower")
+        .value =
+        Number(d.clickPower ?? 1);
+
+    document
+        .getElementById("adminLuck")
+        .value =
+        Number(d.luckLevel ?? 1);
+
+    document
+        .getElementById("adminRebirthCost")
+        .value =
+        Number(d.rebirthCost ?? 100);
+
+
+    // =====================================================
+    // UPGRADES
+    // =====================================================
+
+    const upgrades =
+        document.getElementById(
+            "adminUpgradeFields"
+        );
+
+    upgrades.innerHTML = "";
+
+    adminNumberField(
+        "⚡ Click Speed",
+        "clickSpeedLevel",
+        d.clickSpeedLevel,
+        upgrades
+    );
+
+    adminNumberField(
+        "⚡ Multiplier",
+        "multiplierLevel",
+        d.multiplierLevel,
+        upgrades
+    );
+
+    adminNumberField(
+        "🥚 Hatch Amount",
+        "hatchAmountLevel",
+        d.hatchAmountLevel,
+        upgrades
+    );
+
+    adminNumberField(
+        "🔄 Rebirth Upgrade",
+        "rebirthUpgradeLevel",
+        d.rebirthUpgradeLevel,
+        upgrades
+    );
+
+    adminNumberField(
+        "🐾 Equip Upgrade",
+        "equipUpgradeLevel",
+        d.equipUpgradeLevel,
+        upgrades
+    );
+
+    adminNumberField(
+        "⚡ Faster Hatch",
+        "fasterHatchLevel",
+        d.fasterHatchLevel,
+        upgrades
+    );
+
+
+    // =====================================================
+    // BOOSTS
+    // =====================================================
+
+    const boosts =
+        document.getElementById(
+            "adminBoostFields"
+        );
+
+    boosts.innerHTML = "";
+
+    adminNumberField(
+        "🖱️ Click Boost Cost",
+        "clickBoostCost",
+        d.clickBoostCost,
+        boosts
+    );
+
+    adminCheckbox(
+        "Click Boost Active",
+        "clickBoostActive",
+        d.clickBoostActive,
+        boosts
+    );
+
+    adminNumberField(
+        "🍀 Lucky Boost Cost",
+        "luckyBoostCost",
+        d.luckyBoostCost,
+        boosts
+    );
+
+    adminCheckbox(
+        "Lucky Boost Active",
+        "luckyBoostActive",
+        d.luckyBoostActive,
+        boosts
+    );
+
+    adminNumberField(
+        "📦 Mystery Box Cost",
+        "mysteryBoxCost",
+        d.mysteryBoxCost,
+        boosts
+    );
+
+    adminNumberField(
+        "🖱️ Shop Click Multiplier",
+        "shopClickMultiplier",
+        d.shopClickMultiplier,
+        boosts
+    );
+
+    adminNumberField(
+        "💰 Shop Multiplier Cost",
+        "shopClickMultiplierCost",
+        d.shopClickMultiplierCost,
+        boosts
+    );
+
+
+    // =====================================================
+    // AUTO REBIRTH
+    // =====================================================
+
+    const auto =
+        document.getElementById(
+            "adminAutoRebirthFields"
+        );
+
+    auto.innerHTML = "";
+
+    adminCheckbox(
+        "Purchased",
+        "autoRebirthPurchased",
+        d.autoRebirthPurchased,
+        auto
+    );
+
+    adminCheckbox(
+        "Enabled",
+        "autoRebirthEnabled",
+        d.autoRebirthEnabled,
+        auto
+    );
+
+    adminNumberField(
+        "Target",
+        "autoRebirthTarget",
+        d.autoRebirthTarget,
+        auto
+    );
+
+
+    // =====================================================
+    // PLAYER STATS
+    // =====================================================
+
+    const stats =
+        document.getElementById(
+            "adminStatFields"
+        );
+
+    stats.innerHTML = "";
+
+    adminNumberField(
+        "⏱️ Play Time",
+        "playTime",
+        d.playTime,
+        stats
+    );
+
+    adminNumberField(
+        "🥚 Total Hatches",
+        "totalHatches",
+        d.totalHatches,
+        stats
+    );
+
+    adminNumberField(
+        "🔥 Hatch Streak",
+        "hatchStreak",
+        d.hatchStreak,
+        stats
+    );
+
+    adminNumberField(
+        "🏆 Best Streak",
+        "bestHatchStreak",
+        d.bestHatchStreak,
+        stats
+    );
+
+    adminNumberField(
+        "📦 Mystery Boxes",
+        "mysteryBoxesOpened",
+        d.mysteryBoxesOpened,
+        stats
+    );
+
+    adminNumberField(
+        "🛒 Shop Purchases",
+        "shopPurchases",
+        d.shopPurchases,
+        stats
+    );
+
+
+    // =====================================================
+    // EGGS
+    // =====================================================
+
+    const eggsContainer =
+        document.getElementById(
+            "adminEggFields"
+        );
+
+    eggsContainer.innerHTML = "";
+
+    Object.keys(eggs).forEach(eggName => {
+
+        adminCheckbox(
+            eggName,
+            `egg:${eggName}`,
+            Array.isArray(d.unlockedEggs) &&
+            d.unlockedEggs.includes(eggName),
+            eggsContainer
+        );
+
+    });
+
+    // =====================================================
+    // INVENTORY
+    // =====================================================
+
+    const inventoryContainer =
+        document.getElementById(
+            "adminInventoryFields"
+        );
+
+    inventoryContainer.innerHTML = "";
+
+    const inventory =
+        d.inventory || {};
+
+    Object.entries(inventory)
+        .sort((a,b) =>
+            a[0].localeCompare(b[0])
+        )
+        .forEach(([petName, amount]) => {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "admin-list-row";
+
+            row.innerHTML = `
+                <span>
+                    ${emojiForPet(petName)}
+                    ${escapeGlobalText(petName)}
+                </span>
+
+                <input
+                    type="number"
+                    min="0"
+                    value="${Number(amount) || 0}"
+                    data-inventory-pet="${escapeGlobalText(petName)}"
+                >
+            `;
+
+            inventoryContainer.appendChild(row);
+
+        });
+
+
+    // =====================================================
+    // PET LEVELS
+    // =====================================================
+
+    const petLevelContainer =
+        document.getElementById(
+            "adminPetLevelFields"
+        );
+
+    petLevelContainer.innerHTML = "";
+
+    const petLevels =
+        d.petLevels || {};
+
+    Object.entries(petLevels)
+        .sort((a,b) =>
+            a[0].localeCompare(b[0])
+        )
+        .forEach(([petName, levelData]) => {
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "admin-list-row admin-pet-level-row";
+
+            row.innerHTML = `
+                <span>
+                    ${emojiForPet(petName)}
+                    ${escapeGlobalText(petName)}
+                </span>
+
+                <input
+                    type="number"
+                    min="1"
+                    value="${Number(levelData?.level) || 1}"
+                    data-pet-level="${escapeGlobalText(petName)}"
+                >
+
+                <input
+                    type="number"
+                    min="0"
+                    value="${Number(levelData?.exp) || 0}"
+                    data-pet-exp="${escapeGlobalText(petName)}"
+                >
+            `;
+
+            petLevelContainer.appendChild(row);
+
+        });
+
+
+    // =====================================================
+    // CLICK SKINS
+    // =====================================================
+
+    const skinContainer =
+        document.getElementById(
+            "adminSkinFields"
+        );
+
+    const equippedSkin =
+        document.getElementById(
+            "adminEquippedSkin"
+        );
+
+    skinContainer.innerHTML = "";
+    equippedSkin.innerHTML = "";
+
+    Object.keys(clickSkins).forEach(skin => {
+
+        adminCheckbox(
+            skin,
+            `skin:${skin}`,
+            Array.isArray(d.ownedClickSkins) &&
+            d.ownedClickSkins.includes(skin),
+            skinContainer
+        );
+
+        const option =
+            document.createElement("option");
+
+        option.value = skin;
+        option.textContent = skin;
+
+        if(d.equippedClickSkin === skin){
+            option.selected = true;
         }
 
-        if(selectedPlayer === "ALL"){
+        equippedSkin.appendChild(option);
 
-            adminTargetUserId = "ALL";
-            adminTargetUsername = "ALL PLAYERS";
+    });
 
-            document
-                .getElementById("adminTargetName")
-                .textContent =
-                "Editing: ALL PLAYERS";
 
-            result.textContent =
-                "All players selected.";
+    // =====================================================
+    // EQUIPPED PETS
+    // =====================================================
 
-            controls.classList.remove("hidden");
+    const equippedContainer =
+        document.getElementById(
+            "adminEquippedPets"
+        );
 
-            return;
-        }
+    equippedContainer.innerHTML = "";
 
-        const {
-            data,
-            error
-        } = await supabaseClient
-            .from("usernames")
-            .select("username, user_id")
-            .eq("username", selectedPlayer)
-            .maybeSingle();
+    const equippedPets =
+        Array.isArray(d.equippedPets)
+            ? d.equippedPets
+            : [];
 
-        if(error){
+    const maxSlots =
+        Math.max(
+            equippedPets.length,
+            typeof getMaxEquipped === "function"
+                ? getMaxEquipped()
+                : equippedPets.length
+        );
 
-            console.error(
-                "Admin player error:",
-                error
-            );
+    for(let index = 0; index < maxSlots; index++){
 
-            result.textContent =
-                "Player lookup failed.";
+        const petName =
+            equippedPets[index] || "";
 
-            return;
-        }
+        const row =
+            document.createElement("div");
 
-        if(!data){
+        row.className =
+            "admin-list-row";
 
-            result.textContent =
-                "Player not found.";
+        row.innerHTML = `
+            <span>
+                Slot ${index + 1}
+            </span>
 
-            return;
-        }
+            <select
+                data-equipped-pet="${index}"
+            >
+                <option value="">
+                    NONE
+                </option>
+            </select>
+        `;
 
-        adminTargetUserId =
-            data.user_id;
+        const select =
+            row.querySelector("select");
 
-        adminTargetUsername =
-            data.username;
+        Object.keys(inventory)
+            .forEach(pet => {
 
-        document
-            .getElementById("adminTargetName")
-            .textContent =
-            "Editing: " + data.username;
+                const option =
+                    document.createElement("option");
+
+                option.value = pet;
+                option.textContent = pet;
+
+                if(pet === petName){
+                    option.selected = true;
+                }
+
+                select.appendChild(option);
+
+            });
+
+        equippedContainer.appendChild(row);
+
+    }
+
+
+    // =====================================================
+    // PLAYER SETTINGS
+    // =====================================================
+
+    const misc =
+        document.getElementById(
+            "adminMiscFields"
+        );
+
+    misc.innerHTML = "";
+
+    adminNumberField(
+        "🥚 Shop Purchases",
+        "shopPurchases",
+        d.shopPurchases,
+        misc
+    );
+
+    adminNumberField(
+        "📦 Mystery Boxes Opened",
+        "mysteryBoxesOpened",
+        d.mysteryBoxesOpened,
+        misc
+    );
+
+
+    // =====================================================
+    // RAW JSON
+    // =====================================================
+
+    document
+        .getElementById(
+            "adminRawGameData"
+        )
+        .value =
+        JSON.stringify(
+            d,
+            null,
+            4
+        );
+
+}
+
+
+// =========================================================
+// LOAD SELECTED PLAYER
+// =========================================================
+
+async function loadAdminSelectedPlayer(){
+
+    const select =
+        document.getElementById(
+            "adminPlayerSearch"
+        );
+
+    const result =
+        document.getElementById(
+            "adminPlayerResult"
+        );
+
+    const controls =
+        document.getElementById(
+            "adminControls"
+        );
+
+    const userId =
+        select.value;
+
+
+    if(!userId){
 
         result.textContent =
-            "Player selected.";
+            "Select a player.";
 
-        controls.classList.remove("hidden");
+        controls.classList.add(
+            "hidden"
+        );
 
-    });
+        adminTargetUserId = null;
+        adminTargetUsername = null;
+
+        return;
+
+    }
+
+
+    result.textContent =
+        "⏳ Loading player...";
+
+    controls.classList.add(
+        "hidden"
+    );
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient.rpc(
+        "admin_get_player_data",
+        {
+            target_user_id: userId
+        }
+    );
+
+
+    if(error){
+
+        console.error(
+            "❌ Admin player load error:",
+            error
+        );
+
+        result.textContent =
+            "❌ Failed to load player.";
+
+        return;
+
+    }
+
+
+    if(!data){
+
+        result.textContent =
+            "❌ Player data not found.";
+
+        return;
+
+    }
+
+
+    const username =
+        select.options[
+            select.selectedIndex
+        ]?.dataset.username ||
+        "Player";
+
+
+    adminTargetUserId =
+        userId;
+
+    adminTargetUsername =
+        username;
+
+
+    document
+        .getElementById(
+            "adminTargetName"
+        )
+        .textContent =
+        "Editing: " + username;
+
+
+    renderAdminPlayer(
+        data.game_data || {}
+    );
+
+
+    controls.classList.remove(
+        "hidden"
+    );
+
+    result.textContent =
+        "✅ Player loaded.";
+
+}
+
+
+// =========================================================
+// COLLECT ADMIN EDITS
+// =========================================================
+
+function collectAdminPlayerData(){
+
+    const d =
+        structuredClone(
+            adminEditingData || {}
+        );
+
+
+    // =====================================================
+    // BASIC
+    // =====================================================
+
+    d.coins =
+        Number(
+            document.getElementById(
+                "adminCoins"
+            ).value
+        ) || 0;
+
+    d.gems =
+        Number(
+            document.getElementById(
+                "adminGems"
+            ).value
+        ) || 0;
+
+    d.rebirths =
+        Number(
+            document.getElementById(
+                "adminRebirths"
+            ).value
+        ) || 0;
+
+    d.clickPower =
+        Number(
+            document.getElementById(
+                "adminClickPower"
+            ).value
+        ) || 1;
+
+    d.luckLevel =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "adminLuck"
+                ).value
+            ) || 1
+        );
+
+    d.rebirthCost =
+        Number(
+            document.getElementById(
+                "adminRebirthCost"
+            ).value
+        ) || 100;
+
+
+    // =====================================================
+    // DYNAMIC NUMBER FIELDS
+    // =====================================================
+
+    document
+        .querySelectorAll(
+            "[data-admin-key]"
+        )
+        .forEach(input => {
+
+            d[input.dataset.adminKey] =
+                Number(input.value) || 0;
+
+        });
+
+
+    // =====================================================
+    // CHECKBOXES
+    // =====================================================
+
+    document
+        .querySelectorAll(
+            "[data-admin-check]"
+        )
+        .forEach(input => {
+
+            const key =
+                input.dataset.adminCheck;
+
+
+            if(key.startsWith("egg:")){
+
+                const eggName =
+                    key.substring(4);
+
+                if(!Array.isArray(
+                    d.unlockedEggs
+                )){
+                    d.unlockedEggs = [];
+                }
+
+                d.unlockedEggs =
+                    d.unlockedEggs.filter(
+                        egg => egg !== eggName
+                    );
+
+                if(input.checked){
+
+                    d.unlockedEggs.push(
+                        eggName
+                    );
+
+                }
+
+            }
+
+            else if(key.startsWith(
+                "skin:"
+            )){
+
+                const skin =
+                    key.substring(5);
+
+                if(!Array.isArray(
+                    d.ownedClickSkins
+                )){
+                    d.ownedClickSkins = [];
+                }
+
+                d.ownedClickSkins =
+                    d.ownedClickSkins.filter(
+                        s => s !== skin
+                    );
+
+                if(input.checked){
+
+                    d.ownedClickSkins.push(
+                        skin
+                    );
+
+                }
+
+            }
+
+
+            else{
+
+                d[key] =
+                    input.checked;
+
+            }
+
+        });
+
+
+    // =====================================================
+    // INVENTORY
+    // =====================================================
+
+    d.inventory =
+        d.inventory || {};
+
+    document
+        .querySelectorAll(
+            "[data-inventory-pet]"
+        )
+        .forEach(input => {
+
+            const pet =
+                input.dataset.inventoryPet;
+
+            const amount =
+                Math.max(
+                    0,
+                    Number(input.value) || 0
+                );
+
+            if(amount <= 0){
+
+                delete d.inventory[pet];
+
+            }else{
+
+                d.inventory[pet] =
+                    amount;
+
+            }
+
+        });
+
+
+    // =====================================================
+    // PET LEVELS
+    // =====================================================
+
+    d.petLevels =
+        d.petLevels || {};
+
+    document
+        .querySelectorAll(
+            "[data-pet-level]"
+        )
+        .forEach(input => {
+
+            const pet =
+                input.dataset.petLevel;
+
+            const expInput =
+                document.querySelector(
+                    `[data-pet-exp="${CSS.escape(pet)}"]`
+                );
+
+            d.petLevels[pet] = {
+
+                level:
+                    Math.max(
+                        1,
+                        Number(input.value) || 1
+                    ),
+
+                exp:
+                    Math.max(
+                        0,
+                        Number(
+                            expInput?.value
+                        ) || 0
+                    )
+
+            };
+
+        });
+
+
+    // =====================================================
+    // EQUIPPED PETS
+    // =====================================================
+
+    d.equippedPets = [];
+
+    document
+        .querySelectorAll(
+            "[data-equipped-pet]"
+        )
+        .forEach(select => {
+
+            if(select.value){
+
+                d.equippedPets.push(
+                    select.value
+                );
+
+            }
+
+        });
+
+
+    // =====================================================
+    // EQUIPPED SKIN
+    // =====================================================
+
+    d.equippedClickSkin =
+        document.getElementById(
+            "adminEquippedSkin"
+        ).value;
+
+
+    // =====================================================
+    // SAFETY DEFAULTS
+    // =====================================================
+
+    if(!Array.isArray(
+        d.ownedClickSkins
+    )){
+        d.ownedClickSkins = [];
+    }
+
+    if(!d.ownedClickSkins.includes(
+        "Classic"
+    )){
+
+        d.ownedClickSkins.push(
+            "Classic"
+        );
+
+    }
+
+
+    if(!Array.isArray(
+        d.unlockedEggs
+    )){
+        d.unlockedEggs = [];
+    }
+
+    if(!d.unlockedEggs.includes(
+        "Starter Egg"
+    )){
+
+        d.unlockedEggs.push(
+            "Starter Egg"
+        );
+
+    }
+
+
+    return d;
+
+}
+
+
+// =========================================================
+// SAVE COMPLETE PLAYER
+// =========================================================
+
+async function saveAdminPlayer(){
+
+    if(!adminTargetUserId){
+
+        alert(
+            "Select a player first."
+        );
+
+        return;
+
+    }
+
+
+    const guiData =
+        collectAdminPlayerData();
+
+
+    let rawData;
+
+
+    try{
+
+        rawData =
+            JSON.parse(
+                document
+                    .getElementById(
+                        "adminRawGameData"
+                    )
+                    .value
+            );
+
+    }catch(error){
+
+        alert(
+            "❌ Raw Game Data contains invalid JSON."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !rawData ||
+        typeof rawData !== "object" ||
+        Array.isArray(rawData)
+    ){
+
+        alert(
+            "❌ Invalid player data."
+        );
+
+        return;
+
+    }
+
+
+    // Preserve unknown data,
+    // then apply admin GUI changes.
+
+    const newData = {
+
+        ...rawData,
+        ...guiData
+
+    };
+
+
+    const confirmed =
+        confirm(
+            `💾 SAVE ALL CHANGES FOR ${adminTargetUsername}?`
+        );
+
+
+    if(!confirmed){
+        return;
+    }
+
+
+    const {
+        error
+    } = await supabaseClient.rpc(
+        "admin_set_player_data",
+        {
+            target_user_id:
+                adminTargetUserId,
+
+            new_game_data:
+                newData
+        }
+    );
+
+
+    if(error){
+
+        console.error(
+            "❌ Admin full save error:",
+            error
+        );
+
+        alert(
+            "❌ Failed to save player:\n" +
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    adminEditingData =
+        structuredClone(
+            newData
+        );
+
+
+    document
+        .getElementById(
+            "adminRawGameData"
+        )
+        .value =
+        JSON.stringify(
+            newData,
+            null,
+            4
+        );
+
+
+    alert(
+        `✅ ${adminTargetUsername} saved successfully!`
+    );
+
+}
+
+
+// =========================================================
+// SEARCH / LOAD BUTTON
+// =========================================================
 
 document
-    .getElementById("adminSaveButton")
-    .addEventListener("click", async () => {
+    .getElementById(
+        "adminSearchButton"
+    )
+    .addEventListener(
+        "click",
+        loadAdminSelectedPlayer
+    );
 
-        if(!adminTargetUserId){
-            return;
-        }
 
-        adminResetInProgress = true;
+// =========================================================
+// SAVE BUTTON
+// =========================================================
 
-        if(onlineSaveTimer){
-            clearTimeout(onlineSaveTimer);
-            onlineSaveTimer = null;
-        }
+document
+    .getElementById(
+        "adminSavePlayerButton"
+    )
+    .addEventListener(
+        "click",
+        saveAdminPlayer
+    );
 
-        while(onlineSaveInProgress){
-            await new Promise(resolve =>
-                setTimeout(resolve, 50)
-            );
-        }
 
-        const changes = {};
+// =========================================================
+// RELOAD BUTTON
+// =========================================================
 
-        const coinsValue =
+document
+    .getElementById(
+        "adminReloadPlayerButton"
+    )
+    .addEventListener(
+        "click",
+        loadAdminSelectedPlayer
+    );
+
+
+// =========================================================
+// CLOSE ADMIN
+// =========================================================
+
+document
+    .getElementById(
+        "adminCloseButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
             document
-                .getElementById("adminCoins")
-                .value;
-
-        const gemsValue =
-            document
-                .getElementById("adminGems")
-                .value;
-
-        const rebirthsValue =
-            document
-                .getElementById("adminRebirths")
-                .value;
-
-        const luckValue =
-            document
-                .getElementById("adminLuck")
-                .value;
-
-
-        if(coinsValue !== ""){
-            changes.coins =
-                Number(coinsValue);
-        }
-
-
-        if(gemsValue !== ""){
-            changes.gems =
-                Number(gemsValue);
-        }
-
-
-        if(rebirthsValue !== ""){
-
-            changes.rebirths =
-                Number(rebirthsValue);
-
-            if(Number(rebirthsValue) === 0){
-
-                changes.rebirthCost = 100;
-                changes.clickPower = 1;
-
-            }
-        }
-
-
-        if(luckValue !== ""){
-
-            changes.luckLevel =
-                Math.max(
-                    1,
-                    Number(luckValue)
-                );
+                .getElementById(
+                    "adminPanel"
+                )
+                .classList
+                .add("hidden");
 
         }
+    );
 
 
-        if(Object.keys(changes).length === 0){
+// =========================================================
+// OPEN ADMIN
+// =========================================================
 
-            alert(
-                "Enter at least one value."
-            );
+document
+    .getElementById(
+        "adminButton"
+    )
+    .addEventListener(
+        "click",
+        () => {
 
-            adminResetInProgress = false;
-            return;
-        }
-
-
-        let error = null;
-
-
-        if(adminTargetUserId === "ALL"){
-
-            const {
-                error: updateError
-            } =
-                await supabaseClient.rpc(
-                    "admin_update_all_players",
-                    {
-                        changes: changes
-                    }
-                );
-
-            error = updateError;
-
-        }else{
-
-            const {
-                error: updateError
-            } =
-                await supabaseClient.rpc(
-                    "admin_update_player",
-                    {
-                        target_user_id:
-                            adminTargetUserId,
-
-                        changes: changes
-                    }
-                );
-
-            error = updateError;
-        }
-
-
-        if(error){
-
-            console.error(
-                "ADMIN ERROR:",
-                error
-            );
-
-            alert(
-                "Admin update failed: " +
-                error.message
-            );
-
-            adminResetInProgress = false;
-            return;
-        }
-
-
-        /*
-         * If changing the current player,
-         * reload the authoritative database state.
-         */
-
-        if(
-            adminTargetUserId === "ALL" ||
-            adminTargetUserId === currentUser.id
-        ){
-
-            await load();
-
-            updateUI();
-
-            renderInventory();
-            renderIndex();
-            renderEggs();
-            updateRebirthButtons();
-
-
-            const luckValueEl =
+            const panel =
                 document.getElementById(
-                    "luckValue"
+                    "adminPanel"
                 );
 
-            if(luckValueEl){
+            panel.classList.toggle(
+                "hidden"
+            );
 
-                luckValueEl.textContent =
-                    Number(luckLevel).toFixed(1) +
-                    "x";
-
-            }
-
-
-            /*
-             * IMPORTANT:
-             * Save the freshly loaded state so the
-             * local/online state matches the admin change.
-             */
 
             if(
-                adminTargetUserId === currentUser.id
+                !panel.classList.contains(
+                    "hidden"
+                )
             ){
 
-                await saveOnline();
+                loadAdminPlayers();
 
             }
 
         }
+    );
 
-
-        adminResetInProgress = false;
-
-
-        alert(
-            adminTargetUsername +
-            " updated successfully."
-        );
-
-    });
+// =========================================================
+// 👑 ADMIN TAB NAVIGATION
+// =========================================================
 
 document
-    .getElementById("adminResetButton")
-    .addEventListener("click", async () => {
+    .querySelectorAll(".admin-tab")
+    .forEach(tab => {
 
-        if(!adminTargetUserId){
-            return;
-        }
+        tab.addEventListener(
+            "click",
+            () => {
 
-        const resetType =
-            document
-                .getElementById("adminResetType")
-                .value;
+                const target =
+                    tab.dataset.adminTab;
 
-        const resetNames = {
-            full: "entire game",
-            upgrades: "upgrades",
-            rebirths: "rebirths",
-            shop: "shop purchases",
-            upgrades_shop: "upgrades and shop purchases"
-        };
+                document
+                    .querySelectorAll(
+                        ".admin-tab"
+                    )
+                    .forEach(button => {
 
-        const resetName =
-            resetNames[resetType] || "selected items";
-
-        const confirmed =
-            confirm(
-                adminTargetUserId === "ALL"
-                    ? `⚠️ RESET ${resetName.toUpperCase()} FOR EVERY PLAYER?`
-                    : `Reset ${resetName} for ${adminTargetUsername}?`
-            );
-
-        if(!confirmed){
-            return;
-        }
-
-        // 🔒 BLOCK ALL AUTOSAVES DURING ADMIN RESET
-        adminResetInProgress = true;
-
-        if(onlineSaveTimer){
-            clearTimeout(onlineSaveTimer);
-            onlineSaveTimer = null;
-        }
-
-        // Wait for an already-running save to finish
-        while(onlineSaveInProgress){
-            await new Promise(resolve => setTimeout(resolve, 50));
-        }
-
-        let error = null;
-
-        /* =========================
-           RESET ALL PLAYERS
-        ========================= */
-
-        if(adminTargetUserId === "ALL"){
-
-            if(resetType === "upgrades_shop"){
-
-                let result =
-                    await supabaseClient.rpc(
-                        "admin_reset_all_players",
-                        {
-                            reset_type: "upgrades"
-                        }
-                    );
-
-                error = result.error;
-
-                if(!error){
-
-                    result =
-                        await supabaseClient.rpc(
-                            "admin_reset_all_players",
-                            {
-                                reset_type: "shop"
-                            }
+                        button.classList.toggle(
+                            "active",
+                            button === tab
                         );
 
-                    error = result.error;
-                }
+                    });
 
-            }else{
 
-                const result =
-                    await supabaseClient.rpc(
-                        "admin_reset_all_players",
-                        {
-                            reset_type: resetType
-                        }
-                    );
+                document
+                    .querySelectorAll(
+                        ".admin-tab-content"
+                    )
+                    .forEach(content => {
 
-                error = result.error;
-            }
-
-        /* =========================
-           RESET ONE PLAYER
-        ========================= */
-
-        }else{
-
-            if(resetType === "upgrades_shop"){
-
-                let result =
-                    await supabaseClient.rpc(
-                        "admin_reset_player",
-                        {
-                            target_user_id: adminTargetUserId,
-                            reset_type: "upgrades"
-                        }
-                    );
-
-                error = result.error;
-
-                if(!error){
-
-                    result =
-                        await supabaseClient.rpc(
-                            "admin_reset_player",
-                            {
-                                target_user_id: adminTargetUserId,
-                                reset_type: "shop"
-                            }
+                        content.classList.toggle(
+                            "active",
+                            content.dataset.adminContent === target
                         );
 
-                    error = result.error;
-                }
+                    });
 
-            }else{
-
-                const result =
-                    await supabaseClient.rpc(
-                        "admin_reset_player",
-                        {
-                            target_user_id: adminTargetUserId,
-                            reset_type: resetType
-                        }
-                    );
-
-                error = result.error;
             }
-        }
-
-        /* =========================
-           RESET FAILED
-        ========================= */
-
-        if(error){
-
-            console.error(
-                "Admin reset error:",
-                error
-            );
-
-            adminResetInProgress = false;
-
-            alert(
-                "Reset failed: " +
-                error.message
-            );
-
-            return;
-        }
-
-        /* =========================
-           RELOAD RESET DATA
-        ========================= */
-
-        if(
-            adminTargetUserId === "ALL" ||
-            adminTargetUserId === currentUser.id
-        ){
-
-            await load();
-
-            console.log(
-                "🔥 ADMIN RESET LOAD RESULT:",
-                {
-                    rebirths,
-                    rebirthCost,
-                    clickPower
-                }
-            );
-
-            /*
-             * Force the rebirth reset locally.
-             * The database should already contain these values.
-             */
-            if(resetType === "rebirths"){
-
-                rebirths = 0;
-                rebirthCost = 100;
-                clickPower = 1;
-
-                console.log(
-                    "🔥 REBIRTH RESET APPLIED:",
-                    {
-                        rebirths,
-                        rebirthCost,
-                        clickPower
-                    }
-                );
-
-                // Allow this one corrected reset save
-                adminResetInProgress = false;
-
-                await saveOnline();
-            }
-
-            updateUI();
-            renderInventory();
-            renderIndex();
-            renderEggs();
-            updateRebirthButtons();
-        }
-
-        // 🔓 ALLOW SAVING AGAIN
-        adminResetInProgress = false;
-
-        alert(
-            adminTargetUserId === "ALL"
-                ? `ALL PLAYERS' ${resetName} have been reset.`
-                : `${adminTargetUsername}'s ${resetName} have been reset.`
         );
-
-    });
-
-document
-    .getElementById("adminButton")
-    .addEventListener("click", () => {
-
-        document
-            .getElementById("adminPanel")
-            .classList
-            .toggle("hidden");
-
-            loadAdminPlayers();
 
     });
 
@@ -9795,31 +10595,13 @@ document.getElementById("craftAllMachineButton").addEventListener("click", () =>
 
 async function restoreLogin(){
 
-    document
-        .getElementById("logoutButton")
-        .textContent = "LOGIN";
-
-    const loggedInUser =
     await getCurrentUser();
 
-    setupGlobalPanel();
-
-    await loadGlobalChat();
-
-    await loadGlobalHatches();
-
-    setupGlobalRealtime();
-
-    setupGlobalPanelDrag();
-
-    if(!loggedInUser){
+    // 🔥 getCurrentUser() already sets currentUser
+    if(!currentUser){
 
         document
             .getElementById("accountScreen")
-            .classList.remove("hidden");
-
-        document
-            .getElementById("gameScreen")
             .classList.remove("hidden");
 
         document
@@ -9829,12 +10611,11 @@ async function restoreLogin(){
         return;
     }
 
-    currentUser = loggedInUser;
     await checkAdmin();
 
     document
-    .getElementById("accountScreen")
-    .classList.add("hidden");
+        .getElementById("accountScreen")
+        .classList.add("hidden");
 
     document
         .getElementById("gameScreen")
@@ -9850,7 +10631,7 @@ async function restoreLogin(){
     } = await supabaseClient
         .from("usernames")
         .select("username")
-        .eq("user_id", loggedInUser.id)
+        .eq("user_id", currentUser.id)
         .maybeSingle();
 
     if(usernameError){
@@ -9875,13 +10656,11 @@ async function restoreLogin(){
             .textContent =
             usernameData.username;
 
-        document
-            .getElementById("accountScreen")
-            .classList.add("hidden");
-
+        // 🔥 NOW load the correct player's Supabase save
         await load();
 
-        MAX_EQUIPPED = getMaxEquipped();
+        MAX_EQUIPPED =
+            getMaxEquipped();
 
         renderEggs();
         renderInventory();
@@ -9890,6 +10669,13 @@ async function restoreLogin(){
         renderAchievements();
         renderClickSkins();
         updateRebirthButtons();
+
+        // 🌎 Global systems
+        setupGlobalPanel();
+        await loadGlobalChat();
+        await loadGlobalHatches();
+        setupGlobalRealtime();
+        setupGlobalPanelDrag();
     }
 }
 

@@ -1378,132 +1378,747 @@
 </div>
 
 
-<!-- ========================= -->
-<!-- SEPARATE ADMIN GUI -->
-<!-- ========================= -->
+<div id="adminPanel" class="admin-panel hidden">
 
-<div
-    id="adminPanel"
-    class="admin-panel hidden"
->
+    <div class="admin-card admin-command-deck">
 
-    <div class="admin-card">
+        <!-- TOP BAR -->
+        <div class="admin-topbar">
 
-        <button
-            id="adminCloseButton"
-            class="admin-close-button"
-        >
-            ← BACK TO GAME
-        </button>
+            <div class="admin-brand">
+                <div class="admin-brand-icon">👑</div>
 
+                <div>
+                    <div class="admin-brand-title">
+                        PET HATCHERS
+                    </div>
 
-        <div class="admin-title">
-            👑 ADMIN PANEL
+                    <div class="admin-brand-subtitle">
+                        ADMIN COMMAND DECK
+                    </div>
+                </div>
+            </div>
+
+            <button
+                id="adminCloseButton"
+                class="admin-close-button"
+            >
+                ← EXIT
+            </button>
+
         </div>
 
 
-        <div class="admin-subtitle">
-            Pet Hatchers Control Center
+        <!-- PLAYER SELECTOR -->
+        <div class="admin-player-selector">
+
+            <div class="admin-selector-label">
+                👤 PLAYER ACCOUNT
+            </div>
+
+            <div class="admin-player-select-row">
+
+                <select id="adminPlayerSearch">
+                    <option value="">
+                        SELECT PLAYER
+                    </option>
+                </select>
+
+                <button
+                    id="adminSearchButton"
+                    class="admin-load-button"
+                >
+                    🔍 LOAD PLAYER
+                </button>
+
+            </div>
+
+            <p
+                id="adminPlayerResult"
+                class="admin-result"
+            ></p>
+
         </div>
 
 
-        <select id="adminPlayerSearch">
-            <option value="">SELECT PLAYER</option>
-            <option value="ALL">🌎 ALL PLAYERS</option>
-        </select>
-
-        <button id="adminSearchButton">
-            SELECT PLAYER
-        </button>
-
-
-        <p id="adminPlayerResult"></p>
-
-
+        <!-- MAIN ADMIN AREA -->
         <div
             id="adminControls"
             class="admin-controls hidden"
         >
 
-            <h3 id="adminTargetName"></h3>
+            <div class="admin-dashboard">
 
 
-            <label>
-                💰 Coins
-            </label>
+                <!-- SIDEBAR -->
+                <aside class="admin-sidebar">
 
-            <input
-                type="number"
-                id="adminCoins"
-                placeholder="Coins"
-            >
+                    <div class="admin-sidebar-label">
+                        CONTROL PANEL
+                    </div>
 
 
-            <label>
-                💎 Gems
-            </label>
-
-            <input
-                type="number"
-                id="adminGems"
-                placeholder="Gems"
-            >
+                    <button
+                        class="admin-tab active"
+                        data-admin-tab="core"
+                    >
+                        <span>💰</span>
+                        <span>Overview</span>
+                    </button>
 
 
-            <label>
-                🔄 Rebirths
-            </label>
-
-            <input
-                type="number"
-                id="adminRebirths"
-                placeholder="Rebirths"
-            >
-
-            <label>
-                🍀 Luck
-            </label>
-
-            <input
-                type="number"
-                id="adminLuck"
-                placeholder="Luck"
-                min="1"
-                step="0.1"
-            >
-
-            <button id="adminSaveButton">
-                💾 SAVE CHANGES
-            </button>
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="upgrades"
+                    >
+                        <span>⬆️</span>
+                        <span>Upgrades</span>
+                    </button>
 
 
-           <select id="adminResetType">
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="boosts"
+                    >
+                        <span>🚀</span>
+                        <span>Boosts</span>
+                    </button>
 
-            <option value="full">
-                🔄 RESET ENTIRE GAME
-            </option>
 
-            <option value="upgrades">
-                🛠️ RESET UPGRADES
-            </option>
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="auto"
+                    >
+                        <span>🤖</span>
+                        <span>Auto-Rebirth</span>
+                    </button>
 
-            <option value="rebirths">
-                🔄 RESET REBIRTHS
-            </option>
 
-            <option value="shop">
-                🛒 RESET SHOP PURCHASES
-            </option>
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="stats"
+                    >
+                        <span>📊</span>
+                        <span>Statistics</span>
+                    </button>
 
-            <option value="upgrades_shop">
-                🔧 RESET UPGRADES + SHOP
-            </option>
 
-        </select>
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="eggs"
+                    >
+                        <span>🥚</span>
+                        <span>Eggs</span>
+                    </button>
 
-        <button id="adminResetButton">
-            🗑️ RESET PLAYER
-        </button>
+
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="pets"
+                    >
+                        <span>🐾</span>
+                        <span>Pets</span>
+                    </button>
+
+
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="skins"
+                    >
+                        <span>🎨</span>
+                        <span>Skins</span>
+                    </button>
+
+
+                    <button
+                        class="admin-tab"
+                        data-admin-tab="advanced"
+                    >
+                        <span>⚙️</span>
+                        <span>Advanced</span>
+                    </button>
+
+
+                    <div class="admin-sidebar-spacer"></div>
+
+
+                    <div class="admin-sidebar-status">
+                        <span class="admin-status-dot"></span>
+                        ADMIN ONLINE
+                    </div>
+
+                </aside>
+
+
+
+                <!-- WORKSPACE -->
+                <main class="admin-workspace">
+
+
+                    <!-- PLAYER HEADER -->
+                    <div class="admin-workspace-header">
+
+                        <div>
+
+                            <div class="admin-editing-label">
+                                CURRENTLY EDITING
+                            </div>
+
+                            <h2 id="adminTargetName">
+                                No player selected
+                            </h2>
+
+                        </div>
+
+
+                        <div class="admin-mode-badge">
+                            🛠️ ADMIN MODE
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         OVERVIEW
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content active"
+                        data-admin-content="core"
+                    >
+
+                        <div class="admin-page-heading">
+
+                            <div>
+                                <h3>Player Overview</h3>
+                                <p>
+                                    Core account values and economy controls.
+                                </p>
+                            </div>
+
+                            <span>💰</span>
+
+                        </div>
+
+
+                        <!-- STAT CARDS -->
+
+                        <div class="admin-stat-cards">
+
+                            <div class="admin-stat-card">
+
+                                <div class="admin-stat-icon">💰</div>
+
+                                <div>
+                                    <span>COINS</span>
+                                    <strong id="adminCoinsDisplay">—</strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="admin-stat-card">
+
+                                <div class="admin-stat-icon">💎</div>
+
+                                <div>
+                                    <span>GEMS</span>
+                                    <strong id="adminGemsDisplay">—</strong>
+                                </div>
+
+                            </div>
+
+
+                            <div class="admin-stat-card">
+
+                                <div class="admin-stat-icon">🔄</div>
+
+                                <div>
+                                    <span>REBIRTHS</span>
+                                    <strong id="adminRebirthsDisplay">—</strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CORE CONTROLS -->
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                <span>⚡ CORE CONTROLS</span>
+                            </div>
+
+
+                            <div class="admin-field-grid">
+
+                                <label>
+                                    💰 Coins
+                                    <input
+                                        type="number"
+                                        id="adminCoins"
+                                    >
+                                </label>
+
+
+                                <label>
+                                    💎 Gems
+                                    <input
+                                        type="number"
+                                        id="adminGems"
+                                    >
+                                </label>
+
+
+                                <label>
+                                    🔄 Rebirths
+                                    <input
+                                        type="number"
+                                        id="adminRebirths"
+                                    >
+                                </label>
+
+
+                                <label>
+                                    🖱️ Click Power
+                                    <input
+                                        type="number"
+                                        id="adminClickPower"
+                                    >
+                                </label>
+
+
+                                <label>
+                                    🍀 Luck
+                                    <input
+                                        type="number"
+                                        id="adminLuck"
+                                        min="1"
+                                        step="0.1"
+                                    >
+                                </label>
+
+
+                                <label>
+                                    💰 Rebirth Cost
+                                    <input
+                                        type="number"
+                                        id="adminRebirthCost"
+                                    >
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         UPGRADES
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="upgrades"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Upgrades</h3>
+                                <p>
+                                    Modify player upgrade levels.
+                                </p>
+                            </div>
+
+                            <span>⬆️</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                ⬆️ UPGRADE LEVELS
+                            </div>
+
+                            <div
+                                id="adminUpgradeFields"
+                                class="admin-field-grid"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         BOOSTS
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="boosts"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Boosts</h3>
+                                <p>
+                                    Manage active and unlocked boosts.
+                                </p>
+                            </div>
+
+                            <span>🚀</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🚀 BOOST CONTROLS
+                            </div>
+
+                            <div
+                                id="adminBoostFields"
+                                class="admin-field-grid"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         AUTO REBIRTH
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="auto"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Auto-Rebirth</h3>
+                                <p>
+                                    Configure automatic rebirth settings.
+                                </p>
+                            </div>
+
+                            <span>🤖</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🤖 AUTO-REBIRTH CONTROLS
+                            </div>
+
+                            <div
+                                id="adminAutoRebirthFields"
+                                class="admin-field-grid"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         STATS
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="stats"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Statistics</h3>
+                                <p>
+                                    View and modify player statistics.
+                                </p>
+                            </div>
+
+                            <span>📊</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                📊 PLAYER STATISTICS
+                            </div>
+
+                            <div
+                                id="adminStatFields"
+                                class="admin-field-grid"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         EGGS
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="eggs"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Eggs</h3>
+                                <p>
+                                    Manage unlocked egg types.
+                                </p>
+                            </div>
+
+                            <span>🥚</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🥚 UNLOCKED EGGS
+                            </div>
+
+                            <div
+                                id="adminEggFields"
+                                class="admin-check-grid admin-scroll-list"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         PETS
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="pets"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Pets</h3>
+                                <p>
+                                    Inventory, levels and equipped pets.
+                                </p>
+                            </div>
+
+                            <span>🐾</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🎒 INVENTORY
+                            </div>
+
+                            <div
+                                id="adminInventoryFields"
+                                class="admin-list-editor admin-scroll-list"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                ⭐ PET LEVELS & EXP
+                            </div>
+
+                            <div
+                                id="adminPetLevelFields"
+                                class="admin-list-editor admin-scroll-list"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🐾 EQUIPPED PETS
+                            </div>
+
+                            <div
+                                id="adminEquippedPets"
+                                class="admin-list-editor"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         SKINS
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="skins"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Skins</h3>
+                                <p>
+                                    Manage unlocked and equipped skins.
+                                </p>
+                            </div>
+
+                            <span>🎨</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🎨 EQUIPPED SKIN
+                            </div>
+
+                            <label class="admin-big-select">
+
+                                Equipped Skin
+
+                                <select id="adminEquippedSkin"></select>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🎨 UNLOCKED SKINS
+                            </div>
+
+                            <div
+                                id="adminSkinFields"
+                                class="admin-check-grid admin-scroll-list"
+                            ></div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =========================
+                         ADVANCED
+                         ========================= -->
+
+                    <div
+                        class="admin-tab-content"
+                        data-admin-content="advanced"
+                    >
+
+                        <div class="admin-page-heading">
+                            <div>
+                                <h3>Advanced</h3>
+                                <p>
+                                    Settings and raw saved game data.
+                                </p>
+                            </div>
+
+                            <span>⚙️</span>
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                ⚙️ PLAYER SETTINGS
+                            </div>
+
+                            <div
+                                id="adminMiscFields"
+                                class="admin-field-grid"
+                            ></div>
+
+                        </div>
+
+
+                        <div class="admin-panel-card">
+
+                            <div class="admin-card-heading">
+                                🧬 RAW GAME DATA
+                            </div>
+
+                            <p class="admin-help">
+                                Direct access to the player's complete
+                                saved game data.
+                            </p>
+
+                            <textarea
+                                id="adminRawGameData"
+                                class="admin-raw-data"
+                                spellcheck="false"
+                            ></textarea>
+
+                        </div>
+
+                    </div>
+
+                </main>
+
+            </div>
+
+
+            <!-- PERMANENT ACTION BAR -->
+            <div class="admin-action-bar">
+
+                <div class="admin-save-status">
+                    <span class="admin-status-dot"></span>
+                    PLAYER DATA READY
+                </div>
+
+
+                <div class="admin-action-buttons">
+
+                    <button
+                        id="adminReloadPlayerButton"
+                        class="admin-reload-player-button"
+                    >
+                        🔄 RELOAD
+                    </button>
+
+
+                    <button
+                        id="adminSavePlayerButton"
+                        class="admin-save-player-button"
+                    >
+                        💾 SAVE PLAYER
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
 
