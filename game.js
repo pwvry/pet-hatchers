@@ -418,7 +418,8 @@ async function loginAccount(){
     await saveLeaderboardStats();
 }
 
-const LEADERBOARD_REFRESH_INTERVAL = 60 * 1000;
+const LEADERBOARD_REFRESH_INTERVAL =
+    5 * 60 * 1000;
 
 async function saveLeaderboardStats(){
 
@@ -611,10 +612,12 @@ let rebirthCost = 100;
 let selectedRebirthAmount = 1;
 let gems = 0;
 let rebirthUpgradeLevel = 0;
-const MAX_REBIRTH_UPGRADE = 6;
+const MAX_REBIRTH_UPGRADE = 100;
 
 let adminTargetUserId = null;
 let adminTargetUsername = null;
+
+let rebirthUpgradeInProgress = false;
 
 let clickSpeedLevel = 0;
 let multiplierLevel = 0;
@@ -1126,17 +1129,494 @@ const clickSpeedDelays = [
 const MAX_CLICK_SPEED = 5;
 
 const rebirthUpgradeAmounts = [
-    1,
-    2,
-    5,
-    10,
-    20,
-    50,
-    100
+    1,        // Level 1
+    2,        // 2
+    5,        // 3
+    10,       // 4
+    20,       // 5
+    50,       // 6
+    100,      // 7
+    150,      // 8
+    250,      // 9
+    500,      // 10
+    750,      // 11
+    1000,     // 12
+    1500,     // 13
+    2500,     // 14
+    5000,     // 15
+    7500,     // 16
+    10000,    // 17
+    15000,    // 18
+    25000,    // 19
+    50000,    // 20
+    75000,    // 21
+    100000,   // 22
+    150000,   // 23
+    250000,   // 24
+    500000,   // 25
+    750000,   // 26
+    1000000,  // 27
+    1500000,  // 28
+    2500000,  // 29
+    5000000,  // 30
+    7500000,  // 31
+    10000000, // 32
+    15000000, // 33
+    25000000, // 34
+    50000000, // 35
+    75000000, // 36
+    100000000,// 37
+    150000000,// 38
+    250000000,// 39
+    500000000,// 40
+    750000000,// 41
+    1000000000,// 42
+    1500000000,// 43
+    2500000000,// 44
+    5000000000,// 45
+    7500000000,// 46
+    10000000000,// 47
+    15000000000,// 48
+    25000000000,// 49
+    50000000000,// 50
+    75000000000,// 51
+    100000000000,// 52
+    150000000000,// 53
+    250000000000,// 54
+    500000000000,// 55
+    750000000000,// 56
+    1000000000000,// 57
+    1500000000000,// 58
+    2500000000000,// 59
+    5000000000000,// 60
+    7500000000000,// 61
+    10000000000000,// 62
+    15000000000000,// 63
+    25000000000000,// 64
+    50000000000000,// 65
+    75000000000000,// 66
+    100000000000000,// 67
+    150000000000000,// 68
+    250000000000000,// 69
+    500000000000000,// 70
+    750000000000000,// 71
+    1000000000000000,// 72
+    1500000000000000,// 73
+    2500000000000000,// 74
+    5000000000000000,// 75
+    7500000000000000,// 76
+    10000000000000000,// 77
+    15000000000000000,// 78
+    25000000000000000,// 79
+    50000000000000000,// 80
+    75000000000000000,// 81
+    100000000000000000,// 82
+    150000000000000000,// 83
+    250000000000000000,// 84
+    500000000000000000,// 85
+    750000000000000000,// 86
+    1000000000000000000,// 87
+    1500000000000000000,// 88
+    2500000000000000000,// 89
+    5000000000000000000,// 90
+    7500000000000000000,// 91
+    10000000000000000000,// 92
+    15000000000000000000,// 93
+    25000000000000000000,// 94
+    50000000000000000000,// 95
+    75000000000000000000,// 96
+    100000000000000000000,// 97
+    250000000000000000000,// 98
+    500000000000000000000,// 99
+    1000000000000000000000// 100
 ];
 let clickPower = 1;
 let selectedEgg = "Starter Egg";
 let unlockedEggs = new Set(["Starter Egg"]);
+// =========================================================
+// 🌍 WORLDS + ZONES
+// =========================================================
+
+const WORLD_ZONES = {
+
+    meadow: {
+        world: "Grasslands",
+        name: "Meadow",
+        icon: "🌱",
+        theme: "theme-meadow",
+        requirement: 0,
+        coinMultiplier: 1
+    },
+
+    forest: {
+        world: "Grasslands",
+        name: "Whispering Forest",
+        icon: "🌲",
+        theme: "theme-forest",
+        requirement: 10,
+        coinMultiplier: 1.5
+    },
+
+    ancientGrove: {
+        world: "Grasslands",
+        name: "Ancient Grove",
+        icon: "🌳",
+        theme: "theme-ancient-grove",
+        requirement: 50,
+        coinMultiplier: 2
+    },
+
+    dunes: {
+        world: "Desert",
+        name: "Golden Dunes",
+        icon: "🏜️",
+        theme: "theme-dunes",
+        requirement: 100,
+        coinMultiplier: 3
+    },
+
+    oasis: {
+        world: "Desert",
+        name: "Crystal Oasis",
+        icon: "💎",
+        theme: "theme-oasis",
+        requirement: 250,
+        coinMultiplier: 4
+    },
+
+    pyramid: {
+        world: "Desert",
+        name: "Ancient Pyramid",
+        icon: "🔺",
+        theme: "theme-pyramid",
+        requirement: 500,
+        coinMultiplier: 5
+    },
+
+    snowfields: {
+        world: "Arctic",
+        name: "Snowfields",
+        icon: "❄️",
+        theme: "theme-snowfields",
+        requirement: 1000,
+        coinMultiplier: 7
+    },
+
+    frozenCaves: {
+        world: "Arctic",
+        name: "Frozen Caves",
+        icon: "🧊",
+        theme: "theme-frozen-caves",
+        requirement: 2500,
+        coinMultiplier: 10
+    },
+
+    icePalace: {
+        world: "Arctic",
+        name: "Ice Palace",
+        icon: "🏰",
+        theme: "theme-ice-palace",
+        requirement: 5000,
+        coinMultiplier: 15
+    }
+
+};
+
+// =========================================================
+// 🌍 ZONE FUNCTIONS
+// =========================================================
+
+function getZoneList(){
+
+    return Object.entries(WORLD_ZONES);
+
+}
+
+
+function getZoneIndex(){
+
+    return getZoneList().findIndex(
+        ([id]) => id === currentZone
+    );
+
+}
+
+
+function isZoneUnlocked(zoneId){
+
+    const zone =
+        WORLD_ZONES[zoneId];
+
+    if(!zone){
+        return false;
+    }
+
+    return rebirths >= zone.requirement;
+
+}
+
+
+function applyZoneTheme(){
+
+    const zone =
+        WORLD_ZONES[currentZone];
+
+    if(!zone){
+        return;
+    }
+
+    // Remove old zone themes
+    document.body.classList.forEach(className => {
+
+        if(className.startsWith("theme-")){
+
+            document.body.classList.remove(
+                className
+            );
+
+        }
+
+    });
+
+    // Apply current zone theme
+    document.body.classList.add(
+        zone.theme
+    );
+
+}
+
+
+function renderZoneButtons(){
+
+    const container =
+        document.getElementById(
+            "zoneButtons"
+        );
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = "";
+
+    for(const [id, zone] of getZoneList()){
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "zone-button";
+
+        if(id === currentZone){
+
+            button.classList.add(
+                "active"
+            );
+
+        }
+
+        if(!isZoneUnlocked(id)){
+
+            button.classList.add(
+                "locked"
+            );
+
+            button.textContent =
+                `🔒 ${zone.name}`;
+
+        }else{
+
+            button.textContent =
+                `${zone.icon} ${zone.name}`;
+
+            button.addEventListener(
+                "click",
+                () => changeZone(id)
+            );
+
+        }
+
+        container.appendChild(button);
+
+    }
+
+}
+
+
+function changeZone(zoneId){
+
+    const zone =
+        WORLD_ZONES[zoneId];
+
+    if(!zone){
+        return;
+    }
+
+    if(!isZoneUnlocked(zoneId)){
+
+        showNotification(
+            "🔒 Zone Locked",
+            `You need ${zone.requirement} rebirths to enter ${zone.name}.`
+        );
+
+        return;
+    }
+
+    currentZone =
+        zoneId;
+
+    applyZoneTheme();
+
+    save();
+
+    updateWorldZoneCards();
+
+    updateZoneMultiplierDisplay();
+
+    showNotification(
+        `${zone.icon} ${zone.name}`,
+        `Welcome to ${zone.name}!`
+    );
+
+}
+
+function updateWorldZoneCards(){
+
+    document
+        .querySelectorAll(".zone-card")
+        .forEach(button => {
+
+            const zoneId =
+                button.dataset.zone;
+
+            const zone =
+                WORLD_ZONES[zoneId];
+
+            if(!zone){
+                return;
+            }
+
+            const unlocked =
+                isZoneUnlocked(zoneId);
+
+            button.classList.toggle(
+                "active",
+                zoneId === currentZone
+            );
+
+            button.classList.toggle(
+                "locked",
+                !unlocked
+            );
+
+            const small =
+                button.querySelector(
+                    ".zone-info small"
+                );
+
+            if(small){
+
+                if(unlocked){
+
+                    small.textContent =
+                        zoneId === "meadow"
+                            ? "Starting Zone"
+                            : "Unlocked";
+
+                }else{
+
+                    small.textContent =
+                        `🔒 Requires ${formatSuffixNumber(zone.requirement)} Rebirths`;
+
+                }
+
+            }
+
+        });
+
+}
+
+function updateZoneMultiplierDisplay(){
+
+    const element =
+        document.getElementById(
+            "zoneMultiplierValue"
+        );
+
+    if(!element){
+        return;
+    }
+
+    const multiplier =
+        WORLD_ZONES[currentZone]?.coinMultiplier || 1;
+
+    element.textContent =
+        `${multiplier}x`;
+
+}
+
+function previousZone(){
+
+    const index =
+        getZoneIndex();
+
+    if(index <= 0){
+        return;
+    }
+
+    const zones =
+        getZoneList();
+
+    const previous =
+        zones[index - 1];
+
+    if(isZoneUnlocked(previous[0])){
+
+        changeZone(
+            previous[0]
+        );
+
+    }
+
+}
+
+
+function nextZone(){
+
+    const index =
+        getZoneIndex();
+
+    const zones =
+        getZoneList();
+
+    if(index >= zones.length - 1){
+        return;
+    }
+
+    const next =
+        zones[index + 1];
+
+    if(isZoneUnlocked(next[0])){
+
+        changeZone(
+            next[0]
+        );
+
+    }else{
+
+        showNotification(
+            "🔒 Zone Locked",
+            `You need ${next[1].requirement} rebirths to enter ${next[1].name}.`
+        );
+
+    }
+
+}
+
+// Current zone
+let currentZone = "meadow";
 let inventory = {};
 let discovered = new Set();
 let totalHatches = 0;
@@ -1178,13 +1658,8 @@ function upgradeEquip(){
         return;
     }
 
-    const equipUpgradeCosts = [
-        1000,
-        5000
-    ];
-
     const cost =
-        equipUpgradeCosts[equipUpgradeLevel];
+        getEquipCost(equipUpgradeLevel);
 
     if(gems < cost){
 
@@ -1224,7 +1699,7 @@ function upgradeAutoRebirth(){
         return;
     }
 
-    const cost = 100;
+    const cost = 50000;
 
     if(gems < cost){
 
@@ -1271,30 +1746,19 @@ function autoRebirthCheck(){
     }
 
     let totalCost = 0;
-    let tempCost = rebirthCost;
 
     for(let i = 0; i < amount; i++){
 
-        if(
-            tempCost >= Number.MAX_VALUE ||
-            totalCost >= Number.MAX_VALUE - tempCost
-        ){
-            totalCost = Number.MAX_VALUE;
-            break;
-        }
+        const cost =
+            100 + ((rebirths + i) * 20);
 
-        totalCost += tempCost;
-
-        tempCost =
-            Math.min(
-                tempCost * 1.5,
-                Number.MAX_VALUE
-            );
+        totalCost += cost;
     }
 
     if(coins >= totalCost){
 
         rebirthMultiple(amount);
+
     }
 }
 
@@ -2289,6 +2753,7 @@ function getGameData(){
     return {
         saveVersion: 1,
         petLevels: window.petLevels || {},
+        currentZone,
         fasterHatchLevel,
         coins,
         gems,
@@ -2358,7 +2823,14 @@ function save(){
     // 🌎 SAVE ONLINE IMMEDIATELY
     if(currentUser){
 
-        saveOnline(gameData);
+        if(onlineSaveTimer){
+            clearTimeout(onlineSaveTimer);
+        }
+
+        onlineSaveTimer = setTimeout(
+            saveOnline,
+            5000
+        );
     }
 
 
@@ -2377,7 +2849,7 @@ function save(){
                     await saveLeaderboardStats();
 
                 },
-                60000
+                300000
             );
     }
 
@@ -2397,6 +2869,14 @@ async function saveOnline(){
     }
 
     if(accountResetVersion !== 0){
+        return;
+    }
+
+    if(onlineSaveInProgress){
+        onlineSaveTimer = setTimeout(
+            saveOnline,
+            500
+        );
         return;
     }
 
@@ -2522,219 +3002,75 @@ async function liveSync(){
             error
         } = await supabaseClient
             .from("player_data")
-            .select("game_data, reset_version, updated_at")
-            .eq("user_id", currentUser.id)
+            .select("data_version, reset_version")
+            .eq(
+                "user_id",
+                currentUser.id
+            )
             .maybeSingle();
 
         if(error){
+
             console.error(
-                "Live sync error:",
+                "Live sync check error:",
                 error
             );
 
-            liveSyncLoading = false;
             return;
         }
 
         if(!data){
-            liveSyncLoading = false;
             return;
         }
 
-        if((data.reset_version ?? 0) > 0){
+        const serverVersion =
+            Number(
+                data.data_version ?? 0
+            );
 
-            accountResetVersion = 1;
+        const serverResetVersion =
+            Number(
+                data.reset_version ?? 0
+            );
 
-            coins = 0;
-            gems = 0;
-            rebirths = 0;
-            rebirthCost = 100;
-            clickPower = 1;
 
-            rebirthUpgradeLevel = 0;
-            clickSpeedLevel = 0;
-            multiplierLevel = 0;
-            hatchAmountLevel = 0;
-            luckLevel = 1;
-            equipUpgradeLevel = 0;
+        /* 🔄 SERVER RESET DETECTED */
 
-            autoRebirthPurchased = false;
-            autoRebirthEnabled = false;
-            autoRebirthTarget = 1;
+        if(serverResetVersion > 0){
 
-            clickBoostActive = false;
-            clickBoostEndTime = 0;
-            luckyBoostActive = false;
-            luckyBoostEndTime = 0;
-
-            shopClickMultiplier = 1;
-            selectedEgg = "Starter Egg";
-            unlockedEggs = new Set(["Starter Egg"]);
-
-            inventory = {};
-            discovered = new Set();
-            equippedPets = [];
-
-            totalHatches = 0;
-            totalClicks = 0;
-            hatchStreak = 0;
-            bestHatchStreak = 0;
-
-            unlockedAchievements = new Set();
-            ownedClickSkins = new Set(["Classic"]);
-            equippedClickSkin = "Classic";
-
-            shopPurchases = 0;
-            mysteryBoxesOpened = 0;
-
-            localStorage.removeItem(SAVE_KEY);
+            await load();
 
             updateUI();
             renderInventory();
             renderIndex();
             renderEggs();
+            updateRebirthButtons();
 
-            accountResetVersion = 0;
-
-            liveSyncLoading = false;
             return;
         }
 
-        const d = data.game_data || {};
 
-        coins = d.coins ?? coins;
-        gems = d.gems ?? gems;
+        /* 🛡️ SAVE CHANGED SOMEWHERE ELSE */
 
-        rebirths = d.rebirths ?? rebirths;
+        if(
+            lastKnownDataVersion !== null &&
+            serverVersion !==
+            Number(lastKnownDataVersion)
+        ){
 
-        rebirthCost = Number(d.rebirthCost ?? 100);
+            console.log(
+                "🔄 Remote save changed. Reloading..."
+            );
 
-        if(Number(rebirths) === 0){
-            rebirthCost = 100;
+            await load();
+
+            updateUI();
+            renderInventory();
+            renderIndex();
+            renderEggs();
+            updateRebirthButtons();
+
         }
-
-        if(d.rebirths === 0){
-            rebirthCost = 100;
-            clickPower = 1;
-        }else{
-            rebirthCost = Number(d.rebirthCost ?? 100);
-
-            if(rebirths === 0){
-                rebirthCost = 100;
-            }
-            clickPower = d.clickPower ?? clickPower;
-        }
-        rebirthUpgradeLevel =
-            Math.min(
-                d.rebirthUpgradeLevel ?? rebirthUpgradeLevel,
-                MAX_REBIRTH_UPGRADE
-            );
-
-        clickSpeedLevel =
-            d.clickSpeedLevel ?? clickSpeedLevel;
-
-        multiplierLevel =
-            d.multiplierLevel ?? multiplierLevel;
-
-        hatchAmountLevel =
-            d.hatchAmountLevel ?? hatchAmountLevel;
-
-        console.log("🔥 LOADING LUCK FROM SAVE:", {
-            user: currentUser?.id,
-            databaseLuck: d.luckLevel
-        });
-
-        luckLevel =
-            d.luckLevel ?? luckLevel;
-
-        fasterHatchLevel =
-            Number(
-                d.fasterHatchLevel ?? fasterHatchLevel
-            );
-
-        fasterHatchLevel =
-            Math.max(
-                0,
-                Math.min(
-                    fasterHatchLevel,
-                    MAX_FASTER_HATCH_LEVEL
-                )
-            );
-
-        equipUpgradeLevel =
-            d.equipUpgradeLevel ?? equipUpgradeLevel;
-
-        autoRebirthPurchased =
-            d.autoRebirthPurchased ?? autoRebirthPurchased;
-
-        autoRebirthEnabled =
-            d.autoRebirthEnabled ?? autoRebirthEnabled;
-
-        autoRebirthTarget =
-            d.autoRebirthTarget ?? autoRebirthTarget;
-
-        shopClickMultiplier =
-            d.shopClickMultiplier ?? shopClickMultiplier;
-
-        selectedEgg =
-            d.selectedEgg ?? selectedEgg;
-
-        unlockedEggs =
-            new Set(
-                d.unlockedEggs ?? ["Starter Egg"]
-            );
-
-        inventory =
-            d.inventory ?? {};
-
-        window.petLevels =
-            d.petLevels ?? {};
-
-        discovered =
-            new Set(
-                d.discovered ?? []
-            );
-
-        equippedPets =
-            d.equippedPets ?? [];
-
-        totalHatches =
-            d.totalHatches ?? totalHatches;
-
-        hatchStreak =
-            d.hatchStreak ?? hatchStreak;
-
-        bestHatchStreak =
-            d.bestHatchStreak ?? bestHatchStreak;
-
-        unlockedAchievements =
-            new Set(
-                d.unlockedAchievements ?? []
-            );
-
-        ownedClickSkins =
-            new Set(
-                d.ownedClickSkins ?? ["Classic"]
-            );
-
-        equippedClickSkin =
-            d.equippedClickSkin ?? "Classic";
-
-        shopPurchases =
-            d.shopPurchases ?? shopPurchases;
-
-        mysteryBoxesOpened =
-            d.mysteryBoxesOpened ?? mysteryBoxesOpened;
-
-        localStorage.setItem(
-            SAVE_KEY,
-            JSON.stringify(d)
-        );
-
-        updateUI();
-        renderInventory();
-        renderIndex();
-        renderEggs();
 
     }catch(error){
 
@@ -2743,9 +3079,12 @@ async function liveSync(){
             error
         );
 
+    }finally{
+
+        liveSyncLoading = false;
+
     }
 
-    liveSyncLoading = false;
 }
 
 function startLiveSync(){
@@ -2969,6 +3308,11 @@ async function load(){
         selectedEgg =
             d.selectedEgg ?? selectedEgg;
 
+        currentZone =
+            WORLD_ZONES[d.currentZone]
+                ? d.currentZone
+                : "meadow";
+
         unlockedEggs =
             new Set(
                 d.unlockedEggs ?? ["Starter Egg"]
@@ -2978,6 +3322,9 @@ async function load(){
 
         inventory =
             d.inventory ?? {};
+
+        window.petLevels =
+            d.petLevels ?? {};
 
         discovered =
             new Set(d.discovered ?? []);
@@ -3086,6 +3433,30 @@ if(typeof renderEggs === "function"){
 
 if(typeof updateRebirthButtons === "function"){
     updateRebirthButtons();
+}
+
+if(typeof updateWorldZoneCards === "function"){
+
+    updateWorldZoneCards();
+
+}
+
+if(typeof updateZoneMultiplierDisplay === "function"){
+
+    updateZoneMultiplierDisplay();
+
+}
+
+if(typeof applyZoneTheme === "function"){
+
+    applyZoneTheme();
+
+}
+
+if(typeof renderZoneButtons === "function"){
+
+    renderZoneButtons();
+
 }
 
 console.log("🌎 FINAL ONLINE VALUES:", {
@@ -4005,12 +4376,17 @@ function renderGlobalHatch(hatch){
 
         card.className = "chromatic-test-card";
 
+        card.dataset.createdAt =
+            hatch.created_at;
+
         card.innerHTML = `
             <div>🌎 ${escapeGlobalText(username)}</div>
             <div>${emoji} ${escapeGlobalText(username)} hatched ${escapeGlobalText(petName)}!</div>
             <div>🌈 CHROMATIC</div>
-            <div>Just now</div>
+            <div>${formatGlobalHatchTime(hatch.created_at)}</div>
         `;
+
+        feed.classList.add("global-feed-visible");
 
         feed.appendChild(card);
 
@@ -4031,6 +4407,9 @@ function renderGlobalHatch(hatch){
     hatchEl.className =
         `global-hatch rarity-${rarity}`;
 
+    hatchEl.dataset.createdAt =
+        hatch.created_at;
+
     hatchEl.innerHTML = `
         <div class="global-hatch-username">
             🌎 ${escapeGlobalText(username)}
@@ -4048,9 +4427,11 @@ function renderGlobalHatch(hatch){
         </div>
 
         <div class="global-hatch-time">
-            Just now
+            ${formatGlobalHatchTime(hatch.created_at)}
         </div>
     `;
+
+    feed.classList.add("global-feed-visible");
 
     feed.appendChild(hatchEl);
 
@@ -4132,15 +4513,9 @@ async function loadGlobalHatches(){
      * Then rebuild it from the database.
      */
     feed.innerHTML = "";
+    feed.classList.remove("global-feed-visible");
 
     if(!data || data.length === 0){
-
-        feed.innerHTML = `
-            <div class="global-empty">
-                🌎 No global hatches yet...
-            </div>
-        `;
-
         return;
     }
 
@@ -4152,9 +4527,6 @@ async function loadGlobalHatches(){
     [...data]
         .reverse()
         .forEach(hatch => {
-
-            const hatchEl =
-                document.createElement("div");
 
             const rarity =
                 String(hatch.rarity || "").toLowerCase();
@@ -4180,8 +4552,57 @@ async function loadGlobalHatches(){
                 emoji = emojiForPet(petName);
             }
 
+
+            /* 🌈 CHROMATIC */
+
+            if(rarity === "chromatic"){
+
+                const card =
+                    document.createElement("div");
+
+                card.className =
+                    "chromatic-test-card";
+
+                card.dataset.createdAt =
+                    hatch.created_at;
+
+                card.innerHTML = `
+                    <div>
+                        🌎 ${escapeGlobalText(username)}
+                    </div>
+
+                    <div>
+                        ${emoji}
+                        ${escapeGlobalText(username)}
+                        hatched
+                        ${escapeGlobalText(petName)}!
+                    </div>
+
+                    <div>
+                        🌈 CHROMATIC
+                    </div>
+
+                    <div class="chromatic-time">
+                        ${formatGlobalHatchTime(hatch.created_at)}
+                    </div>
+                `;
+
+                feed.appendChild(card);
+
+                return;
+            }
+
+
+            /* 🥚 NORMAL HATCH */
+
+            const hatchEl =
+                document.createElement("div");
+
             hatchEl.className =
                 `global-hatch rarity-${rarity}`;
+
+            hatchEl.dataset.createdAt =
+                hatch.created_at;
 
             hatchEl.innerHTML = `
                 <div class="global-hatch-username">
@@ -4200,12 +4621,16 @@ async function loadGlobalHatches(){
                 </div>
 
                 <div class="global-hatch-time">
-                    Just now
+                    ${formatGlobalHatchTime(hatch.created_at)}
                 </div>
             `;
 
             feed.appendChild(hatchEl);
         });
+
+    if(feed.children.length > 0){
+        feed.classList.add("global-feed-visible");
+    }
 
     feed.scrollTop = feed.scrollHeight;
 
@@ -4214,6 +4639,71 @@ async function loadGlobalHatches(){
         feed.children.length
     );
 }
+
+function formatGlobalHatchTime(createdAt){
+
+    const created =
+        new Date(createdAt);
+
+    if(isNaN(created.getTime())){
+        return "Just now";
+    }
+
+    const diffMs =
+        Date.now() - created.getTime();
+
+    const diffHours =
+        Math.floor(
+            diffMs / (1000 * 60 * 60)
+        );
+
+    if(diffHours < 1){
+        return "Just now";
+    }
+
+    return `${diffHours}h ago`;
+}
+
+setInterval(() => {
+
+    document
+        .querySelectorAll(".global-hatch")
+        .forEach(hatchEl => {
+
+            const createdAt =
+                hatchEl.dataset.createdAt;
+
+            if(!createdAt) return;
+
+            const timeEl =
+                hatchEl.querySelector(".global-hatch-time");
+
+            if(!timeEl) return;
+
+            timeEl.textContent =
+                formatGlobalHatchTime(createdAt);
+        });
+
+
+    document
+        .querySelectorAll(".chromatic-test-card")
+        .forEach(card => {
+
+            const createdAt =
+                card.dataset.createdAt;
+
+            if(!createdAt) return;
+
+            const timeEl =
+                card.querySelector(".chromatic-time");
+
+            if(!timeEl) return;
+
+            timeEl.textContent =
+                formatGlobalHatchTime(createdAt);
+        });
+
+}, 60 * 1000);
 
 function startEmbryonEvent(){
 
@@ -4698,14 +5188,16 @@ async function loadGlobalChat(){
         return;
     }
 
-    const { data, error } =
-        await supabaseClient
-            .from("global_chat")
-            .select("*")
-            .order("created_at", {
-                ascending:true
-            })
-            .limit(100);
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("global_chat")
+        .select("*")
+        .order("created_at", {
+            ascending: false
+        })
+        .limit(50);
 
     if(error){
 
@@ -4730,7 +5222,7 @@ async function loadGlobalChat(){
     feed.innerHTML = "";
 
     // Add all messages
-    data.forEach(message => {
+    data.reverse().forEach(message => {
 
         const messageEl =
             document.createElement("div");
@@ -6060,6 +6552,41 @@ function pickPet(egg){
     return pets[0];
 }
 
+function formatSuffixNumber(num){
+
+    num = Number(num);
+
+    if(!Number.isFinite(num)){
+        return "0";
+    }
+
+    if(num < 1000){
+        return Math.floor(num).toString();
+    }
+
+    const suffixes = [
+        { value: 1e12, suffix: "t" },
+        { value: 1e9, suffix: "b" },
+        { value: 1e6, suffix: "m" },
+        { value: 1e3, suffix: "k" }
+    ];
+
+    for(const item of suffixes){
+
+        if(num >= item.value){
+
+            const value = num / item.value;
+
+            return (
+                Number(value.toFixed(2))
+                + item.suffix
+            );
+        }
+    }
+
+    return Math.floor(num).toString();
+}
+
 function showHatchAnimation(hatchAmount, hatchedNames){
 
     const overlay =
@@ -6467,7 +6994,7 @@ function upgradeLuck(){
 
     // Luck
     const cost =
-        getUpgradeCost(50, luckLevel);
+        getLuckCost(luckLevel - 1);
 
     if(gems < cost){
 
@@ -6634,44 +7161,63 @@ function startAutoRebirth(){
 
 function upgradeRebirths(){
 
-    const result =
-        document.getElementById("rebirthResult");
-
-    if(rebirthUpgradeLevel >= MAX_REBIRTH_UPGRADE){
-
-        result.textContent =
-            "✅ More Rebirths is already maxed at 15/15!";
-
-        showNotification(
-            "🔄 Already Maxed!",
-            "More Rebirths is already maxed at 15/15."
-        );
-
+    if(rebirthUpgradeInProgress){
         return;
     }
 
-    // More Rebirths
-    const cost =
-        getUpgradeCost(10, rebirthUpgradeLevel);
+    rebirthUpgradeInProgress = true;
 
-    if(gems < cost){
+    try{
+
+        const result =
+            document.getElementById("rebirthResult");
+
+        if(rebirthUpgradeLevel >= MAX_REBIRTH_UPGRADE){
+
+            result.textContent =
+                `✅ More Rebirths is already maxed at ${MAX_REBIRTH_UPGRADE}/${MAX_REBIRTH_UPGRADE}!`;
+
+            showNotification(
+                "🔄 Already Maxed!",
+                `More Rebirths is already maxed at ${MAX_REBIRTH_UPGRADE}/${MAX_REBIRTH_UPGRADE}.`
+            );
+
+            return;
+        }
+
+        const cost =
+            getUpgradeCost(100, rebirthUpgradeLevel);
+
+        if(gems < cost){
+
+            result.textContent =
+                `❌ You need ${formatCoins(cost - gems)} more gems!`;
+
+            return;
+        }
+
+        gems -= cost;
+
+        rebirthUpgradeLevel += 1;
 
         result.textContent =
-            `❌ You need ${formatCoins(cost - gems)} more gems!`;
+            `🎉 More Rebirths upgraded to ${rebirthUpgradeLevel}/${MAX_REBIRTH_UPGRADE}! Rebirth ${formatRebirthAmount(rebirthUpgradeAmounts[rebirthUpgradeLevel])}`;
 
-        return;
+        updateUI();
+        updateRebirthButtons();
+        save();
+
+    }finally{
+
+        /*
+         * Prevent rapid-fire clicks while the current
+         * upgrade operation is being processed.
+         */
+        setTimeout(() => {
+            rebirthUpgradeInProgress = false;
+        }, 150);
+
     }
-
-    gems -= cost;
-
-    rebirthUpgradeLevel += 1;
-
-    result.textContent =
-        `🎉 More Rebirths upgraded to ${rebirthUpgradeLevel}/15! Rebirth ${formatRebirthAmount(rebirthUpgradeAmounts[rebirthUpgradeLevel])}`;
-
-    updateUI();
-    updateRebirthButtons();
-    save();
 }
 
 function updateRebirthButtons(){
@@ -6687,43 +7233,16 @@ function updateRebirthButtons(){
 
 
     /*
-     * COST CALCULATOR
-     *
-     * Each rebirth amount uses 1.5x
-     * progression from the previous rebirth.
-     *
-     * ×1 = current rebirth cost
-     * ×2 = current cost × 1.5
-     * ×5 = current cost × 1.5^4
-     * ×10 = current cost × 1.5^9
-     */
-
-    function getRebirthCost(amount){
-
-        let totalCost = 0;
-        let tempCost = rebirthCost;
-
-        for(let i = 0; i < amount; i++){
-
-            if(
-                tempCost >= Number.MAX_VALUE ||
-                totalCost >= Number.MAX_VALUE - tempCost
-            ){
-                return Number.MAX_VALUE;
-            }
-
-            totalCost += tempCost;
-
-            tempCost =
-                Math.min(
-                    tempCost * 1.5,
-                    Number.MAX_VALUE
-                );
-        }
-
-        return totalCost;
-    }
-
+    * COST CALCULATOR
+    *
+    * Each rebirth amount uses 1.2x
+    * progression from the previous rebirth.
+    *
+    * ×1 = current rebirth cost
+    * ×2 = current cost × 1.2
+    * ×5 = current cost × 1.2^4
+    * ×10 = current cost × 1.2^9
+    */
 
     /*
      * CREATE REBIRTH BUTTON
@@ -6736,11 +7255,6 @@ function updateRebirthButtons(){
 
         button.className =
             "hatch-button rebirth-choice-button";
-
-        if(amount === 100){
-            button.style.gridColumn = "1 / -1";
-            button.style.justifySelf = "center";
-        }
 
         button.innerHTML = `
             <span>
@@ -6897,50 +7411,112 @@ function updateRebirthButtons(){
 
     }
 
+    if(typeof updateWorldZoneCards === "function"){
+
+        updateWorldZoneCards();
+
 }
 
-function formatRebirthAmount(amount){
+}
 
-    if(amount >= 1000000000){
-        return (amount / 1000000000).toFixed(amount % 1000000000 === 0 ? 0 : 1) + "b";
+
+function formatRebirthAmount(num){
+
+    num = Number(num);
+
+    if(!Number.isFinite(num)){
+        return "∞";
     }
 
-    if(amount >= 1000000){
-        return (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1) + "m";
+    if(num < 1000){
+        return Math.floor(num).toLocaleString();
     }
 
-    if(amount >= 1000){
-        return (amount / 1000).toFixed(amount % 1000 === 0 ? 0 : 1) + "k";
+    const suffixes = [
+        { value: 1e3, suffix: "k" },
+        { value: 1e6, suffix: "m" },
+        { value: 1e9, suffix: "b" },
+        { value: 1e12, suffix: "t" },
+        { value: 1e15, suffix: "qa" },
+        { value: 1e18, suffix: "qi" },
+        { value: 1e21, suffix: "sx" },
+        { value: 1e24, suffix: "sp" },
+        { value: 1e27, suffix: "oc" },
+        { value: 1e30, suffix: "no" },
+        { value: 1e33, suffix: "dc" },
+        { value: 1e36, suffix: "ud" },
+        { value: 1e39, suffix: "dd" },
+        { value: 1e42, suffix: "td" },
+        { value: 1e45, suffix: "qad" },
+        { value: 1e48, suffix: "qid" },
+        { value: 1e51, suffix: "sxd" },
+        { value: 1e54, suffix: "spd" },
+        { value: 1e57, suffix: "ocd" },
+        { value: 1e60, suffix: "nod" },
+        { value: 1e63, suffix: "vg" },
+        { value: 1e66, suffix: "uvg" },
+        { value: 1e69, suffix: "dvg" },
+        { value: 1e72, suffix: "tvg" },
+        { value: 1e75, suffix: "qavg" },
+        { value: 1e78, suffix: "qivg" },
+        { value: 1e81, suffix: "sxvg" },
+        { value: 1e84, suffix: "spvg" },
+        { value: 1e87, suffix: "ocvg" },
+        { value: 1e90, suffix: "novg" },
+        { value: 1e93, suffix: "tgn" },
+        { value: 1e96, suffix: "utgn" },
+        { value: 1e99, suffix: "dtgn" },
+        { value: 1e102, suffix: "ttgn" },
+        { value: 1e105, suffix: "qatgn" },
+        { value: 1e108, suffix: "qitgn" },
+        { value: 1e111, suffix: "sxtgn" },
+        { value: 1e114, suffix: "sptgn" },
+        { value: 1e117, suffix: "octgn" },
+        { value: 1e120, suffix: "notgn" }
+    ];
+
+    for(let i = suffixes.length - 1; i >= 0; i--){
+
+        if(num >= suffixes[i].value){
+
+            const value =
+                num / suffixes[i].value;
+
+            if(value >= 100){
+                return value.toFixed(0) + suffixes[i].suffix;
+            }
+
+            if(value >= 10){
+                return value.toFixed(1) + suffixes[i].suffix;
+            }
+
+            return value.toFixed(2) + suffixes[i].suffix;
+        }
     }
 
-    return amount;
+    return Math.floor(num).toLocaleString();
+}
+
+function getRebirthCost(amount){
+
+    amount = Number(amount);
+
+    if(!Number.isFinite(amount) || amount <= 0){
+        return 0;
+    }
+
+    return (
+        amount * (100 + (rebirths * 20)) +
+        20 * amount * (amount - 1) / 2
+    );
 }
 
 function rebirthMultiple(amount){
 
     selectedRebirthAmount = amount;
 
-    let totalCost = 0;
-    let tempCost = rebirthCost;
-
-    for(let i = 0; i < amount; i++){
-
-        if(
-            tempCost >= Number.MAX_VALUE ||
-            totalCost >= Number.MAX_VALUE - tempCost
-        ){
-            totalCost = Number.MAX_VALUE;
-            break;
-        }
-
-        totalCost += tempCost;
-
-        tempCost =
-            Math.min(
-                tempCost * 1.5,
-                Number.MAX_VALUE
-            );
-    }
+    const totalCost =
+        getRebirthCost(amount);
 
     if(coins < totalCost){
 
@@ -6961,15 +7537,6 @@ function rebirthMultiple(amount){
 
     gems += 10 * amount;
 
-    /*
-     * The next rebirth starts after
-     * every rebirth included in this purchase.
-     */
-    rebirthCost = tempCost;
-
-    /*
-     * Every rebirth gives +1x click power.
-     */
     clickPower = rebirths + 1;
 
     document.getElementById("rebirthResult").textContent =
@@ -6981,9 +7548,7 @@ function rebirthMultiple(amount){
     );
 
     updateUI();
-
     updateRebirthButtons();
-
     save();
 }
 
@@ -7004,7 +7569,7 @@ function upgradeClickSpeed(){
 
     // Click Speed
     const cost =
-        getUpgradeCost(50, clickSpeedLevel);
+        getClickSpeedCost(clickSpeedLevel);
 
     if(gems < cost){
 
@@ -7044,10 +7609,7 @@ function upgradeMultiplier(){
     }
 
     const cost =
-        getUpgradeCost(
-            10,
-            multiplierLevel
-        );
+        getClickMultiplierCost(multiplierLevel);
 
     if(gems < cost){
 
@@ -7085,7 +7647,7 @@ function upgradeHatchAmount(){
 
     // Hatch Amount
     const cost =
-        getUpgradeCost(100, hatchAmountLevel);
+        getHatchAmountCost(hatchAmountLevel);
 
     if(gems < cost){
 
@@ -7176,12 +7738,16 @@ const skinMultiplier =
 // 💥 CRIT CHANCE
 const isCrit = Math.random() < critChance;
 
+    const zoneMultiplier =
+    WORLD_ZONES[currentZone]?.coinMultiplier || 1;
+
     let earned =
         clickPower *
         petMultiplier *
         clickMultiplier *
         skinMultiplier *
-        boostMultiplier;
+        boostMultiplier *
+        zoneMultiplier;
 
     if(isCrit){
         earned *= critMultiplier;
@@ -7221,6 +7787,15 @@ if(levelUps.length > 0){
     showPetLevelUpEffect(
         levelUps
     );
+
+    // 🐾 Save the newest pet levels locally immediately
+    localStorage.setItem(
+        SAVE_KEY,
+        JSON.stringify(
+            getGameData()
+        )
+    );
+
 }
 
 if(equippedPets.length > 0){
@@ -8039,10 +8614,69 @@ function formatUpgradePrice(amount){
 function getUpgradeCost(baseCost, level){
 
     const cost =
-        baseCost * Math.pow(1.5, level);
+        baseCost * Math.pow(1.22, level);
 
     return Math.round(cost / 10) * 10;
+}
 
+function getClickSpeedCost(level){
+
+    const prices = [
+        1000,
+        15000,
+        50000,
+        100000,
+        1000000
+    ];
+
+    return prices[level] ?? prices[prices.length - 1];
+}
+
+
+function getClickMultiplierCost(level){
+
+    return Math.round(
+        100 * Math.pow(2.5, level)
+    );
+}
+
+
+function getHatchAmountCost(level){
+
+    const prices = [
+        10000,
+        1000000,
+        150000000
+    ];
+
+    return prices[level] ?? prices[prices.length - 1];
+}
+
+
+function getEquipCost(level){
+
+    const prices = [
+        10000000,
+        100000000000
+    ];
+
+    return prices[level] ?? prices[prices.length - 1];
+}
+
+
+function getLuckCost(level){
+
+    return Math.round(
+        1500 * Math.pow(2, level)
+    );
+}
+
+
+function getFasterHatchCost(level){
+
+    return Math.round(
+        1000 * Math.pow(10, level)
+    );
 }
 
 function getFasterHatchTime(){
@@ -8064,18 +8698,23 @@ function getFasterHatchTime(){
     ];
 }
 
-function getFasterHatchCost(){
+function getFasterHatchTimeForLevel(level){
 
-    const baseCost = 20;
+    const times = [
+        1000, // Level 0
+        867,  // Level 1
+        733,  // Level 2
+        600,  // Level 3
+        467,  // Level 4
+        333   // Level 5
+    ];
 
-    const cost =
-        baseCost *
-        Math.pow(
-            1.5,
-            fasterHatchLevel
-        );
-
-    return Math.round(cost / 10) * 10;
+    return times[
+        Math.min(
+            Number(level),
+            MAX_FASTER_HATCH_LEVEL
+        )
+    ];
 }
 
 function upgradeFasterHatch(){
@@ -8097,7 +8736,7 @@ function upgradeFasterHatch(){
     }
 
     const cost =
-        getFasterHatchCost();
+        getFasterHatchCost(fasterHatchLevel);
 
     if(gems < cost){
 
@@ -8180,12 +8819,8 @@ function updateUpgradeUI(){
         }else{
 
             const nextTime =
-                Math.round(
-                    2000 *
-                    Math.pow(
-                        0.8,
-                        fasterHatchLevel + 1
-                    )
+                getFasterHatchTimeForLevel(
+                    fasterHatchLevel + 1
                 );
 
             fasterHatchNextEl.textContent =
@@ -8206,7 +8841,7 @@ function updateUpgradeUI(){
             ? "MAX"
 
             : `${formatCoins(
-                getFasterHatchCost()
+                getFasterHatchCost(fasterHatchLevel)
             )} gems`;
 
     }
@@ -8242,7 +8877,7 @@ function updateUpgradeUI(){
         clickSpeedLevel >= MAX_CLICK_SPEED
             ? "MAX"
             : `${formatUpgradePrice(
-                getUpgradeCost(50, clickSpeedLevel)
+                getClickSpeedCost(clickSpeedLevel)
             )} gems`;
 
 
@@ -8266,7 +8901,7 @@ function updateUpgradeUI(){
         multiplierLevel >= MAX_MULTIPLIER_LEVEL
             ? "MAX"
             : `${formatUpgradePrice(
-                getUpgradeCost(10, multiplierLevel)
+                getClickMultiplierCost(multiplierLevel)
             )} gems`;
 
 
@@ -8287,7 +8922,7 @@ function updateUpgradeUI(){
         rebirthUpgradeLevel >= MAX_REBIRTH_UPGRADE
             ? "MAX"
             : `${formatUpgradePrice(
-                getUpgradeCost(10, rebirthUpgradeLevel)
+                getUpgradeCost(100, rebirthUpgradeLevel)
             )} gems`;
 
 
@@ -8308,7 +8943,7 @@ function updateUpgradeUI(){
         hatchAmountLevel >= MAX_HATCH_AMOUNT_LEVEL
             ? "MAX"
             : `${formatUpgradePrice(
-                getUpgradeCost(100, hatchAmountLevel)
+                getHatchAmountCost(hatchAmountLevel)
             )} gems`;
 
 
@@ -8329,7 +8964,7 @@ function updateUpgradeUI(){
         luckLevel >= MAX_LUCK_LEVEL
             ? "MAX"
             : `${formatUpgradePrice(
-                getUpgradeCost(50, luckLevel)
+                getLuckCost(luckLevel - 1)
             )} gems`;
 
 
@@ -8350,9 +8985,7 @@ function updateUpgradeUI(){
         equipUpgradeLevel >= MAX_EQUIP_UPGRADE_LEVEL
             ? "MAX"
             : formatUpgradePrice(
-                equipUpgradeLevel === 0
-                    ? 1000
-                    : 5000
+                getEquipCost(equipUpgradeLevel)
             ) + " gems";
 
 
@@ -8366,7 +8999,7 @@ function updateUpgradeUI(){
     document.getElementById("autoRebirthCost").textContent =
         autoRebirthPurchased
             ? "OWNED"
-            : "100 gems";
+            : `${formatCoins(50000)} gems`;
 
     document.getElementById("autoRebirthUpgrade").textContent =
         autoRebirthPurchased
@@ -8378,6 +9011,23 @@ document.getElementById("hatchButton").addEventListener(
     "click",
     hatch
 );
+
+document
+    .querySelectorAll(".zone-card")
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                changeZone(
+                    button.dataset.zone
+                );
+
+            }
+        );
+
+    });
 
 document.getElementById("rebirthButton").addEventListener(
     "click",
@@ -10064,7 +10714,7 @@ document.getElementById("mysteryBoxButton").addEventListener("click", () => {
 
     checkAchievements();
 
-    mysteryBoxCost = Math.floor(mysteryBoxCost * 1.5);
+    mysteryBoxCost = Math.floor(mysteryBoxCost * 1.2);
 
     const mysteryRoll =
         Math.random() * 100;
@@ -10904,20 +11554,6 @@ restoreLogin().then(() => {
     updateRebirthButtons();
 
 });
-supabaseClient
-    .channel("leaderboards-live")
-    .on(
-        "postgres_changes",
-        {
-            event: "*",
-            schema: "public",
-            table: "leaderboards"
-        },
-        () => {
-            loadLeaderboards();
-        }
-    )
-    .subscribe();
 
 setInterval(() => {
 

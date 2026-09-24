@@ -10445,6 +10445,42 @@ textarea{
     scrollbar-color:
         rgba(180,100,255,.45)
         transparent;
+
+    background:transparent !important;
+    border:none !important;
+    box-shadow:none !important;
+}
+
+#globalHatchesFeed{
+    overflow:hidden !important;
+}
+
+#globalHatchesFeed:not(:empty){
+    overflow-y:auto !important;
+}
+
+/* 🚫 NEVER SHOW EMPTY FEED SPACE */
+
+#globalHatchesFeed:empty{
+    display:none !important;
+}
+
+#globalChatFeed.hidden{
+    display:none !important;
+}
+
+.global-empty{
+    padding:35px 15px;
+
+    text-align:center;
+
+    color:#777;
+
+    font-size:13px;
+}
+
+.global-feed:empty{
+    display:none;
 }
 
 .global-feed.hidden{
@@ -12248,4 +12284,303 @@ textarea{
         grid-template-columns:1fr !important;
     }
 
+}
+
+/* ========================================================= */
+/* 🌍 WORLDS PAGE */
+/* ========================================================= */
+
+.worlds-container{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(280px, 1fr)
+        );
+
+    gap:20px;
+
+    margin-top:24px;
+
+}
+
+
+.world-card{
+
+    padding:20px;
+
+    border:1px solid var(--border);
+
+    border-radius:18px;
+
+    background:rgba(15,23,42,.55);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.2);
+
+}
+
+
+.world-card-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    margin-bottom:18px;
+
+}
+
+
+.world-icon{
+
+    width:58px;
+    height:58px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    font-size:32px;
+
+    border-radius:15px;
+
+    background:rgba(255,255,255,.07);
+
+    border:1px solid rgba(255,255,255,.1);
+
+}
+
+
+.world-card-header h3{
+
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    color:var(--text);
+
+}
+
+
+.world-card-header p{
+
+    margin:5px 0 0;
+
+    font-size:13px;
+
+    color:var(--muted);
+
+    line-height:1.4;
+
+}
+
+
+.zone-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:9px;
+
+}
+
+
+.zone-card{
+
+    width:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.035);
+
+    color:var(--text);
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+
+}
+
+
+.zone-card:hover{
+
+    transform:translateY(-2px);
+
+    background:rgba(255,255,255,.07);
+
+    border-color:var(--accent);
+
+}
+
+
+.zone-card.active{
+
+    border-color:var(--accent);
+
+    background:rgba(139,115,255,.12);
+
+}
+
+
+.zone-card.locked{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
+
+.zone-icon{
+
+    width:42px;
+    height:42px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+
+    font-size:23px;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.06);
+
+}
+
+
+.zone-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:3px;
+
+    min-width:0;
+
+}
+
+
+.zone-info strong{
+
+    font-size:14px;
+
+    font-weight:850;
+
+}
+
+
+.zone-info small{
+
+    font-size:11px;
+
+    color:var(--muted);
+
+}
+
+
+@media(max-width:700px){
+
+    .worlds-container{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+/* 🌍 Zone multiplier */
+
+#zoneMultiplierDisplay{
+    position:fixed !important;
+
+    left:238px !important;
+    bottom:20px !important;
+
+    top:auto !important;
+    right:auto !important;
+
+    margin:0 !important;
+    transform:none !important;
+
+    width:max-content;
+
+    padding:8px 12px;
+
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:.2px;
+
+    color:var(--text);
+
+    background:rgba(15,23,42,.55);
+
+    border:1px solid var(--border);
+
+    border-radius:10px;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.25),
+        0 0 12px rgba(139,115,255,.08);
+
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+
+    text-shadow:
+        0 1px 4px rgba(0,0,0,.45);
+
+    pointer-events:none;
+
+    z-index:9999;
+}
+
+/* 🌎 GLOBAL HATCHES — KILL EMPTY GREY BOXES */
+
+#globalHatchesFeed{
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+
+    min-height:0 !important;
+    height:auto !important;
+    padding:0 !important;
+    margin:0 !important;
+}
+
+/* Completely collapse when empty */
+#globalHatchesFeed:empty{
+    display:none !important;
 }

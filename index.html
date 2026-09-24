@@ -88,11 +88,7 @@
         <div
             id="globalHatchesFeed"
             class="global-feed"
-        >
-            <div class="global-empty">
-                🥚 Waiting for rare hatches...
-            </div>
-        </div>
+        ></div>
 
         <!-- CHAT FEED -->
         <div
@@ -182,7 +178,7 @@
         🍀 Luck = <span id="luckValue">1.0x</span>
     </div>
 
-    <aside class="sidebar">
+    <aside class="sidebar"> 
 
         <button class="nav active" data-page="eggs">
             🥚 <span>Eggs</span>
@@ -224,10 +220,18 @@
             🏆 <span>Leaderboards</span>
         </button>
 
+        <button class="nav" data-page="worlds">
+            🌍 <span>Worlds</span>
+        </button>
+
     </aside>
 
 
     <main class="content">
+
+        <div id="zoneMultiplierDisplay" class="zone-multiplier-display">
+            Zone Multiplier: <span id="zoneMultiplierValue">1x</span>
+        </div>
 
 
         <!-- ========================= -->
@@ -1080,6 +1084,343 @@
 
         </section>
 
+        <!-- ========================= -->
+        <!-- 🌍 WORLDS -->
+        <!-- ========================= -->
+
+        <section
+            class="page hidden"
+            id="worlds"
+        >
+
+            <div class="page-title">
+
+                <h2>🌍 Worlds</h2>
+
+                <p>
+                    Explore different worlds and unlock new zones.
+                </p>
+
+            </div>
+
+
+            <div class="worlds-container">
+
+                <div class="world-card">
+
+                    <div class="world-card-header">
+
+                        <div class="world-icon">
+                            🌱
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Grasslands
+                            </h3>
+
+                            <p>
+                                A peaceful land filled with mysterious creatures.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="zone-list">
+
+                        <button
+                            class="zone-card active"
+                            type="button"
+                            data-zone="meadow"
+                        >
+
+                            <span class="zone-icon">
+                                🌱
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Meadow
+                                </strong>
+
+                                <small>
+                                    Starting Zone
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="forest"
+                        >
+
+                            <span class="zone-icon">
+                                🌲
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Whispering Forest
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 10 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="ancientGrove"
+                        >
+
+                            <span class="zone-icon">
+                                🌳
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Ancient Grove
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 50 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="world-card">
+
+                    <div class="world-card-header">
+
+                        <div class="world-icon">
+                            🏜️
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Desert
+                            </h3>
+
+                            <p>
+                                A scorching world hiding ancient secrets.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="zone-list">
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="dunes"
+                        >
+
+                            <span class="zone-icon">
+                                🏜️
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Golden Dunes
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 100 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="oasis"
+                        >
+
+                            <span class="zone-icon">
+                                💎
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Crystal Oasis
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 250 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="pyramid"
+                        >
+
+                            <span class="zone-icon">
+                                🔺
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Ancient Pyramid
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 500 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="world-card">
+
+                    <div class="world-card-header">
+
+                        <div class="world-icon">
+                            ❄️
+                        </div>
+
+                        <div>
+
+                            <h3>
+                                Arctic
+                            </h3>
+
+                            <p>
+                                A frozen world where powerful creatures dwell.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="zone-list">
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="snowfields"
+                        >
+
+                            <span class="zone-icon">
+                                ❄️
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Snowfields
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 1,000 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="frozenCaves"
+                        >
+
+                            <span class="zone-icon">
+                                🧊
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Frozen Caves
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 2,500 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+
+                        <button
+                            class="zone-card"
+                            type="button"
+                            data-zone="icePalace"
+                        >
+
+                            <span class="zone-icon">
+                                🏰
+                            </span>
+
+                            <span class="zone-info">
+
+                                <strong>
+                                    Ice Palace
+                                </strong>
+
+                                <small>
+                                    🔒 Requires 5,000 Rebirths
+                                </small>
+
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
 
         <!-- ========================= -->
         <!-- CLICK SKINS -->
@@ -1232,7 +1573,6 @@
                     </button>
 
                 </div>
-
 
                 <div class="upgrade-card">
 
